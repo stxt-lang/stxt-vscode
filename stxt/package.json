@@ -20,6 +20,13 @@
       "aliases": ["STXT (Semantic Text)","STXT"],
       "extensions": [".stxt"]
     }],
+    "grammars": [
+    {
+      "language": "stxt",
+      "scopeName": "source.stxt",
+      "path": "./syntaxes/stxt.tmLanguage.json"
+    }
+    ],
     "commands": [
       {
         "command": "stxt.helloWorld",

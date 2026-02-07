@@ -1,0 +1,61 @@
+{
+  "scopeName": "source.stxt",
+  "name": "Semantic Text",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#tags" },
+    { "include": "#keyValue" },
+    { "include": "#links" },
+    { "include": "#emphasis" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.stxt",
+          "match": "^\\s*#.*$"
+        }
+      ]
+    },
+    "tags": {
+      "patterns": [
+        {
+          "name": "keyword.control.stxt",
+          "match": "^\\s*@\\w+"
+        }
+      ]
+    },
+    "keyValue": {
+      "patterns": [
+        {
+          "name": "variable.other.property.stxt",
+          "match": "^\\s*\\w+(?=\\s*:)"
+        },
+        {
+          "name": "string.unquoted.value.stxt",
+          "match": "(?<=:)\\s*.+$"
+        }
+      ]
+    },
+    "links": {
+      "patterns": [
+        {
+          "name": "constant.other.link.stxt",
+          "match": "\\[\\[[^\\]]+\\]\\]"
+        }
+      ]
+    },
+    "emphasis": {
+      "patterns": [
+        {
+          "name": "markup.bold.stxt",
+          "match": "\\*[^*]+\\*"
+        },
+        {
+          "name": "markup.italic.stxt",
+          "match": "_[^_]+_"
+        }
+      ]
+    }
+  }
+}
