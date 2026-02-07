@@ -9,9 +9,17 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:stxt"
+  ],
   "main": "./out/extension.js",
   "contributes": {
+    "languages": [
+    {
+      "id": "stxt",
+      "aliases": ["STXT (Semantic Text)","STXT"],
+      "extensions": [".stxt"]
+    }],
     "commands": [
       {
         "command": "stxt.helloWorld",
