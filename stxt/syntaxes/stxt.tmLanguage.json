@@ -21,7 +21,7 @@
       "patterns": [
         {
           "name": "keyword.control.stxt",
-          "match": "^\\s*@\\w+"
+          "match": "^.*>>\\s*$"
         }
       ]
     },
@@ -34,26 +34,6 @@
         {
           "name": "string.unquoted.value.stxt",
           "match": "(?<=:)\\s*.+$"
-        }
-      ]
-    },
-    "links": {
-      "patterns": [
-        {
-          "name": "constant.other.link.stxt",
-          "match": "\\[\\[[^\\]]+\\]\\]"
-        }
-      ]
-    },
-    "emphasis": {
-      "patterns": [
-        {
-          "name": "markup.bold.stxt",
-          "match": "\\*[^*]+\\*"
-        },
-        {
-          "name": "markup.italic.stxt",
-          "match": "_[^_]+_"
         }
       ]
     }

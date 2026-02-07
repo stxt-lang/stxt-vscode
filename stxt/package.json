@@ -18,7 +18,8 @@
     {
       "id": "stxt",
       "aliases": ["STXT (Semantic Text)","STXT"],
-      "extensions": [".stxt"]
+      "extensions": [".stxt"],
+      "configuration": "./language-configuration.json"
     }],
     "grammars": [
     {
