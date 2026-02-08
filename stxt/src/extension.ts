@@ -1,5 +1,13 @@
 import * as vscode from 'vscode';
 
+const tokenTypes = [
+    'keyword',
+    'property',
+    'string',
+    'variable'
+];
+
+const tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
 let diagnosticCollection: vscode.DiagnosticCollection;
 
 export function activate(context: vscode.ExtensionContext) {
@@ -25,6 +33,12 @@ export function activate(context: vscode.ExtensionContext) {
     	diagnosticCollection.delete(document.uri);
 	});
 
+    context.subscriptions.push(
+        vscode.languages.registerDocumentSemanticTokensProvider(
+            { language: 'stxt' },
+            new StxtSemanticTokensProvider(),
+            tokenLegend
+    ));
 }
 
 export function deactivate() {}
@@ -52,29 +66,63 @@ function validateStxtDocument(document: vscode.TextDocument) {
         // Regla 1: etiqueta sin :
         if (line.trim().startsWith('@') && !line.includes(':')) {
             const range = new vscode.Range(lineNumber,0,lineNumber,line.length);
-
-            diagnostics.push(
-                new vscode.Diagnostic(
-                    range,
-                    'Las etiquetas STXT deben usar ":"',
-                    vscode.DiagnosticSeverity.Error
-                )
-            );
+            diagnostics.push(new vscode.Diagnostic(range, 'Las etiquetas STXT deben usar ":"', vscode.DiagnosticSeverity.Error));
         }
 
         // Regla 2: key: sin valor
         if (/^\s*\w+\s*:\s*$/.test(line)) {
             const range = new vscode.Range(lineNumber,0,lineNumber,line.length);
-
-            diagnostics.push(
-                new vscode.Diagnostic(
-                    range,
-                    'La clave tiene que tener un valor',
-                    vscode.DiagnosticSeverity.Warning
-                )
-            );
+            diagnostics.push(new vscode.Diagnostic(range, 'La clave tiene que tener un valor', vscode.DiagnosticSeverity.Warning));
         }
     });
 
     diagnosticCollection.set(document.uri, diagnostics);
 }
+
+class StxtSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
+
+    provideDocumentSemanticTokens(document: vscode.TextDocument): vscode.ProviderResult<vscode.SemanticTokens> {
+
+        const builder = new vscode.SemanticTokensBuilder(tokenLegend);
+        const lines = document.getText().split(/\r?\n/);
+
+        lines.forEach((line, lineIndex) => {
+
+            // @tag
+            const tagMatch = line.match(/^(\s*)(@\w+)/);
+            if (tagMatch) {
+                const start = tagMatch[1].length;
+                const length = tagMatch[2].length;
+                builder.push(lineIndex, start, length, tokenTypes.indexOf('keyword'));
+            }
+
+            // key: value
+            const kvMatch = line.match(/^(\s*)(\w+)\s*:\s*(.+)?$/);
+            if (kvMatch) {
+                const keyStart = kvMatch[1].length;
+                const keyLength = kvMatch[2].length;
+                builder.push(lineIndex, keyStart, keyLength, tokenTypes.indexOf('property'));
+
+                if (kvMatch[3]) {
+                    const valueStart = line.indexOf(kvMatch[3]);
+                    const valueLength = kvMatch[3].length;
+
+                    builder.push(lineIndex, valueStart, valueLength, tokenTypes.indexOf('string'));
+                }
+            }
+
+            // [[link]]
+            const linkRegex = /\[\[([^\]]+)\]\]/g;
+            let match;
+            while ((match = linkRegex.exec(line))) {
+                builder.push(lineIndex, match.index, match[0].length, tokenTypes.indexOf('variable'));
+            }
+        });
+
+        return builder.build();
+    }
+}
+
+
+
+

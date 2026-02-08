@@ -36,6 +36,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
+const tokenTypes = [
+    'keyword',
+    'property',
+    'string',
+    'variable'
+];
+const tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
 let diagnosticCollection;
 function activate(context) {
     console.log('STXT extension activated');
@@ -55,6 +62,7 @@ function activate(context) {
     vscode.workspace.onDidCloseTextDocument(document => {
         diagnosticCollection.delete(document.uri);
     });
+    context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new StxtSemanticTokensProvider(), tokenLegend));
 }
 function deactivate() { }
 function handleStxtDocument(document) {
@@ -84,5 +92,39 @@ function validateStxtDocument(document) {
         }
     });
     diagnosticCollection.set(document.uri, diagnostics);
+}
+class StxtSemanticTokensProvider {
+    provideDocumentSemanticTokens(document) {
+        const builder = new vscode.SemanticTokensBuilder(tokenLegend);
+        const lines = document.getText().split(/\r?\n/);
+        lines.forEach((line, lineIndex) => {
+            // @tag
+            const tagMatch = line.match(/^(\s*)(@\w+)/);
+            if (tagMatch) {
+                const start = tagMatch[1].length;
+                const length = tagMatch[2].length;
+                builder.push(lineIndex, start, length, tokenTypes.indexOf('keyword'));
+            }
+            // key: value
+            const kvMatch = line.match(/^(\s*)(\w+)\s*:\s*(.+)?$/);
+            if (kvMatch) {
+                const keyStart = kvMatch[1].length;
+                const keyLength = kvMatch[2].length;
+                builder.push(lineIndex, keyStart, keyLength, tokenTypes.indexOf('property'));
+                if (kvMatch[3]) {
+                    const valueStart = line.indexOf(kvMatch[3]);
+                    const valueLength = kvMatch[3].length;
+                    builder.push(lineIndex, valueStart, valueLength, tokenTypes.indexOf('string'));
+                }
+            }
+            // [[link]]
+            const linkRegex = /\[\[([^\]]+)\]\]/g;
+            let match;
+            while ((match = linkRegex.exec(line))) {
+                builder.push(lineIndex, match.index, match[0].length, tokenTypes.indexOf('variable'));
+            }
+        });
+        return builder.build();
+    }
 }
 //# sourceMappingURL=extension.js.map
