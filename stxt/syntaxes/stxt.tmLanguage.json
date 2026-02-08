@@ -4,9 +4,7 @@
   "patterns": [
     { "include": "#comments" },
     { "include": "#tags" },
-    { "include": "#keyValue" },
-    { "include": "#links" },
-    { "include": "#emphasis" }
+    { "include": "#keyValue" }
   ],
   "repository": {
     "comments": {
@@ -29,7 +27,7 @@
       "patterns": [
         {
           "name": "variable.other.property.stxt",
-          "match": "^\\s*\\w+(?=\\s*:)"
+          "match": "^\\s[^\\:]*.*:"
         },
         {
           "name": "string.unquoted.value.stxt",
