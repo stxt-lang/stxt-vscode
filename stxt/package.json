@@ -3,6 +3,12 @@
   "displayName": "stxt",
   "description": "Semantic Text syntax (.stxt)",
   "version": "0.0.1",
+  "publisher": "stxt-lang",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stxt-lang/stxt-vscode"
+  },
+  "license": "MIT",
   "engines": {
     "vscode": "^1.109.0"
   },
