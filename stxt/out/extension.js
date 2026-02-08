@@ -81,6 +81,8 @@ function activate(context) {
     });
     context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new StxtSemanticTokensProvider(), tokenLegend));
     context.subscriptions.push(vscode.languages.registerHoverProvider('stxt', new StxtHoverProvider()));
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider('stxt', new StxtCompletionProvider(), '@' // carácter que dispara sugerencias
+    ));
 }
 function deactivate() { }
 // *************************************
@@ -169,6 +171,34 @@ class StxtHoverProvider {
             return;
         }
         return new vscode.Hover(new vscode.MarkdownString(`**${word}**\n\n${description}`));
+    }
+}
+// *********************
+// Completation provider
+// *********************
+class StxtCompletionProvider {
+    provideCompletionItems(document, position) {
+        const linePrefix = document.lineAt(position).text.slice(0, position.character);
+        // Sugerencias de tags
+        if (linePrefix.trim().startsWith('@')) {
+            return Object.keys(STXT_TAGS).map(tag => {
+                const item = new vscode.CompletionItem(tag, vscode.CompletionItemKind.Keyword);
+                item.insertText = `${tag}: `;
+                item.detail = 'STXT tag';
+                item.documentation = STXT_TAGS[tag];
+                return item;
+            });
+        }
+        // Sugerencias de claves
+        if (/^\s*\w*$/.test(linePrefix)) {
+            return STXT_KEYS.map(key => {
+                const item = new vscode.CompletionItem(key, vscode.CompletionItemKind.Property);
+                item.insertText = `${key}: `;
+                item.detail = 'STXT key';
+                return item;
+            });
+        }
+        return [];
     }
 }
 //# sourceMappingURL=extension.js.map
