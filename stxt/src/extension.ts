@@ -51,12 +51,7 @@ function validateStxtDocument(document: vscode.TextDocument) {
 
         // Regla 1: etiqueta sin :
         if (line.trim().startsWith('@') && !line.includes(':')) {
-            const range = new vscode.Range(
-                lineNumber,
-                0,
-                lineNumber,
-                line.length
-            );
+            const range = new vscode.Range(lineNumber,0,lineNumber,line.length);
 
             diagnostics.push(
                 new vscode.Diagnostic(
@@ -69,12 +64,7 @@ function validateStxtDocument(document: vscode.TextDocument) {
 
         // Regla 2: key: sin valor
         if (/^\s*\w+\s*:\s*$/.test(line)) {
-            const range = new vscode.Range(
-                lineNumber,
-                0,
-                lineNumber,
-                line.length
-            );
+            const range = new vscode.Range(lineNumber,0,lineNumber,line.length);
 
             diagnostics.push(
                 new vscode.Diagnostic(
