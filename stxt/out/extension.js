@@ -36,6 +36,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
+// ******************
+// Variables globales
+// ******************
 const tokenTypes = [
     'keyword',
     'property',
@@ -44,6 +47,9 @@ const tokenTypes = [
 ];
 const tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
 let diagnosticCollection;
+// ******************************
+// Método principal de activación
+// ******************************
 function activate(context) {
     console.log('STXT extension activated');
     diagnosticCollection = vscode.languages.createDiagnosticCollection('stxt');
@@ -65,6 +71,9 @@ function activate(context) {
     context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new StxtSemanticTokensProvider(), tokenLegend));
 }
 function deactivate() { }
+// *************************************
+// Modificación y apertura de documentos
+// *************************************
 function handleStxtDocument(document) {
     console.log('Documento STXT abierto:', document.uri.toString());
     const text = document.getText();
@@ -75,6 +84,9 @@ function handleStxtChangeTextDocument(event, document) {
     console.log('Documento STXT modificado');
     validateStxtDocument(document);
 }
+// ************************
+// Validación del documento
+// ************************
 function validateStxtDocument(document) {
     const diagnostics = [];
     const lines = document.getText().split(/\r?\n/);
@@ -93,6 +105,9 @@ function validateStxtDocument(document) {
     });
     diagnosticCollection.set(document.uri, diagnostics);
 }
+// *****************
+// Tokens especiales
+// *****************
 class StxtSemanticTokensProvider {
     provideDocumentSemanticTokens(document) {
         const builder = new vscode.SemanticTokensBuilder(tokenLegend);
