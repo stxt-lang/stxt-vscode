@@ -12,7 +12,21 @@ const tokenTypes = [
 ];
 
 const tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
+
 let diagnosticCollection: vscode.DiagnosticCollection;
+
+const STXT_TAGS: Record<string, string> = {
+    '@title': 'Título principal del documento',
+    '@note': 'Nota informativa',
+    '@todo': 'Tarea pendiente',
+    '@author': 'Autor del documento'
+};
+
+const STXT_KEYS = [
+    'author',
+    'status',
+    'version'
+];
 
 // ******************************
 // Método principal de activación
@@ -46,6 +60,12 @@ export function activate(context: vscode.ExtensionContext) {
             { language: 'stxt' },
             new StxtSemanticTokensProvider(),
             tokenLegend
+    ));
+
+    context.subscriptions.push(
+        vscode.languages.registerHoverProvider(
+            'stxt',
+            new StxtHoverProvider()
     ));
 }
 
@@ -96,7 +116,7 @@ function validateStxtDocument(document: vscode.TextDocument) {
 }
 
 // *****************
-// Tokens especiales
+// Tokens semánticos
 // *****************
 
 class StxtSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
@@ -143,6 +163,30 @@ class StxtSemanticTokensProvider implements vscode.DocumentSemanticTokensProvide
     }
 }
 
+// **************
+// Hover provider
+// **************
 
+class StxtHoverProvider implements vscode.HoverProvider {
+
+    provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Hover> {
+
+        const range = document.getWordRangeAtPosition(position, /@\w+/);
+        if (!range) {
+            return;
+        }
+
+        const word = document.getText(range);
+
+        const description = STXT_TAGS[word];
+        if (!description) {
+            return;
+        }
+
+        return new vscode.Hover(
+            new vscode.MarkdownString(`**${word}**\n\n${description}`)
+        );
+    }
+}
 
 

@@ -47,6 +47,17 @@ const tokenTypes = [
 ];
 const tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
 let diagnosticCollection;
+const STXT_TAGS = {
+    '@title': 'Título principal del documento',
+    '@note': 'Nota informativa',
+    '@todo': 'Tarea pendiente',
+    '@author': 'Autor del documento'
+};
+const STXT_KEYS = [
+    'author',
+    'status',
+    'version'
+];
 // ******************************
 // Método principal de activación
 // ******************************
@@ -69,6 +80,7 @@ function activate(context) {
         diagnosticCollection.delete(document.uri);
     });
     context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new StxtSemanticTokensProvider(), tokenLegend));
+    context.subscriptions.push(vscode.languages.registerHoverProvider('stxt', new StxtHoverProvider()));
 }
 function deactivate() { }
 // *************************************
@@ -106,7 +118,7 @@ function validateStxtDocument(document) {
     diagnosticCollection.set(document.uri, diagnostics);
 }
 // *****************
-// Tokens especiales
+// Tokens semánticos
 // *****************
 class StxtSemanticTokensProvider {
     provideDocumentSemanticTokens(document) {
@@ -140,6 +152,23 @@ class StxtSemanticTokensProvider {
             }
         });
         return builder.build();
+    }
+}
+// **************
+// Hover provider
+// **************
+class StxtHoverProvider {
+    provideHover(document, position) {
+        const range = document.getWordRangeAtPosition(position, /@\w+/);
+        if (!range) {
+            return;
+        }
+        const word = document.getText(range);
+        const description = STXT_TAGS[word];
+        if (!description) {
+            return;
+        }
+        return new vscode.Hover(new vscode.MarkdownString(`**${word}**\n\n${description}`));
     }
 }
 //# sourceMappingURL=extension.js.map
