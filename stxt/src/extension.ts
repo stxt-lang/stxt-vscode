@@ -1,26 +1,90 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+let diagnosticCollection: vscode.DiagnosticCollection;
+
 export function activate(context: vscode.ExtensionContext) {
+    console.log('STXT extension activated');
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "stxt" is now active!!!!');
+	diagnosticCollection = vscode.languages.createDiagnosticCollection('stxt');
+	context.subscriptions.push(diagnosticCollection);
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('stxt.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from stxt!');
+	vscode.workspace.onDidOpenTextDocument(document => {
+		if (document.languageId === 'stxt') {
+			handleStxtDocument(document);
+		}
 	});
 
-	context.subscriptions.push(disposable);
+	vscode.workspace.onDidChangeTextDocument(event => {
+		const document = event.document;
+		if (document.languageId === 'stxt') {
+			handleStxtChangeTextDocument(event, document);
+		}
+	});
+
+	vscode.workspace.onDidCloseTextDocument(document => {
+    	diagnosticCollection.delete(document.uri);
+	});
+
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
+
+function handleStxtDocument(document: vscode.TextDocument) {
+	console.log('Documento STXT abierto:', document.uri.toString());
+    const text = document.getText();
+    console.log('Procesando STXT:\n', text);
+	validateStxtDocument(document);
+}
+
+function handleStxtChangeTextDocument(event: vscode.TextDocumentChangeEvent, document: vscode.TextDocument) {
+	console.log('Documento STXT modificado');
+	validateStxtDocument(document);
+}
+
+function validateStxtDocument(document: vscode.TextDocument) {
+    const diagnostics: vscode.Diagnostic[] = [];
+
+    const lines = document.getText().split(/\r?\n/);
+
+    lines.forEach((line, index) => {
+        const lineNumber = index;
+
+        // Regla 1: etiqueta sin :
+        if (line.trim().startsWith('@') && !line.includes(':')) {
+            const range = new vscode.Range(
+                lineNumber,
+                0,
+                lineNumber,
+                line.length
+            );
+
+            diagnostics.push(
+                new vscode.Diagnostic(
+                    range,
+                    'Las etiquetas STXT deben usar ":"',
+                    vscode.DiagnosticSeverity.Error
+                )
+            );
+        }
+
+        // Regla 2: key: sin valor
+        if (/^\s*\w+\s*:\s*$/.test(line)) {
+            const range = new vscode.Range(
+                lineNumber,
+                0,
+                lineNumber,
+                line.length
+            );
+
+            diagnostics.push(
+                new vscode.Diagnostic(
+                    range,
+                    'La clave tiene que tener un valor',
+                    vscode.DiagnosticSeverity.Warning
+                )
+            );
+        }
+    });
+
+    diagnosticCollection.set(document.uri, diagnostics);
+}
