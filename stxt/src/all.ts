@@ -4,7 +4,7 @@ import { parseSTXT } from "./parser.js";
 
 async function main() {
     const texto: string = await readFile("demo.stxt", "utf-8");
-    console.log(texto);
+    //console.log(texto);
 
     parseSTXT(texto);
 }
