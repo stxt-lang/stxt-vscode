@@ -3,7 +3,8 @@
 import { readFile } from "fs/promises";
 import { ParseException } from "./ParseException";
 import { Node } from "./Node";
-import { LineIndent, LineIndentParser } from "./LineIndentParser";
+import { LineIndentParser } from "./LineIndentParser";
+import { LineIndent} from "./LineIndent";
 import { NameNamespaceParser } from "./NameNamespaceParser";
 
 function removeUTF8BOM(content: string): string {

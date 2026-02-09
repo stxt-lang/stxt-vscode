@@ -1,20 +1,11 @@
 "use strict";
 // LineIndentParser.ts
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LineIndentParser = exports.LineIndent = void 0;
+exports.LineIndentParser = void 0;
 const Constants_1 = require("./Constants");
 const StringUtils_1 = require("./StringUtils");
 const ParseException_1 = require("./ParseException");
-class LineIndent {
-    // Igual que en Java: campos públicos e inmutables
-    indentLevel;
-    lineWithoutIndent;
-    constructor(level, line) {
-        this.indentLevel = level;
-        this.lineWithoutIndent = line;
-    }
-}
-exports.LineIndent = LineIndent;
+const LineIndent_1 = require("./LineIndent");
 class LineIndentParser {
     constructor() {
         // Evita instanciación (clase "utility" como en Java)
@@ -46,14 +37,14 @@ class LineIndentParser {
             pointer++;
             // Dentro del bloque de texto
             if (lastNodeBlock && level > lastLevel) {
-                return new LineIndent(level, (0, StringUtils_1.rightTrim)(line.substring(pointer)));
+                return new LineIndent_1.LineIndent(level, (0, StringUtils_1.rightTrim)(line.substring(pointer)));
             }
         }
         // En este punto ya estamos fuera de bloque de texto (si existía)
         // Empty
         if (pointer === line.length) {
             if (lastNodeBlock) {
-                return new LineIndent(lastLevel + 1, "");
+                return new LineIndent_1.LineIndent(lastLevel + 1, "");
             }
             return null;
         }
@@ -66,7 +57,7 @@ class LineIndentParser {
             throw new ParseException_1.ParseException(numLine, "INDENTATION_LEVEL_NOT_VALID", `Level of indent incorrect: ${level}`);
         }
         // Caso general: devolver la línea sin la indentación consumida
-        return new LineIndent(level, line.substring(pointer).trim());
+        return new LineIndent_1.LineIndent(level, line.substring(pointer).trim());
     }
 }
 exports.LineIndentParser = LineIndentParser;
