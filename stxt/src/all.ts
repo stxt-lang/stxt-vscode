@@ -1,14 +1,10 @@
 import { readFile } from "fs/promises";
-import { text } from "stream/consumers";
-import { parseSTXT } from "./parserSTXT";
 import { Parser } from "./Parser";
 import { Node } from "./Node";
 
 async function main() {
     const texto: string = await readFile("demo.stxt", "utf-8");
     //console.log(texto);
-
-    parseSTXT(texto);
 
     const parser:Parser = new Parser();
     const nodes: Node[] = parser.parse(texto);

@@ -1,12 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const promises_1 = require("fs/promises");
-const parserSTXT_1 = require("./parserSTXT");
 const Parser_1 = require("./Parser");
 async function main() {
     const texto = await (0, promises_1.readFile)("demo.stxt", "utf-8");
     //console.log(texto);
-    (0, parserSTXT_1.parseSTXT)(texto);
     const parser = new Parser_1.Parser();
     const nodes = parser.parse(texto);
     for (let i = 0; i < nodes.length; i++) {
