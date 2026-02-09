@@ -8,8 +8,6 @@ class Constants {
     static TAB = "\t";
     static SPACE = " ";
     static SEP_NODE = ":";
-    // En Node.js normalmente se usa un string con el nombre del encoding.
-    static ENCODING = "utf8";
     static EMPTY_NAMESPACE = "";
 }
 exports.Constants = Constants;

@@ -36,7 +36,7 @@ class NameNamespaceParser {
         else {
             throw new ParseException_1.ParseException(lineNumber, "INVALID_NAMESPACE", `Line not valid: ${fullLine}`);
         }
-        // Equivalente a toLowerCase(Locale.ROOT)
+        // Retorno
         return new NameNamespace_1.NameNamespace(name, namespace.toLowerCase());
     }
 }

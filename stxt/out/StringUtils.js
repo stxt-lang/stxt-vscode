@@ -2,12 +2,9 @@
 // StringUtils.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalize = exports.compactSpaces = exports.lowerCase = exports.cleanSpaces = exports.rightTrim = exports.StringUtils = void 0;
-// En Java usabas Normalizer + regex \p{Mn} para quitar diacríticos.
-// En JS/TS se puede hacer con Unicode normalization + quitar el rango de “combining marks”.
 const DIACRITICS = /[\u0300-\u036f]+/g;
 class StringUtils {
     constructor() {
-        // Utility class: no instanciable
     }
     // Usado para nodos name>>
     static rightTrim(s) {
@@ -61,7 +58,6 @@ class StringUtils {
     }
 }
 exports.StringUtils = StringUtils;
-// Si prefieres exports sueltos (en vez de clase), dímelo y lo dejo en funciones.
 exports.rightTrim = StringUtils.rightTrim;
 exports.cleanSpaces = StringUtils.cleanSpaces;
 exports.lowerCase = StringUtils.lowerCase;

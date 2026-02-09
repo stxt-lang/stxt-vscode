@@ -8,7 +8,6 @@ import { LineIndent} from "./LineIndent";
 import { NameNamespaceParser } from "./NameNamespaceParser";
 
 function removeUTF8BOM(content: string): string {
-	// BOM UTF-8: U+FEFF (a veces aparece al principio)
 	return content.charCodeAt(0) === 0xfeff ? content.slice(1) : content;
 }
 
@@ -22,19 +21,11 @@ export class Parser {
 
 		let lineNumber = 0;
 
-		// BufferedReader.readLine() (Java) equivale a iterar por líneas sin el '\n'
-		// split mantiene línea vacía final si el texto termina con salto de línea.
 		const lines = content.split(/\r?\n/);
 
-		try {
-			for (const line of lines) {
-				lineNumber++;
-				this.processLine(line, lineNumber, stack, documents);
-			}
-		} catch (e) {
-			// En Java este try/catch era por IOException; aquí el parse no hace IO.
-			// Lo dejamos por simetría: si quieres, puedes quitarlo.
-			throw e;
+		for (const line of lines) {
+			lineNumber++;
+			this.processLine(line, lineNumber, stack, documents);
 		}
 
 		// Cerrar todos los nodos pendientes al EOF
@@ -44,24 +35,17 @@ export class Parser {
 		return documents;
 	}
 
-	private processLine(
-		line: string,
-		lineNumber: number,
-		stack: Node[],
-		documents: Node[]
-	): void {
+	private processLine(line: string, lineNumber: number, stack: Node[], documents: Node[]): void {
 		const lastNode: Node | null = stack.length === 0 ? null : stack[stack.length - 1];
 		const lastLevel = lastNode ? lastNode.getLevel() : 0;
 		const lastNodeText = lastNode ? lastNode.isTextNode() : false;
 
 		// Parseamos línea
-		const lineIndent: LineIndent | null = LineIndentParser.parseLine(
-			line,
-			lastNodeText,
-			lastLevel,
-			lineNumber
-		);
-		if (lineIndent == null) return;
+		const lineIndent: LineIndent | null = LineIndentParser.parseLine(line,lastNodeText,lastLevel,lineNumber);
+		
+		if (lineIndent == null) {
+			return;
+		}
 
 		const currentLevel = lineIndent.indentLevel;
 

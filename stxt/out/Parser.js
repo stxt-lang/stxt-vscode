@@ -7,7 +7,6 @@ const Node_1 = require("./Node");
 const LineIndentParser_1 = require("./LineIndentParser");
 const NameNamespaceParser_1 = require("./NameNamespaceParser");
 function removeUTF8BOM(content) {
-    // BOM UTF-8: U+FEFF (a veces aparece al principio)
     return content.charCodeAt(0) === 0xfeff ? content.slice(1) : content;
 }
 class Parser {
@@ -16,19 +15,10 @@ class Parser {
         const stack = [];
         const documents = [];
         let lineNumber = 0;
-        // BufferedReader.readLine() (Java) equivale a iterar por líneas sin el '\n'
-        // split mantiene línea vacía final si el texto termina con salto de línea.
         const lines = content.split(/\r?\n/);
-        try {
-            for (const line of lines) {
-                lineNumber++;
-                this.processLine(line, lineNumber, stack, documents);
-            }
-        }
-        catch (e) {
-            // En Java este try/catch era por IOException; aquí el parse no hace IO.
-            // Lo dejamos por simetría: si quieres, puedes quitarlo.
-            throw e;
+        for (const line of lines) {
+            lineNumber++;
+            this.processLine(line, lineNumber, stack, documents);
         }
         // Cerrar todos los nodos pendientes al EOF
         this.closeToLevel(stack, documents, 0);
@@ -41,8 +31,9 @@ class Parser {
         const lastNodeText = lastNode ? lastNode.isTextNode() : false;
         // Parseamos línea
         const lineIndent = LineIndentParser_1.LineIndentParser.parseLine(line, lastNodeText, lastLevel, lineNumber);
-        if (lineIndent == null)
+        if (lineIndent == null) {
             return;
+        }
         const currentLevel = lineIndent.indentLevel;
         // Si estamos dentro de un nodo texto, y el nivel indica que sigue siendo texto,
         // añadimos línea de texto y no creamos nodo.

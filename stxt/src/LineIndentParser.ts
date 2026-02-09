@@ -10,12 +10,7 @@ export class LineIndentParser {
 		// Evita instanciación (clase "utility" como en Java)
 	}
 
-	static parseLine(
-		line: string,
-		lastNodeBlock: boolean,
-		lastLevel: number,
-		numLine: number
-	): LineIndent | null {
+	static parseLine(line: string, lastNodeBlock: boolean, lastLevel: number,numLine: number): LineIndent | null {
 		let level = 0;
 		let spaces = 0;
 		let pointer = 0;
@@ -59,20 +54,12 @@ export class LineIndentParser {
 
 		// Indentación no es múltiplo de 4 con espacios
 		if (spaces > 0) {
-			throw new ParseException(
-				numLine,
-				"INVALID_NUMBER_SPACES",
-				`There are ${spaces} spaces before node`
-			);
+			throw new ParseException(numLine,"INVALID_NUMBER_SPACES",`There are ${spaces} spaces before node`);
 		}
 
 		// Validamos level
 		if (level > lastLevel + 1) {
-			throw new ParseException(
-				numLine,
-				"INDENTATION_LEVEL_NOT_VALID",
-				`Level of indent incorrect: ${level}`
-			);
+			throw new ParseException(numLine,"INDENTATION_LEVEL_NOT_VALID",`Level of indent incorrect: ${level}`);
 		}
 
 		// Caso general: devolver la línea sin la indentación consumida

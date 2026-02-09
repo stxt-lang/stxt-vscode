@@ -52,7 +52,6 @@ class Node {
     getChildren() {
         return this.children;
     }
-    // Package-private en Java; en TS lo dejamos "public" pero con chequeo de freeze.
     addChild(node) {
         if (this.isFrozen) {
             throw new Error("Node is frozen");
@@ -82,8 +81,6 @@ class Node {
             return;
         for (const n of this.children)
             n.freeze();
-        // En JS/TS no existe Collections.unmodifiableList; lo habitual es congelar o exponer ReadonlyArray.
-        // Aquí congelamos las estructuras para evitar mutaciones accidentales.
         Object.freeze(this.children);
         Object.freeze(this.textLines);
         this.isFrozen = true;
