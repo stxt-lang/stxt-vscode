@@ -8,7 +8,6 @@ const ParseException_1 = require("./ParseException");
 const LineIndent_1 = require("./LineIndent");
 class LineIndentParser {
     constructor() {
-        // Evita instanciación (clase "utility" como en Java)
     }
     static parseLine(line, lastNodeBlock, lastLevel, numLine) {
         let level = 0;

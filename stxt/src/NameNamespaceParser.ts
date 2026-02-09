@@ -5,7 +5,6 @@ import { NameNamespace } from "./NameNamespace";
 
 export class NameNamespaceParser {
 	private constructor() {
-		// Utility
 	}
 
 	static parse(rawName: string | null | undefined, inheritedNs: string | null | undefined, lineNumber: number, fullLine: string): NameNamespace {

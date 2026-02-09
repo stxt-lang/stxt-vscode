@@ -6,7 +6,6 @@ const ParseException_1 = require("./ParseException");
 const NameNamespace_1 = require("./NameNamespace");
 class NameNamespaceParser {
     constructor() {
-        // Utility
     }
     static parse(rawName, inheritedNs, lineNumber, fullLine) {
         if (rawName == null) {

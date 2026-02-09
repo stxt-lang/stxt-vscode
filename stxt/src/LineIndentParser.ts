@@ -7,7 +7,6 @@ import { LineIndent } from "./LineIndent";
 
 export class LineIndentParser {
 	private constructor() {
-		// Evita instanciación (clase "utility" como en Java)
 	}
 
 	static parseLine(line: string, lastNodeBlock: boolean, lastLevel: number,numLine: number): LineIndent | null {
