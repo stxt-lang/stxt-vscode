@@ -1,6 +1,6 @@
 import { readFile } from "fs/promises";
 import { text } from "stream/consumers";
-import { parseSTXT } from "./parser.js";
+import { parseSTXT } from "./parserSTXT";
 
 async function main() {
     const texto: string = await readFile("demo.stxt", "utf-8");

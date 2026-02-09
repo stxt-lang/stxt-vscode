@@ -2,7 +2,7 @@
 // LineIndentParser.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LineIndentParser = exports.LineIndent = void 0;
-const constants_1 = require("./constants");
+const Constants_1 = require("./Constants");
 const StringUtils_1 = require("./StringUtils");
 const ParseException_1 = require("./ParseException");
 class LineIndent {
@@ -25,18 +25,18 @@ class LineIndentParser {
         let pointer = 0;
         while (pointer < line.length) {
             const c = line.charAt(pointer);
-            if (c === constants_1.Constants.SPACE) {
+            if (c === Constants_1.Constants.SPACE) {
                 spaces++;
-                if (spaces === constants_1.Constants.TAB_SPACES) {
+                if (spaces === Constants_1.Constants.TAB_SPACES) {
                     level++;
                     spaces = 0;
                 }
             }
-            else if (c === constants_1.Constants.TAB) {
+            else if (c === Constants_1.Constants.TAB) {
                 level++;
                 spaces = 0;
             }
-            else if (c === constants_1.Constants.COMMENT_CHAR) {
+            else if (c === Constants_1.Constants.COMMENT_CHAR) {
                 return null;
             }
             else {

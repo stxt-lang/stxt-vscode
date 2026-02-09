@@ -1,6 +1,6 @@
 // LineIndentParser.ts
 
-import { Constants } from "./constants";
+import { Constants } from "./Constants";
 import { rightTrim } from "./StringUtils";
 import { ParseException } from "./ParseException";
 
