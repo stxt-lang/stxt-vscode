@@ -1,0 +1,1 @@
+{"version":3,"file":"LineIndent.js","sourceRoot":"","sources":["../../src/core/LineIndent.ts"],"names":[],"mappings":";;;AAAA,gBAAgB;AAChB,MAAa,UAAU;IACtB,kDAAkD;IAClC,WAAW,CAAS;IACpB,iBAAiB,CAAS;IAE1C,YAAY,KAAa,EAAE,IAAY;QACtC,IAAI,CAAC,WAAW,GAAG,KAAK,CAAC;QACzB,IAAI,CAAC,iBAAiB,GAAG,IAAI,CAAC;IAC/B,CAAC;CACD;AATD,gCASC"}
