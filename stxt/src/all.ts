@@ -1,6 +1,6 @@
 import { readFile } from "fs/promises";
-import { Parser } from "./Parser";
-import { Node } from "./Node";
+import { Parser } from "./stxt/Parser";
+import { Node } from "./stxt/Node";
 
 async function main() {
     const texto: string = await readFile("demo.stxt", "utf-8");
