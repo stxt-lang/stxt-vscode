@@ -42,7 +42,8 @@ const tokenTypes = [
     'keyword',
     'property',
     'string',
-    'variable'
+    'variable',
+    'comment'
 ];
 exports.tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
 class StxtSemanticTokensProvider {
@@ -50,6 +51,10 @@ class StxtSemanticTokensProvider {
         const builder = new vscode.SemanticTokensBuilder(exports.tokenLegend);
         const lines = document.getText().split(/\r?\n/);
         lines.forEach((line, lineIndex) => {
+            // Comment (hacer mejor)
+            if (line.trim().startsWith("#")) {
+                builder.push(lineIndex, 0, line.length, tokenTypes.indexOf('comment'));
+            }
             // @tag
             const tagMatch = line.match(/^(\s*)(@\w+)/);
             if (tagMatch) {

@@ -8,7 +8,8 @@ const tokenTypes = [
     'keyword',
     'property',
     'string',
-    'variable'
+    'variable',
+    'comment'
 ];
 
 export const tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
@@ -21,6 +22,10 @@ export class StxtSemanticTokensProvider implements vscode.DocumentSemanticTokens
         const lines = document.getText().split(/\r?\n/);
 
         lines.forEach((line, lineIndex) => {
+            // Comment (hacer mejor)
+            if (line.trim().startsWith("#")) {
+                builder.push(lineIndex, 0, line.length, tokenTypes.indexOf('comment'));
+            }
 
             // @tag
             const tagMatch = line.match(/^(\s*)(@\w+)/);

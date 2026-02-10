@@ -2,19 +2,10 @@
   "scopeName": "source.stxt",
   "name": "Semantic Text",
   "patterns": [
-    { "include": "#comments" },
     { "include": "#tags" },
     { "include": "#keyValue" }
   ],
   "repository": {
-    "comments": {
-      "patterns": [
-        {
-          "name": "comment.line.stxt",
-          "match": "^\\s*#.*$"
-        }
-      ]
-    },
     "tags": {
       "patterns": [
         {
