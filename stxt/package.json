@@ -15,9 +15,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onLanguage:stxt"
-  ],
   "main": "./out/extension.js",
   "contributes": {
     "languages": [
@@ -33,12 +30,6 @@
       "scopeName": "source.stxt",
       "path": "./syntaxes/stxt.tmLanguage.json"
     }
-    ],
-    "commands": [
-      {
-        "command": "stxt.helloWorld",
-        "title": "Hello World"
-      }
     ]
   },
   "scripts": {
