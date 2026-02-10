@@ -1,6 +1,7 @@
 import { readFile } from "fs/promises";
 import { Parser } from "./core/Parser";
 import { Node } from "./core/Node";
+import { IndentStyle, NodeWriter } from "./runtime/NodeWriter";
 
 async function main() {
     const texto: string = await readFile("demo.stxt", "utf-8");
@@ -21,6 +22,8 @@ async function main() {
             console.log(`\tChild ${i+1}: ${child}`);
         }
     }
+    const str = NodeWriter.toSTXTDocs(nodes, IndentStyle.SPACES_4);
+    console.log(str);
 }
 
 main();

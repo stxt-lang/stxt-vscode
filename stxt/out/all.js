@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const promises_1 = require("fs/promises");
 const Parser_1 = require("./core/Parser");
+const NodeWriter_1 = require("./runtime/NodeWriter");
 async function main() {
     const texto = await (0, promises_1.readFile)("demo.stxt", "utf-8");
     //console.log(texto);
@@ -16,6 +17,8 @@ async function main() {
             console.log(`\tChild ${i + 1}: ${child}`);
         }
     }
+    const str = NodeWriter_1.NodeWriter.toSTXTDocs(nodes, NodeWriter_1.IndentStyle.SPACES_4);
+    console.log(str);
 }
 main();
 console.log("Hola mundo!!");
