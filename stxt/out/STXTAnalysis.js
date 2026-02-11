@@ -33,44 +33,51 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.analisysDoc = analisysDoc;
 exports.getLastAnalysis = getLastAnalysis;
+exports.analisysDoc = analisysDoc;
 const vscode = __importStar(require("vscode"));
 const Node_1 = require("./core/Node");
 const LineIndentParser_1 = require("./core/LineIndentParser");
 const lastAnalysisByUri = new Map();
+function getLastAnalysis(document) {
+    return lastAnalysisByUri.get(document.uri.toString());
+}
 function analisysDoc(document, diagnosticCollection) {
     console.log("Parse init...");
     const diagnostics = [];
     const tokens = [];
     const lines = document.getText().split(/\r?\n/);
     let lastNode = new Node_1.Node(0, 0, "empty", null, false, "");
-    lines.forEach((line, index) => {
+    for (let index = 0; index < lines.length; index++) {
+        const line = lines[index];
         const lineNumber = index + 1;
         console.log(`${lineNumber}: ${line}`);
         const lastLevel = lastNode.getLevel();
         const lastNodeText = lastNode.isTextNode();
         // Parseamos línea
+        let lineIndent = null;
         try {
-            const lineIndent = LineIndentParser_1.LineIndentParser.parseLine(line, lastNodeText, lastLevel, lineNumber);
-            if (lineIndent === null) {
-                tokens.push({ line: index, startChar: 0, length: line.length, type: 'comment' });
-            }
+            lineIndent = LineIndentParser_1.LineIndentParser.parseLine(line, lastNodeText, lastLevel, lineNumber);
         }
         catch (e) {
             console.log("Error en " + lineNumber + e);
             const range = new vscode.Range(index, 0, index, line.length);
             diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Error));
+            continue;
+        }
+        // Es un comentario
+        if (lineIndent === null) {
+            tokens.push({ line: index, startChar: 0, length: line.length, type: 'comment' });
+            continue;
         }
         // TODO Actualizar lastNode si hace falta
-    });
+    }
+    ;
+    // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
     const result = { tokens };
     lastAnalysisByUri.set(document.uri.toString(), result);
     console.log("Parse end.");
     return result;
-}
-function getLastAnalysis(document) {
-    return lastAnalysisByUri.get(document.uri.toString());
 }
 //# sourceMappingURL=STXTAnalysis.js.map
