@@ -35,12 +35,12 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StxtSemanticTokensProvider = void 0;
 const vscode = __importStar(require("vscode"));
-const STXTAnalysis_1 = require("./STXTAnalysis");
+const STXTAnalysisDoc_1 = require("./STXTAnalysisDoc");
 const STXTTokens_1 = require("./STXTTokens");
 class StxtSemanticTokensProvider {
     provideDocumentSemanticTokens(document) {
         const builder = new vscode.SemanticTokensBuilder(STXTTokens_1.tokenLegend);
-        const analysis = (0, STXTAnalysis_1.getLastAnalysis)(document);
+        const analysis = (0, STXTAnalysisDoc_1.getLastAnalysis)(document);
         if (!analysis) {
             return builder.build();
         }

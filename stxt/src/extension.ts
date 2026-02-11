@@ -3,7 +3,7 @@ import { StxtSemanticTokensProvider } from './StxtSemanticTokensProvider';
 import { StxtFormattingProvider } from './StxtFormattingProvider';
 import { StxtCompletionProvider } from './StxtCompletionProvider';
 import { StxtHoverProvider } from './StxtHoverProvider';
-import { analisysDoc } from './STXTAnalysis';
+import { analisysDoc } from './STXTAnalysisDoc';
 import { tokenLegend } from './STXTTokens';
 
 let diagnosticCollection: vscode.DiagnosticCollection;

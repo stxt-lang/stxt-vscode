@@ -17,3 +17,10 @@ export const tokenLegend = new vscode.SemanticTokensLegend([...STXT_TOKEN_TYPES]
 // Mapping type -> index derivado del mismo sitio
 export const tokenTypeIndex: Record<StxtTokenType, number> =
   Object.fromEntries(STXT_TOKEN_TYPES.map((t, i) => [t, i])) as Record<StxtTokenType, number>;
+
+export interface StxtToken {
+  line: number; // 0 based
+  startChar: number; // 0 based
+  length: number;
+  type: StxtTokenType;
+}

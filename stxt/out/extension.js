@@ -40,7 +40,7 @@ const StxtSemanticTokensProvider_1 = require("./StxtSemanticTokensProvider");
 const StxtFormattingProvider_1 = require("./StxtFormattingProvider");
 const StxtCompletionProvider_1 = require("./StxtCompletionProvider");
 const StxtHoverProvider_1 = require("./StxtHoverProvider");
-const STXTAnalysis_1 = require("./STXTAnalysis");
+const STXTAnalysisDoc_1 = require("./STXTAnalysisDoc");
 const STXTTokens_1 = require("./STXTTokens");
 let diagnosticCollection;
 function activate(context) {
@@ -50,13 +50,13 @@ function activate(context) {
     context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(doc => {
         if (doc.languageId === 'stxt') {
             console.log("onDidOpenTextDocument");
-            (0, STXTAnalysis_1.analisysDoc)(doc, diagnosticCollection);
+            (0, STXTAnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
         }
     }), vscode.workspace.onDidChangeTextDocument(e => {
         const doc = e.document;
         if (doc.languageId === 'stxt') {
             console.log("onDidChangeTextDocument");
-            (0, STXTAnalysis_1.analisysDoc)(doc, diagnosticCollection);
+            (0, STXTAnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
         }
     }), vscode.workspace.onDidCloseTextDocument(doc => {
         console.log("onDidCloseTextDocument");
@@ -70,7 +70,7 @@ function activate(context) {
     for (const doc of vscode.workspace.textDocuments) {
         if (doc.languageId === 'stxt') {
             console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
-            (0, STXTAnalysis_1.analisysDoc)(doc, diagnosticCollection);
+            (0, STXTAnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
         }
     }
 }
