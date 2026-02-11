@@ -56,6 +56,7 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
 		// añadimos línea de texto y no creamos nodo.
 		if (lastNodeText && currentLevel > lastLevel) {
 			lastNodeValid!.addTextLine(lineIndent.lineWithoutIndent);
+            //tokens.push({line: index, startChar: 0, length: line.length, type: 'string'});
 			continue;
 		}
 
@@ -64,6 +65,12 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
 		    lastNodeValid = createNode(lineIndent, lineNumber, currentLevel, null);
 
             // TODO: Añadir tipo de línea,...
+            if (lastNodeValid.isTextNode()) {
+                tokens.push({line: index, startChar: 0, length: line.length, type: 'property'});
+            }
+            else {
+                tokens.push({line: index, startChar: 0, length: line.length, type: 'keyword'});
+            }
         }
         catch(e)
         {

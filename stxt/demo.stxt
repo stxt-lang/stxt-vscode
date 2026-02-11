@@ -3,7 +3,7 @@ Ejemplo(demo.example): Hola, esto es un texto
     Título:Prueba
     Texto>>   
         Esto es un texto
-        Un poco largo
-    
+        Un poco largo *Hola mundo*
+        
 # Hola mundo 
 # Hola esto es otro comentarioooooo

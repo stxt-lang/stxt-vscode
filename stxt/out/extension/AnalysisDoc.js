@@ -76,11 +76,18 @@ function analisysDoc(document, diagnosticCollection) {
         // añadimos línea de texto y no creamos nodo.
         if (lastNodeText && currentLevel > lastLevel) {
             lastNodeValid.addTextLine(lineIndent.lineWithoutIndent);
+            //tokens.push({line: index, startChar: 0, length: line.length, type: 'string'});
             continue;
         }
         try {
             lastNodeValid = (0, NodeCreator_1.createNode)(lineIndent, lineNumber, currentLevel, null);
             // TODO: Añadir tipo de línea,...
+            if (lastNodeValid.isTextNode()) {
+                tokens.push({ line: index, startChar: 0, length: line.length, type: 'property' });
+            }
+            else {
+                tokens.push({ line: index, startChar: 0, length: line.length, type: 'keyword' });
+            }
         }
         catch (e) {
             console.log("Error en " + lineNumber + e);
