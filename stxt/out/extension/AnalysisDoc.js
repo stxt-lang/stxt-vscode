@@ -52,7 +52,7 @@ function analisysDoc(document, diagnosticCollection) {
     for (let index = 0; index < lines.length; index++) {
         const line = lines[index];
         const lineNumber = index + 1;
-        console.log(`${lineNumber}: ${line}`);
+        //console.log(`${lineNumber}: ${line}`);
         const lastLevel = lastNodeValid.getLevel();
         const lastNodeText = lastNodeValid.isTextNode();
         // Parseamos línea
@@ -61,7 +61,7 @@ function analisysDoc(document, diagnosticCollection) {
             lineIndent = LineIndentParser_1.LineIndentParser.parseLine(line, lastNodeText, lastLevel, lineNumber);
         }
         catch (e) {
-            console.log("Error en " + lineNumber + e);
+            //console.log("Error en " + lineNumber + e);
             const range = new vscode.Range(index, 0, index, line.length);
             diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Error));
             continue;

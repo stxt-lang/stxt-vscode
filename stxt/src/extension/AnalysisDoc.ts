@@ -25,7 +25,7 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
         const line = lines[index];
         const lineNumber = index + 1;
 
-        console.log(`${lineNumber}: ${line}`);
+        //console.log(`${lineNumber}: ${line}`);
 
         const lastLevel = lastNodeValid.getLevel();
         const lastNodeText = lastNodeValid.isTextNode();
@@ -38,7 +38,7 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
         }
         catch(e)
         {
-            console.log("Error en " + lineNumber + e);
+            //console.log("Error en " + lineNumber + e);
             const range = new vscode.Range(index,0,index,line.length);
             diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Error));
             continue;
