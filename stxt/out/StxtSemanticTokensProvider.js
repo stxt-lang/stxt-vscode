@@ -33,17 +33,17 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StxtSemanticTokensProvider = exports.tokenLegend = void 0;
+exports.StxtSemanticTokensProvider = exports.tokenLegend = exports.tokenTypes = void 0;
 const vscode = __importStar(require("vscode"));
 const STXTAnalysis_1 = require("./STXTAnalysis");
-const tokenTypes = [
+exports.tokenTypes = [
     'keyword',
     'property',
     'string',
     'variable',
     'comment'
 ];
-exports.tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
+exports.tokenLegend = new vscode.SemanticTokensLegend(exports.tokenTypes);
 class StxtSemanticTokensProvider {
     provideDocumentSemanticTokens(document) {
         const builder = new vscode.SemanticTokensBuilder(exports.tokenLegend);
@@ -52,8 +52,12 @@ class StxtSemanticTokensProvider {
             return builder.build();
         }
         for (const t of analysis.tokens) {
-            if (t.type === 'comment') {
-                builder.push(t.line, t.startChar, t.length, tokenTypes.indexOf('comment'));
+            let index = exports.tokenTypes.indexOf(t.type);
+            if (index !== -1) {
+                builder.push(t.line, t.startChar, t.length, index);
+            }
+            else {
+                console.log("No valid type: " + t.type);
             }
         }
         return builder.build();

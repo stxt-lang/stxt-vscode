@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { getLastAnalysis } from './STXTAnalysis';
 
-const tokenTypes = [
+export const tokenTypes = [
 	'keyword',
 	'property',
 	'string',
@@ -21,13 +21,11 @@ export class StxtSemanticTokensProvider implements vscode.DocumentSemanticTokens
 		}
 
 		for (const t of analysis.tokens) {
-			if (t.type === 'comment') {
-				builder.push(
-					t.line,
-					t.startChar,
-					t.length,
-					tokenTypes.indexOf('comment')
-				);
+			let index = tokenTypes.indexOf(t.type);
+			if (index !== -1) {
+				builder.push(t.line, t.startChar, t.length, index);
+			} else {
+				console.log("No valid type: " + t.type);
 			}
 		}
 
