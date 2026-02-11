@@ -37,21 +37,13 @@ exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
 const StxtSemanticTokensProvider_1 = require("./StxtSemanticTokensProvider");
+const StxtFormattingProvider_1 = require("./StxtFormattingProvider");
+const StxtCompletionProvider_1 = require("./StxtCompletionProvider");
+const StxtHoverProvider_1 = require("./StxtHoverProvider");
 // ******************
 // Variables globales
 // ******************
 let diagnosticCollection;
-const STXT_TAGS = {
-    '@title': 'Título principal del documento',
-    '@note': 'Nota informativa',
-    '@todo': 'Tarea pendiente',
-    '@author': 'Autor del documento'
-};
-const STXT_KEYS = [
-    'author',
-    'status',
-    'version'
-];
 // ******************************
 // Método principal de activación
 // ******************************
@@ -74,10 +66,10 @@ function activate(context) {
         diagnosticCollection.delete(document.uri);
     });
     context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new StxtSemanticTokensProvider_1.StxtSemanticTokensProvider(), StxtSemanticTokensProvider_1.tokenLegend));
-    context.subscriptions.push(vscode.languages.registerHoverProvider('stxt', new StxtHoverProvider()));
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider('stxt', new StxtCompletionProvider(), '@' // carácter que dispara sugerencias
+    context.subscriptions.push(vscode.languages.registerHoverProvider('stxt', new StxtHoverProvider_1.StxtHoverProvider()));
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider('stxt', new StxtCompletionProvider_1.StxtCompletionProvider(), '@' // carácter que dispara sugerencias
     ));
-    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new StxtFormattingProvider()));
+    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new StxtFormattingProvider_1.StxtFormattingProvider()));
 }
 function deactivate() { }
 // *************************************
@@ -113,94 +105,5 @@ function validateStxtDocument(document) {
         }
     });
     diagnosticCollection.set(document.uri, diagnostics);
-}
-// ******************
-// Formating provider
-// ******************
-class StxtFormattingProvider {
-    provideDocumentFormattingEdits(document) {
-        const lines = document.getText().split(/\r?\n/);
-        const edits = [];
-        let blockStart = -1;
-        let maxKeyLength = 0;
-        function flushBlock(endLine) {
-            if (blockStart === -1) {
-                return;
-            }
-            for (let i = blockStart; i < endLine; i++) {
-                const line = lines[i];
-                const match = line.match(/^(\s*)(\w+)\s*:\s*(.*)$/);
-                if (!match)
-                    continue;
-                const [, indent, key, value] = match;
-                const paddedKey = key.padEnd(maxKeyLength, ' ');
-                const newLine = `${indent}${paddedKey} : ${value}`;
-                if (newLine !== line) {
-                    edits.push(vscode.TextEdit.replace(new vscode.Range(i, 0, i, line.length), newLine));
-                }
-            }
-            blockStart = -1;
-            maxKeyLength = 0;
-        }
-        lines.forEach((line, index) => {
-            const match = line.match(/^(\s*)(\w+)\s*:\s*(.*)$/);
-            if (match && !line.trim().startsWith('#')) {
-                if (blockStart === -1) {
-                    blockStart = index;
-                }
-                maxKeyLength = Math.max(maxKeyLength, match[2].length);
-            }
-            else {
-                flushBlock(index);
-            }
-        });
-        flushBlock(lines.length);
-        return edits;
-    }
-}
-// *********************
-// Completation provider
-// *********************
-class StxtCompletionProvider {
-    provideCompletionItems(document, position) {
-        const linePrefix = document.lineAt(position).text.slice(0, position.character);
-        // Sugerencias de tags
-        if (linePrefix.trim().startsWith('@')) {
-            return Object.keys(STXT_TAGS).map(tag => {
-                const item = new vscode.CompletionItem(tag, vscode.CompletionItemKind.Keyword);
-                item.insertText = `${tag}: `;
-                item.detail = 'STXT tag';
-                item.documentation = STXT_TAGS[tag];
-                return item;
-            });
-        }
-        // Sugerencias de claves
-        if (/^\s*\w*$/.test(linePrefix)) {
-            return STXT_KEYS.map(key => {
-                const item = new vscode.CompletionItem(key, vscode.CompletionItemKind.Property);
-                item.insertText = `${key}: `;
-                item.detail = 'STXT key';
-                return item;
-            });
-        }
-        return [];
-    }
-}
-// **************
-// Hover provider
-// **************
-class StxtHoverProvider {
-    provideHover(document, position) {
-        const range = document.getWordRangeAtPosition(position, /@\w+/);
-        if (!range) {
-            return;
-        }
-        const word = document.getText(range);
-        const description = STXT_TAGS[word];
-        if (!description) {
-            return;
-        }
-        return new vscode.Hover(new vscode.MarkdownString(`**${word}**\n\n${description}`));
-    }
 }
 //# sourceMappingURL=extension.js.map

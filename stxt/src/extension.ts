@@ -1,24 +1,14 @@
 import * as vscode from 'vscode';
 import { StxtSemanticTokensProvider, tokenLegend } from './StxtSemanticTokensProvider';
+import { StxtFormattingProvider } from './StxtFormattingProvider';
+import { StxtCompletionProvider } from './StxtCompletionProvider';
+import { StxtHoverProvider } from './StxtHoverProvider';
 
 // ******************
 // Variables globales
 // ******************
 
 let diagnosticCollection: vscode.DiagnosticCollection;
-
-const STXT_TAGS: Record<string, string> = {
-    '@title': 'Título principal del documento',
-    '@note': 'Nota informativa',
-    '@todo': 'Tarea pendiente',
-    '@author': 'Autor del documento'
-};
-
-const STXT_KEYS = [
-    'author',
-    'status',
-    'version'
-];
 
 // ******************************
 // Método principal de activación
@@ -122,124 +112,5 @@ function validateStxtDocument(document: vscode.TextDocument) {
     diagnosticCollection.set(document.uri, diagnostics);
 }
 
-// ******************
-// Formating provider
-// ******************
 
-class StxtFormattingProvider implements vscode.DocumentFormattingEditProvider {
 
-    provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {
-
-        const lines = document.getText().split(/\r?\n/);
-        const edits: vscode.TextEdit[] = [];
-
-        let blockStart = -1;
-        let maxKeyLength = 0;
-
-        function flushBlock(endLine: number) {
-            if (blockStart === -1) {
-                return;
-            }
-
-            for (let i = blockStart; i < endLine; i++) {
-                const line = lines[i];
-                const match = line.match(/^(\s*)(\w+)\s*:\s*(.*)$/);
-                if (!match) continue;
-
-                const [, indent, key, value] = match;
-                const paddedKey = key.padEnd(maxKeyLength, ' ');
-                const newLine = `${indent}${paddedKey} : ${value}`;
-
-                if (newLine !== line) {
-                    edits.push(
-                        vscode.TextEdit.replace(
-                            new vscode.Range(i, 0, i, line.length),
-                            newLine
-                        )
-                    );
-                }
-            }
-
-            blockStart = -1;
-            maxKeyLength = 0;
-        }
-
-        lines.forEach((line, index) => {
-            const match = line.match(/^(\s*)(\w+)\s*:\s*(.*)$/);
-
-            if (match && !line.trim().startsWith('#')) {
-                if (blockStart === -1) {
-                    blockStart = index;
-                }
-                maxKeyLength = Math.max(maxKeyLength, match[2].length);
-            } else {
-                flushBlock(index);
-            }
-        });
-
-        flushBlock(lines.length);
-
-        return edits;
-    }
-}
-
-// *********************
-// Completation provider
-// *********************
-
-class StxtCompletionProvider implements vscode.CompletionItemProvider {
-
-    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.CompletionItem[]> {
-
-        const linePrefix = document.lineAt(position).text.slice(0, position.character);
-
-        // Sugerencias de tags
-        if (linePrefix.trim().startsWith('@')) {
-            return Object.keys(STXT_TAGS).map(tag => {
-                const item = new vscode.CompletionItem(tag, vscode.CompletionItemKind.Keyword);
-                item.insertText = `${tag}: `;
-                item.detail = 'STXT tag';
-                item.documentation = STXT_TAGS[tag];
-                return item;
-            });
-        }
-
-        // Sugerencias de claves
-        if (/^\s*\w*$/.test(linePrefix)) {
-            return STXT_KEYS.map(key => {
-                const item = new vscode.CompletionItem(key, vscode.CompletionItemKind.Property);
-                item.insertText = `${key}: `;
-                item.detail = 'STXT key';
-                return item;
-            });
-        }
-
-        return [];
-    }
-}
-
-// **************
-// Hover provider
-// **************
-
-class StxtHoverProvider implements vscode.HoverProvider {
-
-    provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Hover> {
-
-        const range = document.getWordRangeAtPosition(position, /@\w+/);
-        if (!range) {
-            return;
-        }
-
-        const word = document.getText(range);
-
-        const description = STXT_TAGS[word];
-        if (!description) {
-            return;
-        }
-
-        return new vscode.Hover(
-            new vscode.MarkdownString(`**${word}**\n\n${description}`)
-        );
-    }
-}
