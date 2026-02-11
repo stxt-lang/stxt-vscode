@@ -83,23 +83,21 @@ function analisysDoc(document, diagnosticCollection) {
             lastNodeValid = (0, NodeCreator_1.createNode)(lineIndent, lineNumber, currentLevel, null);
             // TODO: Añadir tipo de línea,...
             if (lastNodeValid.isTextNode()) {
-                tokens.push({ line: index, startChar: 0, length: line.length, type: 'property' });
+                tokens.push({ line: index, startChar: 0, length: line.length, type: 'keyword' });
             }
             else {
-                //tokens.push({line: index, startChar: 0, length: line.length, type: 'keyword'});
                 const i0 = line.indexOf(":");
                 const cname = line.substring(0, i0);
                 const value = line.substring(i0 + 1);
                 const nsIndex = cname.indexOf("(");
-                //tokens.push({line: index, startChar: 0, length: i0+1, type: 'keyword'});
                 //tokens.push({line: index, startChar: i0+1, length: line.length-i0, type: 'string'});
                 if (nsIndex !== -1) {
-                    tokens.push({ line: index, startChar: 0, length: nsIndex - 1, type: 'keyword' });
+                    tokens.push({ line: index, startChar: 0, length: nsIndex - 1, type: 'property' });
                     tokens.push({ line: index, startChar: nsIndex - 1, length: cname.length - nsIndex, type: 'namespace' });
-                    tokens.push({ line: index, startChar: nsIndex, length: 1, type: 'keyword' });
+                    tokens.push({ line: index, startChar: nsIndex, length: 1, type: 'property' });
                 }
                 else {
-                    tokens.push({ line: index, startChar: 0, length: i0 + 1, type: 'keyword' });
+                    tokens.push({ line: index, startChar: 0, length: i0 + 1, type: 'property' });
                 }
             }
         }
