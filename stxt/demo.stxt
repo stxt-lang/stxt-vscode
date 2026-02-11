@@ -1,12 +1,12 @@
 Ejemplo   (demo.example) : Hola, esto es un texto
-    Autor: Joan
+    Autor : Joan
     Título:Prueba
     Texto>>   
         Esto es un texto
         Un poco largo *Hola mundo*
 # Hola mundo 
 # Hola esto es otro comentarioooooo
-Hola: Como te llamas?
+Hola : Como te llamas?
 Demo    >>     
     World Esto es texto normal
     Sigue siendo texto normal
@@ -14,10 +14,10 @@ Demo    >>
     También es normal
     Y sigue 
 Demo (hola.mundo): World
-Hola: Esto es otro texto
-Hola:
+Hola : Esto es otro texto
+Hola : 
     Hola (dd.dd):
-    Hola: Demo World *Como te llamas?*
+    Hola : Demo World *Como te llamas?*
         Otro hola: Como vas?
         Demo >>
             Esto es texto
@@ -27,3 +27,5 @@ Hola:
             fasf *Mundo*
             saf     
             asf       
+            Demo
+Hola : Mundo
