@@ -88,7 +88,6 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
                 } else {
                     tokens.push({line: index, startChar: 0, length: i0+1, type: 'keyword'});
                 }
-
             }
         }
         catch(e)

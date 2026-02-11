@@ -1,5 +1,5 @@
 Ejemplo   (demo.example) : Hola, esto es un texto
-    Autor : Joan
+    Autor: Joan
     Título:Prueba
     Texto>>   
         Esto es un texto
@@ -7,7 +7,7 @@ Ejemplo   (demo.example) : Hola, esto es un texto
 # Hola mundo 
 # Hola esto es otro comentarioooooo
 Hola: Como te llamas?
-Demo >>
+Demo    >>     
     World Esto es texto normal
     Sigue siendo texto normal
 # Hola
@@ -27,4 +27,3 @@ Hola:
             fasf *Mundo*
             saf
             asf
-
