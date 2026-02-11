@@ -46,22 +46,21 @@ function activate(context) {
     console.log('STXT extension activated');
     diagnosticCollection = vscode.languages.createDiagnosticCollection('stxt');
     context.subscriptions.push(diagnosticCollection);
-    vscode.workspace.onDidOpenTextDocument(document => {
-        if (document.languageId === 'stxt') {
-            console.log('Documento STXT abierto:', document.uri.toString());
-            (0, STXTAnalysis_1.analisysDoc)(document, diagnosticCollection);
+    context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(doc => {
+        if (doc.languageId === 'stxt') {
+            console.log("onDidOpenTextDocument");
+            (0, STXTAnalysis_1.analisysDoc)(doc, diagnosticCollection);
         }
-    });
-    vscode.workspace.onDidChangeTextDocument(event => {
-        const document = event.document;
-        if (document.languageId === 'stxt') {
-            console.log('Documento STXT modificado');
-            (0, STXTAnalysis_1.analisysDoc)(document, diagnosticCollection);
+    }), vscode.workspace.onDidChangeTextDocument(e => {
+        const doc = e.document;
+        if (doc.languageId === 'stxt') {
+            console.log("onDidChangeTextDocument");
+            (0, STXTAnalysis_1.analisysDoc)(doc, diagnosticCollection);
         }
-    });
-    vscode.workspace.onDidCloseTextDocument(document => {
-        diagnosticCollection.delete(document.uri);
-    });
+    }), vscode.workspace.onDidCloseTextDocument(doc => {
+        console.log("onDidCloseTextDocument");
+        diagnosticCollection.delete(doc.uri);
+    }));
     context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new StxtSemanticTokensProvider_1.StxtSemanticTokensProvider(), StxtSemanticTokensProvider_1.tokenLegend));
     context.subscriptions.push(vscode.languages.registerHoverProvider('stxt', new StxtHoverProvider_1.StxtHoverProvider()));
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider('stxt', new StxtCompletionProvider_1.StxtCompletionProvider(), '@' // carácter que dispara sugerencias
@@ -69,6 +68,7 @@ function activate(context) {
     context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new StxtFormattingProvider_1.StxtFormattingProvider()));
     for (const doc of vscode.workspace.textDocuments) {
         if (doc.languageId === 'stxt') {
+            console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
             (0, STXTAnalysis_1.analisysDoc)(doc, diagnosticCollection);
         }
     }
