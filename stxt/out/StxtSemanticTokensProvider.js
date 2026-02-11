@@ -33,17 +33,17 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StxtSemanticTokensProvider = exports.tokenLegend = exports.tokenTypes = void 0;
+exports.StxtSemanticTokensProvider = exports.tokenLegend = void 0;
 const vscode = __importStar(require("vscode"));
 const STXTAnalysis_1 = require("./STXTAnalysis");
-exports.tokenTypes = [
-    'keyword',
-    'property',
-    'string',
-    'variable',
-    'comment'
+const tokenTypes = [
+    'comment', // # ...
+    'namespace', // Clave (namespace)
+    'property', // Clave:
+    'keyword', // Nodo texto >>
+    'string' // valores y bloque de texto
 ];
-exports.tokenLegend = new vscode.SemanticTokensLegend(exports.tokenTypes);
+exports.tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
 class StxtSemanticTokensProvider {
     provideDocumentSemanticTokens(document) {
         const builder = new vscode.SemanticTokensBuilder(exports.tokenLegend);
@@ -52,7 +52,7 @@ class StxtSemanticTokensProvider {
             return builder.build();
         }
         for (const t of analysis.tokens) {
-            let index = exports.tokenTypes.indexOf(t.type);
+            let index = tokenTypes.indexOf(t.type);
             if (index !== -1) {
                 builder.push(t.line, t.startChar, t.length, index);
             }

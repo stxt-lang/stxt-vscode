@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 import { getLastAnalysis } from './STXTAnalysis';
 
-export const tokenTypes = [
-	'keyword',
-	'property',
-	'string',
-	'variable',
-	'comment'
+const tokenTypes = [
+  'comment',    // # ...
+  'namespace',  // Clave (namespace)
+  'property',   // Clave:
+  'keyword',    // Nodo texto >>
+  'string'      // valores y bloque de texto
 ];
 
 export const tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
