@@ -2,10 +2,8 @@
 // Parser.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
-const ParseException_1 = require("./ParseException");
-const Node_1 = require("./Node");
 const LineIndentParser_1 = require("./LineIndentParser");
-const NameNamespaceParser_1 = require("./NameNamespaceParser");
+const NodeCreator_1 = require("./NodeCreator");
 function removeUTF8BOM(content) {
     return content.charCodeAt(0) === 0xfeff ? content.slice(1) : content;
 }
@@ -45,7 +43,7 @@ class Parser {
         this.closeToLevel(stack, documents, currentLevel);
         // Creamos el nuevo nodo y lo dejamos "abierto" en la pila (NO lo adjuntamos aún)
         const parent = stack.length === 0 ? null : stack[stack.length - 1];
-        const node = this.createNode(lineIndent, lineNumber, currentLevel, parent);
+        const node = (0, NodeCreator_1.createNode)(lineIndent, lineNumber, currentLevel, parent);
         // Añadimos a stack
         stack.push(node);
     }
@@ -58,50 +56,6 @@ class Parser {
             else
                 stack[stack.length - 1].addChild(completed);
         }
-    }
-    createNode(lineIndent, lineNumber, level, parent) {
-        const line = lineIndent.lineWithoutIndent;
-        let name;
-        let value;
-        let textNode = false;
-        const nodeIndex = line.indexOf(":");
-        const textIndex = line.indexOf(">>");
-        if (nodeIndex === -1 && textIndex === -1) {
-            throw new ParseException_1.ParseException(lineNumber, "INVALID_LINE", `Line not valid: ${line}`);
-        }
-        else if (nodeIndex === -1 && textIndex !== -1) {
-            textNode = true;
-        }
-        else if (nodeIndex !== -1 && textIndex === -1) {
-            textNode = false;
-        }
-        else if (nodeIndex < textIndex) {
-            textNode = false;
-        }
-        else {
-            throw new ParseException_1.ParseException(lineNumber, "INVALID_LINE", `Line not valid: ${line}`);
-        }
-        if (textNode) {
-            name = line.substring(0, textIndex);
-            value = line.substring(textIndex + 2);
-        }
-        else {
-            name = line.substring(0, nodeIndex);
-            value = line.substring(nodeIndex + 1);
-        }
-        if (textNode && value.trim().length > 0) {
-            throw new ParseException_1.ParseException(lineNumber, "INLINE_VALUE_NOT_VALID", `Line not valid: ${line}`);
-        }
-        // Namespace por defecto: heredado del padre
-        const nn = NameNamespaceParser_1.NameNamespaceParser.parse(name, parent ? parent.getNamespace() : null, lineNumber, line);
-        name = nn.getName();
-        const namespace = nn.getNamespace();
-        // Validamos nombre
-        if (name.length === 0) {
-            throw new ParseException_1.ParseException(lineNumber, "INVALID_LINE", `Line not valid: ${line}`);
-        }
-        // Creamos nodo
-        return new Node_1.Node(lineNumber, level, name, namespace, textNode, value);
     }
 }
 exports.Parser = Parser;

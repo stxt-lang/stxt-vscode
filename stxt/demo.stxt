@@ -1,8 +1,9 @@
-Ejemplo(demo.example):
+Ejemplo(demo.example): Hola, esto es un texto
     Autor : Joan
     Título:Prueba
     Texto>>   
         Esto es un texto
         Un poco largo
+    
 # Hola mundo 
 # Hola esto es otro comentarioooooo

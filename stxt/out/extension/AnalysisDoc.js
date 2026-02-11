@@ -38,6 +38,7 @@ exports.analisysDoc = analisysDoc;
 const vscode = __importStar(require("vscode"));
 const Node_1 = require("../core/Node");
 const LineIndentParser_1 = require("../core/LineIndentParser");
+const NodeCreator_1 = require("../core/NodeCreator");
 const lastAnalysisByUri = new Map();
 function getLastAnalysis(document) {
     return lastAnalysisByUri.get(document.uri.toString());
@@ -47,13 +48,13 @@ function analisysDoc(document, diagnosticCollection) {
     const diagnostics = [];
     const tokens = [];
     const lines = document.getText().split(/\r?\n/);
-    let lastNode = new Node_1.Node(0, 0, "empty", null, false, "");
+    let lastNodeValid = new Node_1.Node(0, 0, "empty", null, false, "");
     for (let index = 0; index < lines.length; index++) {
         const line = lines[index];
         const lineNumber = index + 1;
         console.log(`${lineNumber}: ${line}`);
-        const lastLevel = lastNode.getLevel();
-        const lastNodeText = lastNode.isTextNode();
+        const lastLevel = lastNodeValid.getLevel();
+        const lastNodeText = lastNodeValid.isTextNode();
         // Parseamos línea
         let lineIndent = null;
         try {
@@ -70,7 +71,23 @@ function analisysDoc(document, diagnosticCollection) {
             tokens.push({ line: index, startChar: 0, length: line.length, type: 'comment' });
             continue;
         }
-        // TODO Actualizar lastNode si hace falta
+        const currentLevel = lineIndent.indentLevel;
+        // Si estamos dentro de un nodo texto, y el nivel indica que sigue siendo texto,
+        // añadimos línea de texto y no creamos nodo.
+        if (lastNodeText && currentLevel > lastLevel) {
+            lastNodeValid.addTextLine(lineIndent.lineWithoutIndent);
+            continue;
+        }
+        try {
+            lastNodeValid = (0, NodeCreator_1.createNode)(lineIndent, lineNumber, currentLevel, null);
+            // TODO: Añadir tipo de línea,...
+        }
+        catch (e) {
+            console.log("Error en " + lineNumber + e);
+            const range = new vscode.Range(index, 0, index, line.length);
+            diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Error));
+            continue;
+        }
     }
     ;
     // Fin de diagnosis
