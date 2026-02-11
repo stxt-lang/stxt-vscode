@@ -51,4 +51,4 @@ class StxtSemanticTokensProvider {
     }
 }
 exports.StxtSemanticTokensProvider = StxtSemanticTokensProvider;
-//# sourceMappingURL=StxtSemanticTokensProvider.js.map
+//# sourceMappingURL=STXTSemanticTokensProvider.js.map

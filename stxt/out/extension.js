@@ -36,10 +36,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
-const StxtSemanticTokensProvider_1 = require("./StxtSemanticTokensProvider");
-const StxtFormattingProvider_1 = require("./StxtFormattingProvider");
-const StxtCompletionProvider_1 = require("./StxtCompletionProvider");
-const StxtHoverProvider_1 = require("./StxtHoverProvider");
+const STXTSemanticTokensProvider_1 = require("./STXTSemanticTokensProvider");
+const STXTFormattingProvider_1 = require("./STXTFormattingProvider");
+const STXTCompletionProvider_1 = require("./STXTCompletionProvider");
+const STXTHoverProvider_1 = require("./STXTHoverProvider");
 const STXTAnalysisDoc_1 = require("./STXTAnalysisDoc");
 const STXTTokens_1 = require("./STXTTokens");
 let diagnosticCollection;
@@ -62,11 +62,11 @@ function activate(context) {
         console.log("onDidCloseTextDocument");
         diagnosticCollection.delete(doc.uri);
     }));
-    context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new StxtSemanticTokensProvider_1.StxtSemanticTokensProvider(), STXTTokens_1.tokenLegend));
-    context.subscriptions.push(vscode.languages.registerHoverProvider('stxt', new StxtHoverProvider_1.StxtHoverProvider()));
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider('stxt', new StxtCompletionProvider_1.StxtCompletionProvider(), '@' // carácter que dispara sugerencias
+    context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new STXTSemanticTokensProvider_1.StxtSemanticTokensProvider(), STXTTokens_1.tokenLegend));
+    context.subscriptions.push(vscode.languages.registerHoverProvider('stxt', new STXTHoverProvider_1.StxtHoverProvider()));
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider('stxt', new STXTCompletionProvider_1.StxtCompletionProvider(), '@' // carácter que dispara sugerencias
     ));
-    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new StxtFormattingProvider_1.StxtFormattingProvider()));
+    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new STXTFormattingProvider_1.StxtFormattingProvider()));
     for (const doc of vscode.workspace.textDocuments) {
         if (doc.languageId === 'stxt') {
             console.log('Documento STXT ya cargado inicial:', doc.uri.toString());

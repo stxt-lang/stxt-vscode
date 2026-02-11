@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { STXT_TAGS } from './StxtCompletionProvider';
+import { STXT_TAGS } from './STXTCompletionProvider';
 
 export class StxtHoverProvider implements vscode.HoverProvider {
 

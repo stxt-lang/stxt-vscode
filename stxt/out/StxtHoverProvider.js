@@ -35,7 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StxtHoverProvider = void 0;
 const vscode = __importStar(require("vscode"));
-const StxtCompletionProvider_1 = require("./StxtCompletionProvider");
+const STXTCompletionProvider_1 = require("./STXTCompletionProvider");
 class StxtHoverProvider {
     provideHover(document, position) {
         const range = document.getWordRangeAtPosition(position, /@\w+/);
@@ -43,7 +43,7 @@ class StxtHoverProvider {
             return;
         }
         const word = document.getText(range);
-        const description = StxtCompletionProvider_1.STXT_TAGS[word];
+        const description = STXTCompletionProvider_1.STXT_TAGS[word];
         if (!description) {
             return;
         }
@@ -51,4 +51,4 @@ class StxtHoverProvider {
     }
 }
 exports.StxtHoverProvider = StxtHoverProvider;
-//# sourceMappingURL=StxtHoverProvider.js.map
+//# sourceMappingURL=STXTHoverProvider.js.map

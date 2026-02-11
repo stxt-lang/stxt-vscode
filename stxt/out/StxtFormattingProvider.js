@@ -77,4 +77,4 @@ class StxtFormattingProvider {
     }
 }
 exports.StxtFormattingProvider = StxtFormattingProvider;
-//# sourceMappingURL=StxtFormattingProvider.js.map
+//# sourceMappingURL=STXTFormattingProvider.js.map

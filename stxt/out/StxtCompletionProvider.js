@@ -72,4 +72,4 @@ class StxtCompletionProvider {
     }
 }
 exports.StxtCompletionProvider = StxtCompletionProvider;
-//# sourceMappingURL=StxtCompletionProvider.js.map
+//# sourceMappingURL=STXTCompletionProvider.js.map

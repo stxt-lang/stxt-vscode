@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { StxtSemanticTokensProvider } from './StxtSemanticTokensProvider';
-import { StxtFormattingProvider } from './StxtFormattingProvider';
-import { StxtCompletionProvider } from './StxtCompletionProvider';
-import { StxtHoverProvider } from './StxtHoverProvider';
+import { StxtSemanticTokensProvider } from './STXTSemanticTokensProvider';
+import { StxtFormattingProvider } from './STXTFormattingProvider';
+import { StxtCompletionProvider } from './STXTCompletionProvider';
+import { StxtHoverProvider } from './STXTHoverProvider';
 import { analisysDoc } from './STXTAnalysisDoc';
 import { tokenLegend } from './STXTTokens';
 
