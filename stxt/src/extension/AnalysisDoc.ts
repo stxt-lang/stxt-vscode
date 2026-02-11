@@ -13,7 +13,7 @@ export function getLastAnalysis(document: vscode.TextDocument): AnalysisResult |
 }
 
 export function analisysDoc(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection): AnalysisResult  {
-    console.log("Parse init...");
+    //console.log("Parse init...");
     const diagnostics: vscode.Diagnostic[] = [];
     const tokens: StxtToken[] = [];
 
@@ -67,14 +67,33 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
             // TODO: Añadir tipo de línea,...
             if (lastNodeValid.isTextNode()) {
                 tokens.push({line: index, startChar: 0, length: line.length, type: 'property'});
+
             }
             else {
-                tokens.push({line: index, startChar: 0, length: line.length, type: 'keyword'});
+                //tokens.push({line: index, startChar: 0, length: line.length, type: 'keyword'});
+
+                const i0 = line.indexOf(":");
+
+                const cname = line.substring(0, i0);
+                const value = line.substring(i0+1);
+                const nsIndex = cname.indexOf("(");
+
+                //tokens.push({line: index, startChar: 0, length: i0+1, type: 'keyword'});
+                //tokens.push({line: index, startChar: i0+1, length: line.length-i0, type: 'string'});
+
+                if (nsIndex !== -1) {
+                    tokens.push({line: index, startChar: 0, length: nsIndex-1, type: 'keyword'});
+                    tokens.push({line: index, startChar: nsIndex -1, length: cname.length-nsIndex, type: 'namespace'});
+                    tokens.push({line: index, startChar: nsIndex, length: 1, type: 'keyword'});
+                } else {
+                    tokens.push({line: index, startChar: 0, length: i0+1, type: 'keyword'});
+                }
+
             }
         }
         catch(e)
         {
-            console.log("Error en " + lineNumber + e);
+            //console.log("Error en " + lineNumber + e);
             const range = new vscode.Range(index,0,index,line.length);
             diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Error));
             continue;
@@ -85,7 +104,7 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
     diagnosticCollection.set(document.uri, diagnostics);
     const result = { tokens };
     lastAnalysisByUri.set(document.uri.toString(), result);
-    console.log("Parse end.");
+    //console.log("Parse end.");
     return result;
 }
 

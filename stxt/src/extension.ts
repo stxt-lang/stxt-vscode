@@ -9,7 +9,7 @@ import { tokenLegend } from './extension/Tokens';
 let diagnosticCollection: vscode.DiagnosticCollection;
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('STXT extension activated');
+	//console.log('STXT extension activated');
 
 	diagnosticCollection = vscode.languages.createDiagnosticCollection('stxt');
 
@@ -17,19 +17,19 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.workspace.onDidOpenTextDocument(doc => {
 			if (doc.languageId === 'stxt') {
-				console.log("onDidOpenTextDocument");
+				//console.log("onDidOpenTextDocument");
 				analisysDoc(doc, diagnosticCollection);
 			}
 		}),
 		vscode.workspace.onDidChangeTextDocument(e => {
 			const doc = e.document;
 			if (doc.languageId === 'stxt') {
-				console.log("onDidChangeTextDocument");
+				//console.log("onDidChangeTextDocument");
 				analisysDoc(doc, diagnosticCollection);
 			}
 		}),
 		vscode.workspace.onDidCloseTextDocument(doc => {
-			console.log("onDidCloseTextDocument");
+			//console.log("onDidCloseTextDocument");
 			diagnosticCollection.delete(doc.uri);
 		})
 	);
@@ -63,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	for (const doc of vscode.workspace.textDocuments) {
 		if (doc.languageId === 'stxt') {
-			console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
+			//console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
 			analisysDoc(doc, diagnosticCollection);
 		}
 	}

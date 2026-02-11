@@ -44,22 +44,22 @@ const AnalysisDoc_1 = require("./extension/AnalysisDoc");
 const Tokens_1 = require("./extension/Tokens");
 let diagnosticCollection;
 function activate(context) {
-    console.log('STXT extension activated');
+    //console.log('STXT extension activated');
     diagnosticCollection = vscode.languages.createDiagnosticCollection('stxt');
     context.subscriptions.push(diagnosticCollection);
     context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(doc => {
         if (doc.languageId === 'stxt') {
-            console.log("onDidOpenTextDocument");
+            //console.log("onDidOpenTextDocument");
             (0, AnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
         }
     }), vscode.workspace.onDidChangeTextDocument(e => {
         const doc = e.document;
         if (doc.languageId === 'stxt') {
-            console.log("onDidChangeTextDocument");
+            //console.log("onDidChangeTextDocument");
             (0, AnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
         }
     }), vscode.workspace.onDidCloseTextDocument(doc => {
-        console.log("onDidCloseTextDocument");
+        //console.log("onDidCloseTextDocument");
         diagnosticCollection.delete(doc.uri);
     }));
     context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new SemanticTokensProvider_1.StxtSemanticTokensProvider(), Tokens_1.tokenLegend));
@@ -69,7 +69,7 @@ function activate(context) {
     context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new FormattingProvider_1.StxtFormattingProvider()));
     for (const doc of vscode.workspace.textDocuments) {
         if (doc.languageId === 'stxt') {
-            console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
+            //console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
             (0, AnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
         }
     }
