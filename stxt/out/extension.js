@@ -40,26 +40,23 @@ const StxtSemanticTokensProvider_1 = require("./StxtSemanticTokensProvider");
 const StxtFormattingProvider_1 = require("./StxtFormattingProvider");
 const StxtCompletionProvider_1 = require("./StxtCompletionProvider");
 const StxtHoverProvider_1 = require("./StxtHoverProvider");
-// ******************
-// Variables globales
-// ******************
+const STXTValidation_1 = require("./STXTValidation");
 let diagnosticCollection;
-// ******************************
-// Método principal de activación
-// ******************************
 function activate(context) {
     console.log('STXT extension activated');
     diagnosticCollection = vscode.languages.createDiagnosticCollection('stxt');
     context.subscriptions.push(diagnosticCollection);
     vscode.workspace.onDidOpenTextDocument(document => {
         if (document.languageId === 'stxt') {
-            handleStxtDocument(document);
+            console.log('Documento STXT abierto:', document.uri.toString());
+            (0, STXTValidation_1.validateStxtDocument)(document, diagnosticCollection);
         }
     });
     vscode.workspace.onDidChangeTextDocument(event => {
         const document = event.document;
         if (document.languageId === 'stxt') {
-            handleStxtChangeTextDocument(event, document);
+            console.log('Documento STXT modificado');
+            (0, STXTValidation_1.validateStxtDocument)(document, diagnosticCollection);
         }
     });
     vscode.workspace.onDidCloseTextDocument(document => {
@@ -72,38 +69,4 @@ function activate(context) {
     context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new StxtFormattingProvider_1.StxtFormattingProvider()));
 }
 function deactivate() { }
-// *************************************
-// Modificación y apertura de documentos
-// *************************************
-function handleStxtDocument(document) {
-    console.log('Documento STXT abierto:', document.uri.toString());
-    const text = document.getText();
-    console.log('Procesando STXT:\n', text);
-    validateStxtDocument(document);
-}
-function handleStxtChangeTextDocument(event, document) {
-    console.log('Documento STXT modificado');
-    validateStxtDocument(document);
-}
-// ************************
-// Validación del documento
-// ************************
-function validateStxtDocument(document) {
-    const diagnostics = [];
-    const lines = document.getText().split(/\r?\n/);
-    lines.forEach((line, index) => {
-        const lineNumber = index;
-        // Regla 1: etiqueta sin :
-        if (line.trim().startsWith('@') && !line.includes(':')) {
-            const range = new vscode.Range(lineNumber, 0, lineNumber, line.length);
-            diagnostics.push(new vscode.Diagnostic(range, 'Las etiquetas STXT deben usar ":"', vscode.DiagnosticSeverity.Error));
-        }
-        // Regla 2: key: sin valor
-        if (/^\s*\w+\s*:\s*$/.test(line)) {
-            const range = new vscode.Range(lineNumber, 0, lineNumber, line.length);
-            diagnostics.push(new vscode.Diagnostic(range, 'La clave tiene que tener un valor', vscode.DiagnosticSeverity.Warning));
-        }
-    });
-    diagnosticCollection.set(document.uri, diagnostics);
-}
 //# sourceMappingURL=extension.js.map

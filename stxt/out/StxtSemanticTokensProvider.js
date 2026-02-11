@@ -52,20 +52,17 @@ class StxtSemanticTokensProvider {
     provideDocumentSemanticTokens(document) {
         const builder = new vscode.SemanticTokensBuilder(exports.tokenLegend);
         const lines = document.getText().split(/\r?\n/);
-        console.log("Init 1!");
         const stack = [];
         let lastNode = new Node_1.Node(0, 0, "Init", null, false, "");
-        console.log("Init 2");
         lines.forEach((line, lineIndex) => {
             const lastLevel = lastNode ? lastNode.getLevel() : 0;
             const lastNodeText = lastNode ? lastNode.isTextNode() : false;
             // Parseamos línea
             try {
                 const lineIndent = LineIndentParser_1.LineIndentParser.parseLine(line, lastNodeText, lastLevel, lineIndex + 1);
-                console.log(lineIndent);
             }
             catch (e) {
-                console.log("Error: " + e);
+                //console.log("Error: " + e);
                 // Añadir a errores!! ¿Está bien?
             }
             // Comment (hacer mejor)
