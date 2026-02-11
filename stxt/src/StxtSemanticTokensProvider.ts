@@ -1,4 +1,7 @@
 import * as vscode from 'vscode';
+import { Node } from './core/Node';
+import { LineIndent } from './core/LineIndent';
+import { LineIndentParser } from './core/LineIndentParser';
 
 // *****************
 // Tokens semánticos
@@ -20,41 +23,31 @@ export class StxtSemanticTokensProvider implements vscode.DocumentSemanticTokens
 
         const builder = new vscode.SemanticTokensBuilder(tokenLegend);
         const lines = document.getText().split(/\r?\n/);
+        console.log("Init 1!");
+
+        const stack: Node[] = [];
+        let lastNode: Node = new Node(0,0,"Init",null,false,"");
+        console.log("Init 2");
 
         lines.forEach((line, lineIndex) => {
+            const lastLevel = lastNode ? lastNode.getLevel() : 0;
+            const lastNodeText = lastNode ? lastNode.isTextNode() : false;
+
+            // Parseamos línea
+            try
+            {
+            const lineIndent: LineIndent | null = LineIndentParser.parseLine(line,lastNodeText,lastLevel,lineIndex + 1);
+            console.log(lineIndent);
+            }
+            catch(e)
+            {
+                console.log("Error: " + e);
+                // Añadir a errores!! ¿Está bien?
+            }
+            
             // Comment (hacer mejor)
             if (line.trim().startsWith("#")) {
                 builder.push(lineIndex, 0, line.length, tokenTypes.indexOf('comment'));
-            }
-
-            // @tag
-            const tagMatch = line.match(/^(\s*)(@\w+)/);
-            if (tagMatch) {
-                const start = tagMatch[1].length;
-                const length = tagMatch[2].length;
-                builder.push(lineIndex, start, length, tokenTypes.indexOf('keyword'));
-            }
-
-            // key: value
-            const kvMatch = line.match(/^(\s*)(\w+)\s*:\s*(.+)?$/);
-            if (kvMatch) {
-                const keyStart = kvMatch[1].length;
-                const keyLength = kvMatch[2].length;
-                builder.push(lineIndex, keyStart, keyLength, tokenTypes.indexOf('property'));
-
-                if (kvMatch[3]) {
-                    const valueStart = line.indexOf(kvMatch[3]);
-                    const valueLength = kvMatch[3].length;
-
-                    builder.push(lineIndex, valueStart, valueLength, tokenTypes.indexOf('string'));
-                }
-            }
-
-            // [[link]]
-            const linkRegex = /\[\[([^\]]+)\]\]/g;
-            let match;
-            while ((match = linkRegex.exec(line))) {
-                builder.push(lineIndex, match.index, match[0].length, tokenTypes.indexOf('variable'));
             }
         });
 
