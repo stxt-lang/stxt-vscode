@@ -39,7 +39,8 @@ exports.STXT_TOKEN_TYPES = [
     'comment',
     'namespace',
     'property',
-    'keyword',
+    'macro',
+    'function',
     'string'
 ];
 // Legend derivado del mismo sitio

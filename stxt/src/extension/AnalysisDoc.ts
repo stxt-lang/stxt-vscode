@@ -66,7 +66,10 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
 
             // TODO: Añadir tipo de línea,...
             if (lastNodeValid.isTextNode()) {
-                tokens.push({line: index, startChar: 0, length: line.length, type: 'keyword'});
+                const sepIndx = line.indexOf(">>");
+
+                tokens.push({line: index, startChar: 0, length: sepIndx, type: 'macro'});
+                tokens.push({line: index, startChar: sepIndx, length: 2, type: 'function'});
             }
             else {
                 const colon = line.indexOf(':');
@@ -77,9 +80,10 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
                 if (nsOpen !== -1 && nsClose !== -1) {
                     tokens.push({ line: index, startChar: 0, length: nsOpen, type: 'property' });
                     tokens.push({ line: index, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
-                    tokens.push({ line: index, startChar: nsClose + 1, length: colon - (nsClose + 1) + 1, type: 'property' });
+                    tokens.push({ line: index, startChar: nsClose + 1, length: colon - (nsClose + 1) + 1, type: 'function' });
                 } else {
-                    tokens.push({ line: index, startChar: 0, length: colon + 1, type: 'property' });
+                    tokens.push({ line: index, startChar: 0, length: colon, type: 'property' });
+                    tokens.push({ line: index, startChar: colon, length: 1, type: 'function' });
                 }
 
                 const valueStart = colon + 1;

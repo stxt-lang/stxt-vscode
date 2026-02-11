@@ -4,7 +4,8 @@ export const STXT_TOKEN_TYPES = [
   'comment',
   'namespace',
   'property',
-  'keyword',
+  'macro',
+  'function',
   'string'
 ] as const;
 
