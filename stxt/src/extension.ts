@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import { StxtSemanticTokensProvider } from './STXTSemanticTokensProvider';
-import { StxtFormattingProvider } from './STXTFormattingProvider';
-import { StxtCompletionProvider } from './STXTCompletionProvider';
-import { StxtHoverProvider } from './STXTHoverProvider';
-import { analisysDoc } from './STXTAnalysisDoc';
-import { tokenLegend } from './STXTTokens';
+import { StxtSemanticTokensProvider } from './extension/SemanticTokensProvider';
+import { StxtFormattingProvider } from './extension/FormattingProvider';
+import { StxtCompletionProvider } from './extension/CompletionProvider';
+import { StxtHoverProvider } from './extension/HoverProvider';
+import { analisysDoc } from './extension/AnalysisDoc';
+import { tokenLegend } from './extension/Tokens';
 
 let diagnosticCollection: vscode.DiagnosticCollection;
 

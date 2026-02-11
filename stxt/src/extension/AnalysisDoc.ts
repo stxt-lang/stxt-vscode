@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { Node } from './core/Node';
-import { LineIndent } from './core/LineIndent';
-import { LineIndentParser } from './core/LineIndentParser';
-import { AnalysisResult } from './STXTAnalysisResult';
-import { StxtToken } from './STXTTokens';
+import { Node } from '../core/Node';
+import { LineIndent } from '../core/LineIndent';
+import { LineIndentParser } from '../core/LineIndentParser';
+import { AnalysisResult } from './AnalysisResult';
+import { StxtToken } from './Tokens';
 
 const lastAnalysisByUri = new Map<string, AnalysisResult>();
 

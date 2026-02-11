@@ -36,12 +36,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
-const STXTSemanticTokensProvider_1 = require("./STXTSemanticTokensProvider");
-const STXTFormattingProvider_1 = require("./STXTFormattingProvider");
-const STXTCompletionProvider_1 = require("./STXTCompletionProvider");
-const STXTHoverProvider_1 = require("./STXTHoverProvider");
-const STXTAnalysisDoc_1 = require("./STXTAnalysisDoc");
-const STXTTokens_1 = require("./STXTTokens");
+const SemanticTokensProvider_1 = require("./extension/SemanticTokensProvider");
+const FormattingProvider_1 = require("./extension/FormattingProvider");
+const CompletionProvider_1 = require("./extension/CompletionProvider");
+const HoverProvider_1 = require("./extension/HoverProvider");
+const AnalysisDoc_1 = require("./extension/AnalysisDoc");
+const Tokens_1 = require("./extension/Tokens");
 let diagnosticCollection;
 function activate(context) {
     console.log('STXT extension activated');
@@ -50,27 +50,27 @@ function activate(context) {
     context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(doc => {
         if (doc.languageId === 'stxt') {
             console.log("onDidOpenTextDocument");
-            (0, STXTAnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
+            (0, AnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
         }
     }), vscode.workspace.onDidChangeTextDocument(e => {
         const doc = e.document;
         if (doc.languageId === 'stxt') {
             console.log("onDidChangeTextDocument");
-            (0, STXTAnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
+            (0, AnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
         }
     }), vscode.workspace.onDidCloseTextDocument(doc => {
         console.log("onDidCloseTextDocument");
         diagnosticCollection.delete(doc.uri);
     }));
-    context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new STXTSemanticTokensProvider_1.StxtSemanticTokensProvider(), STXTTokens_1.tokenLegend));
-    context.subscriptions.push(vscode.languages.registerHoverProvider('stxt', new STXTHoverProvider_1.StxtHoverProvider()));
-    context.subscriptions.push(vscode.languages.registerCompletionItemProvider('stxt', new STXTCompletionProvider_1.StxtCompletionProvider(), '@' // carácter que dispara sugerencias
+    context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new SemanticTokensProvider_1.StxtSemanticTokensProvider(), Tokens_1.tokenLegend));
+    context.subscriptions.push(vscode.languages.registerHoverProvider('stxt', new HoverProvider_1.StxtHoverProvider()));
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider('stxt', new CompletionProvider_1.StxtCompletionProvider(), '@' // carácter que dispara sugerencias
     ));
-    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new STXTFormattingProvider_1.StxtFormattingProvider()));
+    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new FormattingProvider_1.StxtFormattingProvider()));
     for (const doc of vscode.workspace.textDocuments) {
         if (doc.languageId === 'stxt') {
             console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
-            (0, STXTAnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
+            (0, AnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
         }
     }
 }

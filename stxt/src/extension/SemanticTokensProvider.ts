@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { getLastAnalysis } from './STXTAnalysisDoc';
-import { tokenLegend, tokenTypeIndex } from './STXTTokens';
+import { getLastAnalysis } from './AnalysisDoc';
+import { tokenLegend, tokenTypeIndex } from './Tokens';
 
 export class StxtSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
   provideDocumentSemanticTokens(document: vscode.TextDocument): vscode.ProviderResult<vscode.SemanticTokens> {
