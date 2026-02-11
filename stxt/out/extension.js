@@ -41,6 +41,7 @@ const StxtFormattingProvider_1 = require("./StxtFormattingProvider");
 const StxtCompletionProvider_1 = require("./StxtCompletionProvider");
 const StxtHoverProvider_1 = require("./StxtHoverProvider");
 const STXTAnalysis_1 = require("./STXTAnalysis");
+const STXTTokens_1 = require("./STXTTokens");
 let diagnosticCollection;
 function activate(context) {
     console.log('STXT extension activated');
@@ -61,7 +62,7 @@ function activate(context) {
         console.log("onDidCloseTextDocument");
         diagnosticCollection.delete(doc.uri);
     }));
-    context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new StxtSemanticTokensProvider_1.StxtSemanticTokensProvider(), StxtSemanticTokensProvider_1.tokenLegend));
+    context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider({ language: 'stxt' }, new StxtSemanticTokensProvider_1.StxtSemanticTokensProvider(), STXTTokens_1.tokenLegend));
     context.subscriptions.push(vscode.languages.registerHoverProvider('stxt', new StxtHoverProvider_1.StxtHoverProvider()));
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider('stxt', new StxtCompletionProvider_1.StxtCompletionProvider(), '@' // carácter que dispara sugerencias
     ));

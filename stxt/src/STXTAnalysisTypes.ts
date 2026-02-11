@@ -1,12 +1,12 @@
-export type StxtTokenType = 'comment';
+import type { StxtTokenType } from './STXTTokens';
 
 export interface StxtToken {
-    line: number;      // 0-based
-    startChar: number; // 0-based
-    length: number;
-    type: StxtTokenType;
+  line: number; // 0 based
+  startChar: number; // 0 based
+  length: number;
+  type: StxtTokenType;
 }
 
 export interface AnalysisResult {
-    tokens: StxtToken[];
+  tokens: StxtToken[];
 }

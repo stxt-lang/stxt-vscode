@@ -33,22 +33,17 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StxtSemanticTokensProvider = void 0;
+exports.tokenTypeIndex = exports.tokenLegend = exports.STXT_TOKEN_TYPES = void 0;
 const vscode = __importStar(require("vscode"));
-const STXTAnalysis_1 = require("./STXTAnalysis");
-const STXTTokens_1 = require("./STXTTokens");
-class StxtSemanticTokensProvider {
-    provideDocumentSemanticTokens(document) {
-        const builder = new vscode.SemanticTokensBuilder(STXTTokens_1.tokenLegend);
-        const analysis = (0, STXTAnalysis_1.getLastAnalysis)(document);
-        if (!analysis) {
-            return builder.build();
-        }
-        for (const t of analysis.tokens) {
-            builder.push(t.line, t.startChar, t.length, STXTTokens_1.tokenTypeIndex[t.type]);
-        }
-        return builder.build();
-    }
-}
-exports.StxtSemanticTokensProvider = StxtSemanticTokensProvider;
-//# sourceMappingURL=StxtSemanticTokensProvider.js.map
+exports.STXT_TOKEN_TYPES = [
+    'comment',
+    'namespace',
+    'property',
+    'keyword',
+    'string'
+];
+// Legend derivado del mismo sitio
+exports.tokenLegend = new vscode.SemanticTokensLegend([...exports.STXT_TOKEN_TYPES]);
+// Mapping type -> index derivado del mismo sitio
+exports.tokenTypeIndex = Object.fromEntries(exports.STXT_TOKEN_TYPES.map((t, i) => [t, i]));
+//# sourceMappingURL=STXTTokens.js.map
