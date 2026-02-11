@@ -13,10 +13,10 @@ Demo    >>
 # Hola
     También es normal
     Y sigue 
-Demo: World
+Demo (hola.mundo): World
 Hola: Esto es otro texto
 Hola:
-    Hola:
+    Hola (dd.dd):
     Hola: Demo World *Como te llamas?*
         Otro hola: Como vas?
         Demo >>
@@ -25,5 +25,5 @@ Hola:
 
             fsdfsa _Hola_
             fasf *Mundo*
-            saf
-            asf
+            saf     
+            asf       

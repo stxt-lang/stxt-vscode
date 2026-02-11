@@ -69,20 +69,22 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
                 tokens.push({line: index, startChar: 0, length: line.length, type: 'keyword'});
             }
             else {
-                const i0 = line.indexOf(":");
+                const colon = line.indexOf(':');
+                const head = line.substring(0, colon); // "Clave (namespace)"
+                const nsOpen = head.indexOf('(');
+                const nsClose = head.indexOf(')', nsOpen + 1);
 
-                const cname = line.substring(0, i0);
-                const value = line.substring(i0+1);
-                const nsIndex = cname.indexOf("(");
-
-                //tokens.push({line: index, startChar: i0+1, length: line.length-i0, type: 'string'});
-
-                if (nsIndex !== -1) {
-                    tokens.push({line: index, startChar: 0, length: nsIndex-1, type: 'property'});
-                    tokens.push({line: index, startChar: nsIndex -1, length: cname.length-nsIndex, type: 'namespace'});
-                    tokens.push({line: index, startChar: nsIndex, length: 1, type: 'property'});
+                if (nsOpen !== -1 && nsClose !== -1) {
+                    tokens.push({ line: index, startChar: 0, length: nsOpen, type: 'property' });
+                    tokens.push({ line: index, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
+                    tokens.push({ line: index, startChar: nsClose + 1, length: colon - (nsClose + 1) + 1, type: 'property' });
                 } else {
-                    tokens.push({line: index, startChar: 0, length: i0+1, type: 'property'});
+                    tokens.push({ line: index, startChar: 0, length: colon + 1, type: 'property' });
+                }
+
+                const valueStart = colon + 1;
+                if (valueStart < line.length) {
+                    tokens.push({ line: index, startChar: valueStart, length: line.length - valueStart, type: 'string' });
                 }
             }
         }
