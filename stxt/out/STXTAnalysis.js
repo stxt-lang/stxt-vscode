@@ -34,12 +34,15 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.analisysDoc = analisysDoc;
+exports.getLastAnalysis = getLastAnalysis;
 const vscode = __importStar(require("vscode"));
 const Node_1 = require("./core/Node");
 const LineIndentParser_1 = require("./core/LineIndentParser");
+const lastAnalysisByUri = new Map();
 function analisysDoc(document, diagnosticCollection) {
     console.log("Parse init...");
     const diagnostics = [];
+    const tokens = [];
     const lines = document.getText().split(/\r?\n/);
     let lastNode = new Node_1.Node(0, 0, "empty", null, false, "");
     lines.forEach((line, index) => {
@@ -50,6 +53,9 @@ function analisysDoc(document, diagnosticCollection) {
         // Parseamos línea
         try {
             const lineIndent = LineIndentParser_1.LineIndentParser.parseLine(line, lastNodeText, lastLevel, lineNumber);
+            if (lineIndent === null) {
+                tokens.push({ line: index, startChar: 0, length: line.length, type: 'comment' });
+            }
         }
         catch (e) {
             console.log("Error en " + lineNumber + e);
@@ -59,6 +65,12 @@ function analisysDoc(document, diagnosticCollection) {
         // TODO Actualizar lastNode si hace falta
     });
     diagnosticCollection.set(document.uri, diagnostics);
+    const result = { tokens };
+    lastAnalysisByUri.set(document.uri.toString(), result);
     console.log("Parse end.");
+    return result;
+}
+function getLastAnalysis(document) {
+    return lastAnalysisByUri.get(document.uri.toString());
 }
 //# sourceMappingURL=STXTAnalysis.js.map
