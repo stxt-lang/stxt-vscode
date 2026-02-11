@@ -67,6 +67,14 @@ function activate(context) {
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider('stxt', new StxtCompletionProvider_1.StxtCompletionProvider(), '@' // carácter que dispara sugerencias
     ));
     context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new StxtFormattingProvider_1.StxtFormattingProvider()));
+    for (const doc of vscode.workspace.textDocuments) {
+        maybeValidate(doc);
+    }
 }
 function deactivate() { }
+function maybeValidate(document) {
+    if (document.languageId === 'stxt') {
+        (0, STXTValidation_1.validateStxtDocument)(document, diagnosticCollection);
+    }
+}
 //# sourceMappingURL=extension.js.map

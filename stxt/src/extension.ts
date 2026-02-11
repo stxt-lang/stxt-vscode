@@ -58,6 +58,16 @@ export function activate(context: vscode.ExtensionContext) {
             new StxtFormattingProvider()
         )
     );
+
+  for (const doc of vscode.workspace.textDocuments) {
+    maybeValidate(doc);
+  }    
 }
 
 export function deactivate() {}
+
+function maybeValidate(document: vscode.TextDocument) {
+  if (document.languageId === 'stxt') {
+    validateStxtDocument(document, diagnosticCollection);
+  }
+}

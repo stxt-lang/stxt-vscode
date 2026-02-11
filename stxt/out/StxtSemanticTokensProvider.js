@@ -50,6 +50,7 @@ const tokenTypes = [
 exports.tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
 class StxtSemanticTokensProvider {
     provideDocumentSemanticTokens(document) {
+        console.log("Semantics init...");
         const builder = new vscode.SemanticTokensBuilder(exports.tokenLegend);
         const lines = document.getText().split(/\r?\n/);
         const stack = [];
@@ -70,6 +71,7 @@ class StxtSemanticTokensProvider {
                 builder.push(lineIndex, 0, line.length, tokenTypes.indexOf('comment'));
             }
         });
+        console.log("Semantics end.");
         return builder.build();
     }
 }

@@ -20,7 +20,7 @@ export const tokenLegend = new vscode.SemanticTokensLegend(tokenTypes);
 export class StxtSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
 
     provideDocumentSemanticTokens(document: vscode.TextDocument): vscode.ProviderResult<vscode.SemanticTokens> {
-
+        console.log("Semantics init...");
         const builder = new vscode.SemanticTokensBuilder(tokenLegend);
         const lines = document.getText().split(/\r?\n/);
 
@@ -48,6 +48,7 @@ export class StxtSemanticTokensProvider implements vscode.DocumentSemanticTokens
             }
         });
 
+        console.log("Semantics end.");
         return builder.build();
     }
 }
