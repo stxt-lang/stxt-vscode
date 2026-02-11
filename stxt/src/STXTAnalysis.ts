@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 // Validación del documento
 // ************************
 
-export function validateStxtDocument(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection) {
+export function analisysDoc(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection) {
     console.log("Validate init...");
     const diagnostics: vscode.Diagnostic[] = [];
 

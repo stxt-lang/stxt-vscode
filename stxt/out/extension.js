@@ -40,7 +40,7 @@ const StxtSemanticTokensProvider_1 = require("./StxtSemanticTokensProvider");
 const StxtFormattingProvider_1 = require("./StxtFormattingProvider");
 const StxtCompletionProvider_1 = require("./StxtCompletionProvider");
 const StxtHoverProvider_1 = require("./StxtHoverProvider");
-const STXTValidation_1 = require("./STXTValidation");
+const STXTAnalysis_1 = require("./STXTAnalysis");
 let diagnosticCollection;
 function activate(context) {
     console.log('STXT extension activated');
@@ -49,14 +49,14 @@ function activate(context) {
     vscode.workspace.onDidOpenTextDocument(document => {
         if (document.languageId === 'stxt') {
             console.log('Documento STXT abierto:', document.uri.toString());
-            (0, STXTValidation_1.validateStxtDocument)(document, diagnosticCollection);
+            (0, STXTAnalysis_1.analisysDoc)(document, diagnosticCollection);
         }
     });
     vscode.workspace.onDidChangeTextDocument(event => {
         const document = event.document;
         if (document.languageId === 'stxt') {
             console.log('Documento STXT modificado');
-            (0, STXTValidation_1.validateStxtDocument)(document, diagnosticCollection);
+            (0, STXTAnalysis_1.analisysDoc)(document, diagnosticCollection);
         }
     });
     vscode.workspace.onDidCloseTextDocument(document => {
@@ -68,13 +68,10 @@ function activate(context) {
     ));
     context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new StxtFormattingProvider_1.StxtFormattingProvider()));
     for (const doc of vscode.workspace.textDocuments) {
-        maybeValidate(doc);
+        if (doc.languageId === 'stxt') {
+            (0, STXTAnalysis_1.analisysDoc)(doc, diagnosticCollection);
+        }
     }
 }
 function deactivate() { }
-function maybeValidate(document) {
-    if (document.languageId === 'stxt') {
-        (0, STXTValidation_1.validateStxtDocument)(document, diagnosticCollection);
-    }
-}
 //# sourceMappingURL=extension.js.map
