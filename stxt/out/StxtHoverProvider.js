@@ -36,9 +36,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StxtHoverProvider = void 0;
 const vscode = __importStar(require("vscode"));
 const StxtCompletionProvider_1 = require("./StxtCompletionProvider");
-// **************
-// Hover provider
-// **************
 class StxtHoverProvider {
     provideHover(document, position) {
         const range = document.getWordRangeAtPosition(position, /@\w+/);

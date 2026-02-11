@@ -35,9 +35,6 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StxtCompletionProvider = exports.STXT_TAGS = void 0;
 const vscode = __importStar(require("vscode"));
-// *********************
-// Completation provider
-// *********************
 exports.STXT_TAGS = {
     '@title': 'Título principal del documento',
     '@note': 'Nota informativa',

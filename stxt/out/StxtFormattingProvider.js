@@ -35,9 +35,6 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StxtFormattingProvider = void 0;
 const vscode = __importStar(require("vscode"));
-// ******************
-// Formating provider
-// ******************
 class StxtFormattingProvider {
     provideDocumentFormattingEdits(document) {
         const lines = document.getText().split(/\r?\n/);

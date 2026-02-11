@@ -1,8 +1,5 @@
 import * as vscode from 'vscode';
 
-// *********************
-// Completation provider
-// *********************
 export const STXT_TAGS: Record<string, string> = {
     '@title': 'Título principal del documento',
     '@note': 'Nota informativa',

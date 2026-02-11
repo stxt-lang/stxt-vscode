@@ -1,9 +1,5 @@
 import * as vscode from 'vscode';
 
-// ******************
-// Formating provider
-// ******************
-
 export class StxtFormattingProvider implements vscode.DocumentFormattingEditProvider {
 
     provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {

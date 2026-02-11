@@ -1,10 +1,6 @@
 import * as vscode from 'vscode';
 import { STXT_TAGS } from './StxtCompletionProvider';
 
-// **************
-// Hover provider
-// **************
-
 export class StxtHoverProvider implements vscode.HoverProvider {
 
     provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Hover> {
