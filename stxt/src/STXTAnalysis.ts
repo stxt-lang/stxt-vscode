@@ -1,33 +1,41 @@
 import * as vscode from 'vscode';
-
-// ************************
-// Validación del documento
-// ************************
+import { Node } from './core/Node';
+import { LineIndent } from './core/LineIndent';
+import { LineIndentParser } from './core/LineIndentParser';
 
 export function analisysDoc(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection) {
-    console.log("Validate init...");
+    console.log("Parse init...");
     const diagnostics: vscode.Diagnostic[] = [];
 
     const lines = document.getText().split(/\r?\n/);
 
+    let lastNode: Node = new Node(0,0,"empty",null,false,"");
+
     lines.forEach((line, index) => {
-        const lineNumber = index;
+        const lineNumber = index + 1;
 
-        // Regla 1: etiqueta sin :
-        if (line.trim().startsWith('@') && !line.includes(':')) {
-            const range = new vscode.Range(lineNumber,0,lineNumber,line.length);
-            diagnostics.push(new vscode.Diagnostic(range, 'Las etiquetas STXT deben usar ":"', vscode.DiagnosticSeverity.Error));
+        console.log(`${lineNumber}: ${line}`);
+
+        const lastLevel = lastNode.getLevel();
+        const lastNodeText = lastNode.isTextNode();
+
+        // Parseamos línea
+        try
+        {
+            const lineIndent: LineIndent | null = LineIndentParser.parseLine(line,lastNodeText,lastLevel,lineNumber);
+        }
+        catch(e)
+        {
+            console.log("Error en " + lineNumber + e);
+            const range = new vscode.Range(index,0,index,line.length);
+            diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Error));
         }
 
-        // Regla 2: key: sin valor
-        if (/^\s*\w+\s*:\s*$/.test(line)) {
-            const range = new vscode.Range(lineNumber,0,lineNumber,line.length);
-            diagnostics.push(new vscode.Diagnostic(range, 'La clave tiene que tener un valor', vscode.DiagnosticSeverity.Warning));
-        }
+        // TODO Actualizar lastNode si hace falta
     });
 
     diagnosticCollection.set(document.uri, diagnostics);
-    console.log("Validate end.");
+    console.log("Parse end.");
 }
 
 

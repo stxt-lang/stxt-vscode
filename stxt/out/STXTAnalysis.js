@@ -35,27 +35,30 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.analisysDoc = analisysDoc;
 const vscode = __importStar(require("vscode"));
-// ************************
-// Validación del documento
-// ************************
+const Node_1 = require("./core/Node");
+const LineIndentParser_1 = require("./core/LineIndentParser");
 function analisysDoc(document, diagnosticCollection) {
-    console.log("Validate init...");
+    console.log("Parse init...");
     const diagnostics = [];
     const lines = document.getText().split(/\r?\n/);
+    let lastNode = new Node_1.Node(0, 0, "empty", null, false, "");
     lines.forEach((line, index) => {
-        const lineNumber = index;
-        // Regla 1: etiqueta sin :
-        if (line.trim().startsWith('@') && !line.includes(':')) {
-            const range = new vscode.Range(lineNumber, 0, lineNumber, line.length);
-            diagnostics.push(new vscode.Diagnostic(range, 'Las etiquetas STXT deben usar ":"', vscode.DiagnosticSeverity.Error));
+        const lineNumber = index + 1;
+        console.log(`${lineNumber}: ${line}`);
+        const lastLevel = lastNode.getLevel();
+        const lastNodeText = lastNode.isTextNode();
+        // Parseamos línea
+        try {
+            const lineIndent = LineIndentParser_1.LineIndentParser.parseLine(line, lastNodeText, lastLevel, lineNumber);
         }
-        // Regla 2: key: sin valor
-        if (/^\s*\w+\s*:\s*$/.test(line)) {
-            const range = new vscode.Range(lineNumber, 0, lineNumber, line.length);
-            diagnostics.push(new vscode.Diagnostic(range, 'La clave tiene que tener un valor', vscode.DiagnosticSeverity.Warning));
+        catch (e) {
+            console.log("Error en " + lineNumber + e);
+            const range = new vscode.Range(index, 0, index, line.length);
+            diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Error));
         }
+        // TODO Actualizar lastNode si hace falta
     });
     diagnosticCollection.set(document.uri, diagnostics);
-    console.log("Validate end.");
+    console.log("Parse end.");
 }
 //# sourceMappingURL=STXTAnalysis.js.map
