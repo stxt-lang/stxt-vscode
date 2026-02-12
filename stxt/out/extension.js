@@ -42,6 +42,7 @@ const CompletionProvider_1 = require("./extension/CompletionProvider");
 const HoverProvider_1 = require("./extension/HoverProvider");
 const AnalysisDoc_1 = require("./extension/AnalysisDoc");
 const Tokens_1 = require("./extension/Tokens");
+const SchemaLoader_1 = require("./extension/SchemaLoader");
 let diagnosticCollection;
 function activate(context) {
     //console.log('STXT extension activated');
@@ -74,6 +75,7 @@ function activate(context) {
         }
     }
     console.log("INIT GRAMMARS!!!!!");
+    (0, SchemaLoader_1.registerSchemaLoader)(context);
 }
 function deactivate() { }
 //# sourceMappingURL=extension.js.map

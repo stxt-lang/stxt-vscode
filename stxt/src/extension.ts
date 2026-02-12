@@ -5,6 +5,7 @@ import { StxtCompletionProvider } from './extension/CompletionProvider';
 import { StxtHoverProvider } from './extension/HoverProvider';
 import { analisysDoc } from './extension/AnalysisDoc';
 import { tokenLegend } from './extension/Tokens';
+import { registerSchemaLoader } from './extension/SchemaLoader';
 
 let diagnosticCollection: vscode.DiagnosticCollection;
 
@@ -69,6 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 
 	console.log("INIT GRAMMARS!!!!!");
+	registerSchemaLoader(context);
 }
 
 export function deactivate() { }
