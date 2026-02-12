@@ -1,9 +1,9 @@
 // type/INLINE.ts
 
+import { Node } from "../../core/Node";
 import { ValidationException } from "../../exceptions/ValidationException";
 import { NodeDefinition } from "../NodeDefinition";
 import { Type } from "../Type";
-import { Node } from "../../core/Node";
 
 export const INLINE: Type = {
     getName(): string {
