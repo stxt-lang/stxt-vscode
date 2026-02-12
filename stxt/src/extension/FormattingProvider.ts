@@ -28,6 +28,26 @@ function createLine(line: string, node: Node | undefined): string {
     if (!node) {
         return rightTrim(line);
     }
-    
-    return line;
+
+    let result = "\t".repeat(node.getLevel());
+    const indexNs = line.indexOf("(");
+
+    if (node.isTextNode()) {
+        if (indexNs !== -1) {
+            result += node.getName() + " (" + node.getNamespace() + ") >>";
+        }
+        else {
+            result += node.getName() + " >>";
+        }
+    } else {
+        if (indexNs !== -1) {
+            result += node.getName() + " (" + node.getNamespace() + "): ";
+        }
+        else {
+            result += node.getName() + ": ";
+        }
+    }
+
+
+    return result;
 }

@@ -16,31 +16,26 @@ export class NodeWriter {
 		return out.join("");
 	}
 
-	static toSTXTDocs(
-		docs: ReadonlyArray<Node>,
-		style: IndentStyle = IndentStyle.TABS
-	): string {
+	static toSTXTDocs(docs: ReadonlyArray<Node>, style: IndentStyle = IndentStyle.TABS): string {
 		const out: string[] = [];
 		for (let i = 0; i < docs.length; i++) {
-			if (i > 0) out.push("\n");
+			if (i > 0) {
+				out.push("\n");
+			}
 			NodeWriter.writeNode(out, docs[i], 0, style, "");
 		}
 		return out.join("");
 	}
 
-	private static writeNode(
-		out: string[],
-		n: Node,
-		depth: number,
-		style: IndentStyle,
-		parentNs: string
-	): void {
+	private static writeNode(out: string[], n: Node, depth: number, style: IndentStyle, parentNs: string): void {
 		NodeWriter.indent(out, depth, style);
 
 		const ns = n.getNamespace();
 
 		out.push(n.getName());
-		if (ns.length > 0 && ns !== parentNs) out.push(" (", ns, ")");
+		if (ns.length > 0 && ns !== parentNs){
+			 out.push(" (", ns, ")");
+		}
 
 		if (n.isTextNode()) {
 			out.push(" >>\n");
@@ -52,7 +47,9 @@ export class NodeWriter {
 		} else {
 			out.push(":");
 			const value = n.getValue();
-			if (value.length > 0) out.push(" ", value);
+			if (value.length > 0) {
+				out.push(" ", value);
+			}
 			out.push("\n");
 		}
 
@@ -62,7 +59,8 @@ export class NodeWriter {
 	}
 
 	private static indent(out: string[], depth: number, style: IndentStyle): void {
-		if (depth <= 0) return;
-		out.push(style === IndentStyle.SPACES_4 ? "    ".repeat(depth) : "\t".repeat(depth));
+		if (depth > 0) {
+			out.push(style === IndentStyle.SPACES_4 ? "    ".repeat(depth) : "\t".repeat(depth));
+		}
 	}
 }

@@ -17,8 +17,9 @@ class NodeWriter {
     static toSTXTDocs(docs, style = IndentStyle.TABS) {
         const out = [];
         for (let i = 0; i < docs.length; i++) {
-            if (i > 0)
+            if (i > 0) {
                 out.push("\n");
+            }
             NodeWriter.writeNode(out, docs[i], 0, style, "");
         }
         return out.join("");
@@ -27,8 +28,9 @@ class NodeWriter {
         NodeWriter.indent(out, depth, style);
         const ns = n.getNamespace();
         out.push(n.getName());
-        if (ns.length > 0 && ns !== parentNs)
+        if (ns.length > 0 && ns !== parentNs) {
             out.push(" (", ns, ")");
+        }
         if (n.isTextNode()) {
             out.push(" >>\n");
             for (const line of n.getTextLines()) {
@@ -39,8 +41,9 @@ class NodeWriter {
         else {
             out.push(":");
             const value = n.getValue();
-            if (value.length > 0)
+            if (value.length > 0) {
                 out.push(" ", value);
+            }
             out.push("\n");
         }
         for (const child of n.getChildren()) {
@@ -48,9 +51,9 @@ class NodeWriter {
         }
     }
     static indent(out, depth, style) {
-        if (depth <= 0)
-            return;
-        out.push(style === IndentStyle.SPACES_4 ? "    ".repeat(depth) : "\t".repeat(depth));
+        if (depth > 0) {
+            out.push(style === IndentStyle.SPACES_4 ? "    ".repeat(depth) : "\t".repeat(depth));
+        }
     }
 }
 exports.NodeWriter = NodeWriter;

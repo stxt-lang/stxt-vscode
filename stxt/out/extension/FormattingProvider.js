@@ -58,6 +58,24 @@ function createLine(line, node) {
     if (!node) {
         return (0, StringUtils_1.rightTrim)(line);
     }
-    return line;
+    let result = "\t".repeat(node.getLevel());
+    const indexNs = line.indexOf("(");
+    if (node.isTextNode()) {
+        if (indexNs !== -1) {
+            result += node.getName() + " (" + node.getNamespace() + ") >>";
+        }
+        else {
+            result += node.getName() + " >>";
+        }
+    }
+    else {
+        if (indexNs !== -1) {
+            result += node.getName() + " (" + node.getNamespace() + "): ";
+        }
+        else {
+            result += node.getName() + ": ";
+        }
+    }
+    return result;
 }
 //# sourceMappingURL=FormattingProvider.js.map
