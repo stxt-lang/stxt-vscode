@@ -79,7 +79,7 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
                 const sepIndx = line.indexOf(">>");
                 const head = line.substring(0, sepIndx); // "Clave (namespace) " (incluye espacios)
                 const nsOpen = head.indexOf('(');
-                const nsClose = head.indexOf(')', nsOpen + 1);                
+                const nsClose = head.indexOf(')');                
 
                 if (nsOpen !== -1 && nsClose !== -1) {
                     tokens.push({line: index,startChar: 0,length: nsOpen,type: 'macro'});
@@ -95,7 +95,7 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
                 const colon = line.indexOf(':');
                 const head = line.substring(0, colon); // "Clave (namespace)"
                 const nsOpen = head.indexOf('(');
-                const nsClose = head.indexOf(')', nsOpen + 1);
+                const nsClose = head.indexOf(')');
 
                 if (nsOpen !== -1 && nsClose !== -1) {
                     tokens.push({ line: index, startChar: 0, length: nsOpen, type: 'property' });

@@ -24,7 +24,7 @@ export class StxtHoverProvider implements vscode.HoverProvider {
 
 		const text = node.getText();
 		md.appendMarkdown(`\n---\n`);
-		md.appendMarkdown(node.isTextNode() ? `**Text**\n\n`: `- **Value:** ${node.getValue()}`);
+		md.appendMarkdown(node.isTextNode() ? `**Text**\n\n`: `- **Value:** \`${escapeMd(node.getValue())}\``);
 		if(node.isTextNode()) {
 			md.appendCodeblock(String(text), 'stxt');
 		}

@@ -93,7 +93,7 @@ function analisysDoc(document, diagnosticCollection) {
                 const sepIndx = line.indexOf(">>");
                 const head = line.substring(0, sepIndx); // "Clave (namespace) " (incluye espacios)
                 const nsOpen = head.indexOf('(');
-                const nsClose = head.indexOf(')', nsOpen + 1);
+                const nsClose = head.indexOf(')');
                 if (nsOpen !== -1 && nsClose !== -1) {
                     tokens.push({ line: index, startChar: 0, length: nsOpen, type: 'macro' });
                     tokens.push({ line: index, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
@@ -108,7 +108,7 @@ function analisysDoc(document, diagnosticCollection) {
                 const colon = line.indexOf(':');
                 const head = line.substring(0, colon); // "Clave (namespace)"
                 const nsOpen = head.indexOf('(');
-                const nsClose = head.indexOf(')', nsOpen + 1);
+                const nsClose = head.indexOf(')');
                 if (nsOpen !== -1 && nsClose !== -1) {
                     tokens.push({ line: index, startChar: 0, length: nsOpen, type: 'property' });
                     tokens.push({ line: index, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
