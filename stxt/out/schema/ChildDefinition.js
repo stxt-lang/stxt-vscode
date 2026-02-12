@@ -42,6 +42,15 @@ class ChildDefinition {
             ? this.normalizedName
             : `${this.namespace}:${this.normalizedName}`;
     }
+    toJSON() {
+        return {
+            name: this.getName(),
+            normalizedName: this.getNormalizedName(),
+            namespace: this.getNamespace(),
+            min: this.getMin(),
+            max: this.getMax(),
+        };
+    }
 }
 exports.ChildDefinition = ChildDefinition;
 //# sourceMappingURL=ChildDefinition.js.map

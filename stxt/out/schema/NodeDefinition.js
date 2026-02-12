@@ -42,12 +42,22 @@ class NodeDefinition {
         this.values.add(value);
     }
     isAllowedValue(value) {
-        if (this.values.size === 0)
+        if (this.values.size === 0) {
             return true;
+        }
         return this.values.has(value);
     }
     getValues() {
         return this.values;
+    }
+    toJSON() {
+        return {
+            name: this.getName(),
+            normalizedName: this.getNormalizedName(),
+            type: this.getType(),
+            children: Array.from(this.getChildren().values()).map(c => c.toJSON()),
+            values: Array.from(this.getValues()),
+        };
     }
 }
 exports.NodeDefinition = NodeDefinition;

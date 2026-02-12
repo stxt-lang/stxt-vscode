@@ -52,11 +52,24 @@ export class NodeDefinition {
     }
 
     isAllowedValue(value: string): boolean {
-        if (this.values.size === 0) return true;
+        if (this.values.size === 0) {
+            return true;
+        }
         return this.values.has(value);
     }
 
     getValues(): ReadonlySet<string> {
         return this.values;
     }
+
+    toJSON() {
+        return {
+            name: this.getName(),
+            normalizedName: this.getNormalizedName(),
+            type: this.getType(),
+            children: Array.from(this.getChildren().values()).map(c => c.toJSON()),
+            values: Array.from(this.getValues()),
+        };
+    }
+
 }

@@ -28,6 +28,16 @@ class Schema {
     getNamespace() {
         return this.namespace;
     }
+    // Dentro de la clase Schema
+    toJSON() {
+        return {
+            namespace: this.namespace,
+            nodes: Array.from(this.nodes.values()).map(n => n.toJSON()),
+        };
+    }
+    toString() {
+        return JSON.stringify(this, null, 2); // pretty print
+    }
 }
 exports.Schema = Schema;
 //# sourceMappingURL=Schema.js.map

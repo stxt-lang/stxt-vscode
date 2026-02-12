@@ -35,4 +35,18 @@ export class Schema {
     getNamespace(): string {
         return this.namespace;
     }
+
+    // Dentro de la clase Schema
+
+    toJSON() {
+        return {
+            namespace: this.namespace,
+            nodes: Array.from(this.nodes.values()).map(n => n.toJSON()),
+        };
+    }
+
+    toString(): string {
+        return JSON.stringify(this, null, 2); // pretty print
+    }
+
 }
