@@ -77,9 +77,19 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
 
             if (currentNode.isTextNode()) {
                 const sepIndx = line.indexOf(">>");
+                const head = line.substring(0, sepIndx); // "Clave (namespace) " (incluye espacios)
+                const nsOpen = head.indexOf('(');
+                const nsClose = head.indexOf(')', nsOpen + 1);                
 
-                tokens.push({line: index, startChar: 0, length: sepIndx, type: 'macro'});
-                tokens.push({line: index, startChar: sepIndx, length: 2, type: 'macro'});
+                if (nsOpen !== -1 && nsClose !== -1) {
+                    tokens.push({line: index,startChar: 0,length: nsOpen,type: 'macro'});
+                    tokens.push({line: index,startChar: nsOpen,length: nsClose - nsOpen + 1,type: 'namespace'});
+                    tokens.push({line: index,startChar: nsClose + 1,length: line.length - nsClose - 1,type: 'macro'});
+                }
+                else {
+                    tokens.push({line: index, startChar: 0, length: sepIndx, type: 'macro'});
+                    tokens.push({line: index, startChar: sepIndx, length: 2, type: 'macro'});
+                }
             }
             else {
                 const colon = line.indexOf(':');
