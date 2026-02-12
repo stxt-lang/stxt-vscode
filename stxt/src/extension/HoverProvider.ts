@@ -1,24 +1,36 @@
 import * as vscode from 'vscode';
-import { STXT_TAGS } from './CompletionProvider';
+import { getLastAnalysis } from './AnalysisDoc';
 
 export class StxtHoverProvider implements vscode.HoverProvider {
+	provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Hover> {
 
-    provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Hover> {
+		const analysis = getLastAnalysis(document);
+		if (!analysis) return;
 
-        const range = document.getWordRangeAtPosition(position, /@\w+/);
-        if (!range) {
-            return;
-        }
+		const node = analysis.nodeByLine.get(position.line);
+		if (!node) return;
 
-        const word = document.getText(range);
+		const md = new vscode.MarkdownString();
+		md.appendMarkdown(`### STXT Node\n\n`);
 
-        const description = STXT_TAGS[word];
-        if (!description) {
-            return;
-        }
+		md.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
+		md.appendMarkdown(`- **Normalized:** \`${escapeMd(node.getNormalizedName())}\`\n`);
+		md.appendMarkdown(`- **Qualified:** \`${escapeMd(node.getQualifiedName())}\`\n`);
+		md.appendMarkdown(`- **Text node:** \`${node.isTextNode()}\`\n`);
 
-        return new vscode.Hover(
-            new vscode.MarkdownString(`**${word}**\n\n${description}`)
-        );
-    }
+		const text = node.getText?.() ?? '';
+		if (text && String(text).trim().length > 0) {
+			md.appendMarkdown(`\n---\n`);
+			md.appendMarkdown(`**Text**\n\n`);
+			md.appendCodeblock(String(text), 'stxt');
+		}
+
+		md.isTrusted = false; // por seguridad, no permitir links/HTML
+		return new vscode.Hover(md);
+	}
+}
+
+// Escape mínimo para evitar que backticks rompan el markdown inline
+function escapeMd(s: string): string {
+	return s.replace(/`/g, '\\`');
 }
