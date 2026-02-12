@@ -41,10 +41,10 @@ function createLine(line: string, node: Node | undefined): string {
         }
     } else {
         if (indexNs !== -1) {
-            result += node.getName() + " (" + node.getNamespace() + "): ";
+            result += node.getName() + " (" + node.getNamespace() + "): " + node.getValue();
         }
         else {
-            result += node.getName() + ": ";
+            result += node.getName() + ": " + node.getValue();
         }
     }
 

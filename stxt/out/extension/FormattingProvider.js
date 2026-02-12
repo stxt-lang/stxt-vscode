@@ -70,10 +70,10 @@ function createLine(line, node) {
     }
     else {
         if (indexNs !== -1) {
-            result += node.getName() + " (" + node.getNamespace() + "): ";
+            result += node.getName() + " (" + node.getNamespace() + "): " + node.getValue();
         }
         else {
-            result += node.getName() + ": ";
+            result += node.getName() + ": " + node.getValue();
         }
     }
     return result;
