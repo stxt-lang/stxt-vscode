@@ -23,7 +23,14 @@
       "aliases": ["STXT (Semantic Text)","STXT"],
       "extensions": [".stxt"],
       "configuration": "./language-configuration.json"
-    }]
+    }],
+    "configurationDefaults": {
+      "[stxt]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": false,
+        "editor.detectIndentation": false
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
