@@ -1,60 +1,33 @@
 import * as vscode from 'vscode';
+import { getLastAnalysis } from './AnalysisDoc';
+import type { Node } from '../core/Node';
+import { rightTrim } from '../core/StringUtils';
 
 export class StxtFormattingProvider implements vscode.DocumentFormattingEditProvider {
 
     provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {
-
-        const lines = document.getText().split(/\r?\n/);
+        const analysis = getLastAnalysis(document);
         const edits: vscode.TextEdit[] = [];
 
-        let blockStart = -1;
-        let maxKeyLength = 0;
-
-        function flushBlock(endLine: number) {
-            if (blockStart === -1) {
-                return;
-            }
-
-            for (let i = blockStart; i < endLine; i++) {
-                const line = lines[i];
-                const match = line.match(/^(\s*)(\w+)\s*:\s*(.*)$/);
-                if (!match) {
-                    continue;
-                }
-
-                const [, indent, key, value] = match;
-                const paddedKey = key.padEnd(maxKeyLength, ' ');
-                const newLine = `${indent}${paddedKey} : ${value}`;
-
-                if (newLine !== line) {
-                    edits.push(
-                        vscode.TextEdit.replace(
-                            new vscode.Range(i, 0, i, line.length),
-                            newLine
-                        )
-                    );
-                }
-            }
-
-            blockStart = -1;
-            maxKeyLength = 0;
-        }
+        const lines = document.getText().split(/\r?\n/);
 
         lines.forEach((line, index) => {
-            const match = line.match(/^(\s*)(\w+)\s*:\s*(.*)$/);
-
-            if (match && !line.trim().startsWith('#')) {
-                if (blockStart === -1) {
-                    blockStart = index;
-                }
-                maxKeyLength = Math.max(maxKeyLength, match[2].length);
-            } else {
-                flushBlock(index);
+            const node = analysis?.nodeByLine.get(index);
+            const newLine = createLine(line, node);
+            if (newLine !== line) {
+                edits.push(vscode.TextEdit.replace(new vscode.Range(index, 0, index, line.length), newLine));
             }
         });
 
-        flushBlock(lines.length);
-
         return edits;
     }
+}
+
+// Placeholder para que compile:
+function createLine(line: string, node: Node | undefined): string {
+    if (!node) {
+        return rightTrim(line);
+    }
+    
+    return line;
 }

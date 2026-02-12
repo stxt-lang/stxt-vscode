@@ -35,47 +35,29 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StxtFormattingProvider = void 0;
 const vscode = __importStar(require("vscode"));
+const AnalysisDoc_1 = require("./AnalysisDoc");
+const StringUtils_1 = require("../core/StringUtils");
 class StxtFormattingProvider {
     provideDocumentFormattingEdits(document) {
-        const lines = document.getText().split(/\r?\n/);
+        const analysis = (0, AnalysisDoc_1.getLastAnalysis)(document);
         const edits = [];
-        let blockStart = -1;
-        let maxKeyLength = 0;
-        function flushBlock(endLine) {
-            if (blockStart === -1) {
-                return;
-            }
-            for (let i = blockStart; i < endLine; i++) {
-                const line = lines[i];
-                const match = line.match(/^(\s*)(\w+)\s*:\s*(.*)$/);
-                if (!match) {
-                    continue;
-                }
-                const [, indent, key, value] = match;
-                const paddedKey = key.padEnd(maxKeyLength, ' ');
-                const newLine = `${indent}${paddedKey} : ${value}`;
-                if (newLine !== line) {
-                    edits.push(vscode.TextEdit.replace(new vscode.Range(i, 0, i, line.length), newLine));
-                }
-            }
-            blockStart = -1;
-            maxKeyLength = 0;
-        }
+        const lines = document.getText().split(/\r?\n/);
         lines.forEach((line, index) => {
-            const match = line.match(/^(\s*)(\w+)\s*:\s*(.*)$/);
-            if (match && !line.trim().startsWith('#')) {
-                if (blockStart === -1) {
-                    blockStart = index;
-                }
-                maxKeyLength = Math.max(maxKeyLength, match[2].length);
-            }
-            else {
-                flushBlock(index);
+            const node = analysis?.nodeByLine.get(index);
+            const newLine = createLine(line, node);
+            if (newLine !== line) {
+                edits.push(vscode.TextEdit.replace(new vscode.Range(index, 0, index, line.length), newLine));
             }
         });
-        flushBlock(lines.length);
         return edits;
     }
 }
 exports.StxtFormattingProvider = StxtFormattingProvider;
+// Placeholder para que compile:
+function createLine(line, node) {
+    if (!node) {
+        return (0, StringUtils_1.rightTrim)(line);
+    }
+    return line;
+}
 //# sourceMappingURL=FormattingProvider.js.map
