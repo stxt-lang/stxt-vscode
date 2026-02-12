@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSchemaLoader = registerSchemaLoader;
 const vscode = __importStar(require("vscode"));
 const Parser_1 = require("../core/Parser");
+const SchemaParser_1 = require("../schema/SchemaParser");
 const SCHEMA_DIR_REL = ['.stxt', '@stxt.schema'];
 const SCHEMA_FILES_GLOB = '**/.stxt/@stxt.schema/*.stxt';
 function registerSchemaLoader(context) {
@@ -78,6 +79,8 @@ async function logSchemaFile(uri, reason) {
         const parser = new Parser_1.Parser();
         const node = parser.parse(text)[0];
         console.log("NODE: " + node);
+        const schema = SchemaParser_1.SchemaParser.transformNodeToSchema(node);
+        console.log(`Schema: ${schema}`);
     }
     catch (e) {
         console.log(`[stxt] schema ${reason}: could not read ${uri.toString()} (${String(e)})`);

@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { Parser } from '../core/Parser';
 import { Node } from '../core/Node';
+import { SchemaParser } from '../schema/SchemaParser';
+import { Schema } from '../schema/Schema';
 
 const SCHEMA_DIR_REL = ['.stxt', '@stxt.schema'];
 const SCHEMA_FILES_GLOB = '**/.stxt/@stxt.schema/*.stxt';
@@ -54,6 +56,8 @@ async function logSchemaFile(uri: vscode.Uri, reason: 'initial' | 'changed' | 'c
         const parser: Parser = new Parser();
         const node: Node = parser.parse(text)[0];
         console.log("NODE: " + node);
+        const schema: Schema = SchemaParser.transformNodeToSchema(node);
+        console.log(`Schema: ${schema}`);
 
     } catch (e) {
         console.log(`[stxt] schema ${reason}: could not read ${uri.toString()} (${String(e)})`);
