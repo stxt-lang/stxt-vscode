@@ -17,13 +17,11 @@ export class StxtHoverProvider implements vscode.HoverProvider {
 		md.appendMarkdown(`- **Normalized:** \`${escapeMd(node.getNormalizedName())}\`\n`);
 		md.appendMarkdown(`- **Qualified:** \`${escapeMd(node.getQualifiedName())}\`\n`);
 
-		const text = node.getText?.() ?? '';
-		if (text && String(text).trim().length > 0) {
-			md.appendMarkdown(`\n---\n`);
-			md.appendMarkdown(node.isTextNode() ? `**Text**\n\n`: `- **Value:** ${node.getValue()}`);
-			if(node.isTextNode()) {
-				md.appendCodeblock(String(text), 'stxt');
-			}
+		const text = node.getText();
+		md.appendMarkdown(`\n---\n`);
+		md.appendMarkdown(node.isTextNode() ? `**Text**\n\n`: `- **Value:** ${node.getValue()}`);
+		if(node.isTextNode()) {
+			md.appendCodeblock(String(text), 'stxt');
 		}
 
 		md.isTrusted = false; // por seguridad, no permitir links/HTML
