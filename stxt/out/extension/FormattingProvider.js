@@ -48,8 +48,9 @@ class StxtFormattingProvider {
             for (let i = blockStart; i < endLine; i++) {
                 const line = lines[i];
                 const match = line.match(/^(\s*)(\w+)\s*:\s*(.*)$/);
-                if (!match)
+                if (!match) {
                     continue;
+                }
                 const [, indent, key, value] = match;
                 const paddedKey = key.padEnd(maxKeyLength, ' ');
                 const newLine = `${indent}${paddedKey} : ${value}`;

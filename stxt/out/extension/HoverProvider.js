@@ -39,11 +39,13 @@ const AnalysisDoc_1 = require("./AnalysisDoc");
 class StxtHoverProvider {
     provideHover(document, position) {
         const analysis = (0, AnalysisDoc_1.getLastAnalysis)(document);
-        if (!analysis)
+        if (!analysis) {
             return;
+        }
         const node = analysis.nodeByLine.get(position.line);
-        if (!node)
+        if (!node) {
             return;
+        }
         const md = new vscode.MarkdownString();
         md.appendMarkdown(node.isTextNode() ? "### Block TEXT\n\n" : "### Inline Node\n\n");
         md.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);

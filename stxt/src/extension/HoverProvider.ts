@@ -5,10 +5,14 @@ export class StxtHoverProvider implements vscode.HoverProvider {
 	provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Hover> {
 
 		const analysis = getLastAnalysis(document);
-		if (!analysis) return;
+		if (!analysis) {
+			return;
+		}
 
 		const node = analysis.nodeByLine.get(position.line);
-		if (!node) return;
+		if (!node) {
+			return;
+		}
 
 		const md = new vscode.MarkdownString();
 		md.appendMarkdown(node.isTextNode() ? "### Block TEXT\n\n": "### Inline Node\n\n");

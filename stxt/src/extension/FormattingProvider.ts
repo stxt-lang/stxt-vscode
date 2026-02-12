@@ -18,7 +18,9 @@ export class StxtFormattingProvider implements vscode.DocumentFormattingEditProv
             for (let i = blockStart; i < endLine; i++) {
                 const line = lines[i];
                 const match = line.match(/^(\s*)(\w+)\s*:\s*(.*)$/);
-                if (!match) continue;
+                if (!match) {
+                    continue;
+                }
 
                 const [, indent, key, value] = match;
                 const paddedKey = key.padEnd(maxKeyLength, ' ');
