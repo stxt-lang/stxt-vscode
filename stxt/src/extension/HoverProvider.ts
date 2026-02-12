@@ -15,7 +15,7 @@ export class StxtHoverProvider implements vscode.HoverProvider {
 		}
 
 		const md = new vscode.MarkdownString();
-		md.appendMarkdown(node.isTextNode() ? "### Block TEXT\n\n": "### Inline Node\n\n");
+		md.appendMarkdown(node.isTextNode() ? "### Node - Block TEXT\n\n": "### Node - Inline\n\n");
 
 		md.appendMarkdown(`- **Level:** ${node.getLevel()}\n`);
 		md.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
@@ -36,5 +36,8 @@ export class StxtHoverProvider implements vscode.HoverProvider {
 
 // Escape mínimo para evitar que backticks rompan el markdown inline
 function escapeMd(s: string): string {
+	if (s === "") {
+		return "<EMPTY>";
+	}
 	return s.replace(/`/g, '\\`');
 }

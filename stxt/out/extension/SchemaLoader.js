@@ -33,12 +33,18 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getSchema = getSchema;
 exports.registerSchemaLoader = registerSchemaLoader;
 const vscode = __importStar(require("vscode"));
 const Parser_1 = require("../core/Parser");
 const SchemaParser_1 = require("../schema/SchemaParser");
+const SchemaProviderMemory_1 = require("../schema/SchemaProviderMemory");
 const SCHEMA_DIR_REL = ['.stxt', '@stxt.schema'];
 const SCHEMA_FILES_GLOB = '**/.stxt/@stxt.schema/*.stxt';
+const SCHEMA_PROVIDER = new SchemaProviderMemory_1.SchemaProviderMemory();
+function getSchema(schema) {
+    return SCHEMA_PROVIDER.getSchema(schema);
+}
 function registerSchemaLoader(context) {
     // Carga inicial
     void loadAllWorkspaceSchemas();
@@ -81,6 +87,7 @@ async function logSchemaFile(uri, reason) {
         console.log("NODE: " + node);
         const schema = SchemaParser_1.SchemaParser.transformNodeToSchema(node);
         console.log(`Schema: ${schema}`);
+        SCHEMA_PROVIDER.addSchema(schema);
     }
     catch (e) {
         console.log(`[stxt] schema ${reason}: could not read ${uri.toString()} (${String(e)})`);

@@ -69,7 +69,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}
 
-	console.log("INIT GRAMMARS!!!!!");
 	registerSchemaLoader(context);
 }
 

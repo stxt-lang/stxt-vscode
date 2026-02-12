@@ -74,7 +74,6 @@ function activate(context) {
             (0, AnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
         }
     }
-    console.log("INIT GRAMMARS!!!!!");
     (0, SchemaLoader_1.registerSchemaLoader)(context);
 }
 function deactivate() { }
