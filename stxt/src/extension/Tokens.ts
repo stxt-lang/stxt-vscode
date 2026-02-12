@@ -5,7 +5,6 @@ export const STXT_TOKEN_TYPES = [
   'namespace',
   'property',
   'macro',
-  'function',
   'string'
 ] as const;
 

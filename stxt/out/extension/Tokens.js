@@ -40,7 +40,6 @@ exports.STXT_TOKEN_TYPES = [
     'namespace',
     'property',
     'macro',
-    'function',
     'string'
 ];
 // Legend derivado del mismo sitio
