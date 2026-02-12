@@ -1,6 +1,6 @@
 // NamespaceValidator.ts
 
-import { ParseException } from "./ParseException";
+import { ParseException } from "../exceptions/ParseException";
 
 export class NamespaceValidator {
 	/**

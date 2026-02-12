@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createNode = createNode;
 const NameNamespaceParser_1 = require("./NameNamespaceParser");
 const Node_1 = require("./Node");
-const ParseException_1 = require("./ParseException");
+const ParseException_1 = require("../exceptions/ParseException");
 function createNode(lineIndent, lineNumber, level, parent) {
     const line = lineIndent.lineWithoutIndent;
     let name;

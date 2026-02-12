@@ -1,0 +1,62 @@
+// NodeDefinition.ts
+
+import { ParseException } from "../exceptions/ParseException";
+import { StringUtils } from "../core/StringUtils";
+import { ChildDefinition } from "./ChildDefinition";
+import { SchemaException } from "../exceptions/SchemaException";
+
+export class NodeDefinition {
+    private readonly name: string;
+    private readonly normalizedName: string;
+    private readonly type: string;
+
+    private readonly children: Map<string, ChildDefinition> = new Map();
+    private readonly values: Set<string> = new Set();
+
+    constructor(name: string, type: string, line: number) {
+        this.name = StringUtils.compactSpaces(name);
+        this.normalizedName = StringUtils.normalize(name);
+        this.type = type;
+
+        if (this.normalizedName.length === 0) {
+            throw new ParseException(line, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
+        }
+    }
+
+    getName(): string {
+        return this.name;
+    }
+
+    getNormalizedName(): string {
+        return this.normalizedName;
+    }
+
+    getType(): string {
+        return this.type;
+    }
+
+    getChildren(): ReadonlyMap<string, ChildDefinition> {
+        return this.children;
+    }
+
+    addChildDefinition(childDefinition: ChildDefinition): void {
+        const qname = childDefinition.getQualifiedName();
+        if (this.children.has(qname)) {
+            throw new SchemaException("CHILD_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
+        }
+        this.children.set(qname, childDefinition);
+    }
+
+    addValue(value: string): void {
+        this.values.add(value);
+    }
+
+    isAllowedValue(value: string): boolean {
+        if (this.values.size === 0) return true;
+        return this.values.has(value);
+    }
+
+    getValues(): ReadonlySet<string> {
+        return this.values;
+    }
+}

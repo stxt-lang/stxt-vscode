@@ -1,7 +1,7 @@
 // Parser.ts
 
 import { readFile } from "fs/promises";
-import { ParseException } from "./ParseException";
+import { ParseException } from "../exceptions/ParseException";
 import { Node } from "./Node";
 import { LineIndentParser } from "./LineIndentParser";
 import { LineIndent} from "./LineIndent";

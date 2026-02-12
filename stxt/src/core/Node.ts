@@ -1,6 +1,6 @@
 // Node.ts
 
-import { ParseException } from "./ParseException";
+import { ParseException } from "../exceptions/ParseException";
 import { NamespaceValidator } from "./NamespaceValidator";
 import { StringUtils } from "./StringUtils";
 

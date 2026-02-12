@@ -2,7 +2,7 @@
 // NameNamespaceParser.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NameNamespaceParser = void 0;
-const ParseException_1 = require("./ParseException");
+const ParseException_1 = require("../exceptions/ParseException");
 const NameNamespace_1 = require("./NameNamespace");
 class NameNamespaceParser {
     constructor() {

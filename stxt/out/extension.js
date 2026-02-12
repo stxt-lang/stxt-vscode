@@ -73,6 +73,7 @@ function activate(context) {
             (0, AnalysisDoc_1.analisysDoc)(doc, diagnosticCollection);
         }
     }
+    console.log("INIT GRAMMARS!!!!!");
 }
 function deactivate() { }
 //# sourceMappingURL=extension.js.map

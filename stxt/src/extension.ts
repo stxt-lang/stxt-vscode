@@ -67,6 +67,8 @@ export function activate(context: vscode.ExtensionContext) {
 			analisysDoc(doc, diagnosticCollection);
 		}
 	}
+
+	console.log("INIT GRAMMARS!!!!!");
 }
 
 export function deactivate() { }

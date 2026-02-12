@@ -1,7 +1,7 @@
 import { LineIndent } from "./LineIndent";
 import { NameNamespaceParser } from "./NameNamespaceParser";
 import { Node } from "./Node";
-import { ParseException } from "./ParseException";
+import { ParseException } from "../exceptions/ParseException";
 
 export function createNode(lineIndent: LineIndent, lineNumber: number, level: number, parent: Node | null): Node {
     const line = lineIndent.lineWithoutIndent;

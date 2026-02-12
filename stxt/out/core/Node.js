@@ -2,7 +2,7 @@
 // Node.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Node = void 0;
-const ParseException_1 = require("./ParseException");
+const ParseException_1 = require("../exceptions/ParseException");
 const NamespaceValidator_1 = require("./NamespaceValidator");
 const StringUtils_1 = require("./StringUtils");
 class Node {

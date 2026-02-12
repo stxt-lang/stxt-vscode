@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LineIndentParser = void 0;
 const Constants_1 = require("./Constants");
 const StringUtils_1 = require("./StringUtils");
-const ParseException_1 = require("./ParseException");
+const ParseException_1 = require("../exceptions/ParseException");
 const LineIndent_1 = require("./LineIndent");
 class LineIndentParser {
     constructor() {

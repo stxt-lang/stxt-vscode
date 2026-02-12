@@ -2,7 +2,7 @@
 
 import { Constants } from "./Constants";
 import { rightTrim } from "./StringUtils";
-import { ParseException } from "./ParseException";
+import { ParseException } from "../exceptions/ParseException";
 import { LineIndent } from "./LineIndent";
 
 export class LineIndentParser {
