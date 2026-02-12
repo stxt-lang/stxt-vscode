@@ -17,7 +17,7 @@ Demo (hola.mundo): World
 Hola : Esto es otro texto
 Hola : 
     Hola (dd.dd):
-    Hola : Demo World *Como te llamas?*
+    Hola (xx.zz): Demo World *Como te llamas?*
         Otro hola: Como vas?
         Demo >>
             Esto es texto

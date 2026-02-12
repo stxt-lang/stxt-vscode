@@ -20,7 +20,7 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
 
     const lines = document.getText().split(/\r?\n/);
 
-    let lastNodeValid: Node = new Node(0,0,"empty",null,false,"");
+	const stack: Node[] = [];
 
     for (let index = 0; index<lines.length; index++) {
         const line = lines[index];
@@ -28,8 +28,9 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
 
         //console.log(`${lineNumber}: ${line}`);
 
-        const lastLevel = lastNodeValid.getLevel();
-        const lastNodeText = lastNodeValid.isTextNode();
+		const lastNode: Node | null = stack.length === 0 ? null : stack[stack.length - 1];
+		const lastLevel = lastNode ? lastNode.getLevel() : 0;
+		const lastNodeText = lastNode ? lastNode.isTextNode() : false;
 
         // Parseamos línea
         let lineIndent: LineIndent | null = null;
@@ -53,20 +54,28 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
 
 		const currentLevel = lineIndent.indentLevel;
 
+		// Cerramos nodos hasta el nivel actual (esto "finaliza" y adjunta al padre/documentos)
+		closeToLevel(stack, currentLevel);
+
 		// Si estamos dentro de un nodo texto, y el nivel indica que sigue siendo texto,
 		// añadimos línea de texto y no creamos nodo.
 		if (lastNodeText && currentLevel > lastLevel) {
-			lastNodeValid.addTextLine(lineIndent.lineWithoutIndent);
+			lastNode!.addTextLine(lineIndent.lineWithoutIndent);
             //tokens.push({line: index, startChar: 0, length: line.length, type: 'string'});
 			continue;
 		}
 
         try
         {
-		    lastNodeValid = createNode(lineIndent, lineNumber, currentLevel, null);
-            nodeByLine.set(index, lastNodeValid);
+            // Creamos el nuevo nodo y lo dejamos "abierto" en la pila (NO lo adjuntamos aún)
+            const parent: Node | null = stack.length === 0 ? null : stack[stack.length - 1];
 
-            if (lastNodeValid.isTextNode()) {
+            // Añadimos a stack
+		    const currentNode = createNode(lineIndent, lineNumber, currentLevel, parent);
+            stack.push(currentNode);
+            nodeByLine.set(index, currentNode);
+
+            if (currentNode.isTextNode()) {
                 const sepIndx = line.indexOf(">>");
 
                 tokens.push({line: index, startChar: 0, length: sepIndx, type: 'macro'});
@@ -113,4 +122,10 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
     return result;
 }
 
+function closeToLevel(stack: Node[], targetLevel: number): void {
+    while (stack.length > targetLevel) {
+        const completed = stack.pop()!;
+        completed.freeze();
+    }
+}
 

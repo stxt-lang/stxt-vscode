@@ -36,7 +36,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLastAnalysis = getLastAnalysis;
 exports.analisysDoc = analisysDoc;
 const vscode = __importStar(require("vscode"));
-const Node_1 = require("../core/Node");
 const LineIndentParser_1 = require("../core/LineIndentParser");
 const NodeCreator_1 = require("../core/NodeCreator");
 const lastAnalysisByUri = new Map();
@@ -49,13 +48,14 @@ function analisysDoc(document, diagnosticCollection) {
     const tokens = [];
     const nodeByLine = new Map();
     const lines = document.getText().split(/\r?\n/);
-    let lastNodeValid = new Node_1.Node(0, 0, "empty", null, false, "");
+    const stack = [];
     for (let index = 0; index < lines.length; index++) {
         const line = lines[index];
         const lineNumber = index + 1;
         //console.log(`${lineNumber}: ${line}`);
-        const lastLevel = lastNodeValid.getLevel();
-        const lastNodeText = lastNodeValid.isTextNode();
+        const lastNode = stack.length === 0 ? null : stack[stack.length - 1];
+        const lastLevel = lastNode ? lastNode.getLevel() : 0;
+        const lastNodeText = lastNode ? lastNode.isTextNode() : false;
         // Parseamos línea
         let lineIndent = null;
         try {
@@ -73,17 +73,23 @@ function analisysDoc(document, diagnosticCollection) {
             continue;
         }
         const currentLevel = lineIndent.indentLevel;
+        // Cerramos nodos hasta el nivel actual (esto "finaliza" y adjunta al padre/documentos)
+        closeToLevel(stack, currentLevel);
         // Si estamos dentro de un nodo texto, y el nivel indica que sigue siendo texto,
         // añadimos línea de texto y no creamos nodo.
         if (lastNodeText && currentLevel > lastLevel) {
-            lastNodeValid.addTextLine(lineIndent.lineWithoutIndent);
+            lastNode.addTextLine(lineIndent.lineWithoutIndent);
             //tokens.push({line: index, startChar: 0, length: line.length, type: 'string'});
             continue;
         }
         try {
-            lastNodeValid = (0, NodeCreator_1.createNode)(lineIndent, lineNumber, currentLevel, null);
-            nodeByLine.set(index, lastNodeValid);
-            if (lastNodeValid.isTextNode()) {
+            // Creamos el nuevo nodo y lo dejamos "abierto" en la pila (NO lo adjuntamos aún)
+            const parent = stack.length === 0 ? null : stack[stack.length - 1];
+            // Añadimos a stack
+            const currentNode = (0, NodeCreator_1.createNode)(lineIndent, lineNumber, currentLevel, parent);
+            stack.push(currentNode);
+            nodeByLine.set(index, currentNode);
+            if (currentNode.isTextNode()) {
                 const sepIndx = line.indexOf(">>");
                 tokens.push({ line: index, startChar: 0, length: sepIndx, type: 'macro' });
                 tokens.push({ line: index, startChar: sepIndx, length: 2, type: 'macro' });
@@ -123,5 +129,11 @@ function analisysDoc(document, diagnosticCollection) {
     lastAnalysisByUri.set(document.uri.toString(), result);
     //console.log("Parse end.");
     return result;
+}
+function closeToLevel(stack, targetLevel) {
+    while (stack.length > targetLevel) {
+        const completed = stack.pop();
+        completed.freeze();
+    }
 }
 //# sourceMappingURL=AnalysisDoc.js.map
