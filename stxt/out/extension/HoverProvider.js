@@ -48,6 +48,7 @@ class StxtHoverProvider {
         }
         const md = new vscode.MarkdownString();
         md.appendMarkdown(node.isTextNode() ? "### Block TEXT\n\n" : "### Inline Node\n\n");
+        md.appendMarkdown(`- **Level:** ${node.getLevel()}\n`);
         md.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
         md.appendMarkdown(`- **Normalized:** \`${escapeMd(node.getNormalizedName())}\`\n`);
         md.appendMarkdown(`- **Qualified:** \`${escapeMd(node.getQualifiedName())}\`\n`);
