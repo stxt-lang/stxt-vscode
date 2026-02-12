@@ -126,6 +126,7 @@ function closeToLevel(stack: Node[], targetLevel: number): void {
     while (stack.length > targetLevel) {
         const completed = stack.pop()!;
         completed.freeze();
+        // TODO Validate grammar of completed
     }
 }
 

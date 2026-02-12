@@ -134,6 +134,7 @@ function closeToLevel(stack, targetLevel) {
     while (stack.length > targetLevel) {
         const completed = stack.pop();
         completed.freeze();
+        // TODO Validate grammar of completed
     }
 }
 //# sourceMappingURL=AnalysisDoc.js.map
