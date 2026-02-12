@@ -16,6 +16,7 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
     //console.log("Parse init...");
     const diagnostics: vscode.Diagnostic[] = [];
     const tokens: StxtToken[] = [];
+    const nodeByLine = new Map<number, Node>();
 
     const lines = document.getText().split(/\r?\n/);
 
@@ -63,8 +64,8 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
         try
         {
 		    lastNodeValid = createNode(lineIndent, lineNumber, currentLevel, null);
+            nodeByLine.set(index, lastNodeValid);
 
-            // TODO: Añadir tipo de línea,...
             if (lastNodeValid.isTextNode()) {
                 const sepIndx = line.indexOf(">>");
 
@@ -103,8 +104,11 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
 
     // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
-    const result = { tokens };
+
+    // Guardamos resultados
+    const result: AnalysisResult = { tokens, nodeByLine };
     lastAnalysisByUri.set(document.uri.toString(), result);
+    
     //console.log("Parse end.");
     return result;
 }

@@ -47,6 +47,7 @@ function analisysDoc(document, diagnosticCollection) {
     //console.log("Parse init...");
     const diagnostics = [];
     const tokens = [];
+    const nodeByLine = new Map();
     const lines = document.getText().split(/\r?\n/);
     let lastNodeValid = new Node_1.Node(0, 0, "empty", null, false, "");
     for (let index = 0; index < lines.length; index++) {
@@ -81,7 +82,7 @@ function analisysDoc(document, diagnosticCollection) {
         }
         try {
             lastNodeValid = (0, NodeCreator_1.createNode)(lineIndent, lineNumber, currentLevel, null);
-            // TODO: Añadir tipo de línea,...
+            nodeByLine.set(index, lastNodeValid);
             if (lastNodeValid.isTextNode()) {
                 const sepIndx = line.indexOf(">>");
                 tokens.push({ line: index, startChar: 0, length: sepIndx, type: 'macro' });
@@ -117,7 +118,8 @@ function analisysDoc(document, diagnosticCollection) {
     ;
     // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
-    const result = { tokens };
+    // Guardamos resultados
+    const result = { tokens, nodeByLine };
     lastAnalysisByUri.set(document.uri.toString(), result);
     //console.log("Parse end.");
     return result;
