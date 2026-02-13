@@ -33,6 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SchemaLoaderExtension = void 0;
 exports.getSchema = getSchema;
 exports.registerSchemaLoader = registerSchemaLoader;
 const vscode = __importStar(require("vscode"));
@@ -42,6 +43,12 @@ const SchemaProviderMemory_1 = require("../schema/SchemaProviderMemory");
 const SCHEMA_DIR_REL = ['.stxt', '@stxt.schema'];
 const SCHEMA_FILES_GLOB = '**/.stxt/@stxt.schema/*.stxt';
 const SCHEMA_PROVIDER = new SchemaProviderMemory_1.SchemaProviderMemory();
+class SchemaLoaderExtension {
+    getSchema(namespace) {
+        return getSchema(namespace);
+    }
+}
+exports.SchemaLoaderExtension = SchemaLoaderExtension;
 function getSchema(schema) {
     return SCHEMA_PROVIDER.getSchema(schema);
 }
@@ -84,9 +91,9 @@ async function logSchemaFile(uri, reason) {
         console.log(`\n[stxt] schema ${reason}: ${uri.toString()}\n${text.length} chars.`);
         const parser = new Parser_1.Parser();
         const node = parser.parse(text)[0];
-        console.log("NODE: " + node);
+        //console.log("NODE: " + node);
         const schema = SchemaParser_1.SchemaParser.transformNodeToSchema(node);
-        console.log(`Schema: ${schema}`);
+        //console.log(`Schema: ${schema}`);
         SCHEMA_PROVIDER.addSchema(schema);
     }
     catch (e) {

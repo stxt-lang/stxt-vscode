@@ -38,7 +38,10 @@ exports.analisysDoc = analisysDoc;
 const vscode = __importStar(require("vscode"));
 const LineIndentParser_1 = require("../core/LineIndentParser");
 const NodeCreator_1 = require("../core/NodeCreator");
+const SchemaValidator_1 = require("../schema/SchemaValidator");
+const SchemaLoader_1 = require("./SchemaLoader");
 const lastAnalysisByUri = new Map();
+const SCHEMA_VALIDATOR = new SchemaValidator_1.SchemaValidator(new SchemaLoader_1.SchemaLoaderExtension());
 function getLastAnalysis(document) {
     return lastAnalysisByUri.get(document.uri.toString());
 }
@@ -74,7 +77,7 @@ function analisysDoc(document, diagnosticCollection) {
         }
         const currentLevel = lineIndent.indentLevel;
         // Cerramos nodos hasta el nivel actual (esto "finaliza" y adjunta al padre/documentos)
-        closeToLevel(stack, currentLevel);
+        closeToLevel(stack, currentLevel, diagnostics);
         // Si estamos dentro de un nodo texto, y el nivel indica que sigue siendo texto,
         // añadimos línea de texto y no creamos nodo.
         if (lastNodeText && currentLevel > lastLevel) {
@@ -140,11 +143,21 @@ function analisysDoc(document, diagnosticCollection) {
     //console.log("Parse end.");
     return result;
 }
-function closeToLevel(stack, targetLevel) {
+function closeToLevel(stack, targetLevel, diagnostics) {
     while (stack.length > targetLevel) {
         const completed = stack.pop();
         completed.freeze();
         // TODO Validate grammar of completed
+        try {
+            console.log("Validate: " + completed.getQualifiedName());
+            SCHEMA_VALIDATOR.validate(completed);
+            console.log(" => OK");
+        }
+        catch (e) {
+            console.log(" => ERROR");
+            const range = new vscode.Range(completed.getLine() - 1, 0, completed.getLine() - 1, 5);
+            diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Warning));
+        }
     }
 }
 //# sourceMappingURL=AnalysisDoc.js.map
