@@ -1,0 +1,40 @@
+# -------------------
+# Iniciamos la receta
+# -------------------
+
+Receta (com.kocinando.receta):
+
+	Nombre Receta: Hola!
+	
+	# -------------------------
+	# Ingredientes de la receta
+	# -------------------------
+	
+	Ingredientes:
+		Ingrediente:
+			Cantidad:10
+			Unidades:g
+			Nombre:tomate
+		Ingrediente:
+			Cantidad:1
+			Unidades:u
+			Nombre:pera
+		Ingrediente:
+			Cantidad:200
+			Unidades:dl
+			Nombre:leche
+	
+	# ------------------------
+	# Preparación de la receta
+	# ------------------------
+	
+	Pasos:
+		Paso:1
+		Paso:2
+		Paso:3
+		Paso:4
+		Descripción >>
+			Hay que vigilar este paso, ya que 
+			no se puede garantizar su buen funcionamiento.
+			En caso de error consultar realizar una llamada 
+			al servicio único
