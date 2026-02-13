@@ -135,6 +135,7 @@ function analisysDoc(document, diagnosticCollection) {
         }
     }
     ;
+    closeToLevel(stack, 0, diagnostics);
     // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
     // Guardamos resultados

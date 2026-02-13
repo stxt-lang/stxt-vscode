@@ -121,6 +121,8 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
         }
     };
 
+    closeToLevel(stack, 0, diagnostics);
+
     // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
 
