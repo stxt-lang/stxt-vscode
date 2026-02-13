@@ -136,6 +136,11 @@ function closeToLevel(stack: Node[], targetLevel: number, diagnostics: vscode.Di
     while (stack.length > targetLevel) {
         const completed = stack.pop()!;
         completed.freeze();
+
+		if (stack.length > 0) {
+		    stack[stack.length - 1].addChild(completed);
+        }
+
         // TODO Validate grammar of completed
         try {
             console.log("Validate: " + completed.getQualifiedName());
@@ -143,7 +148,7 @@ function closeToLevel(stack: Node[], targetLevel: number, diagnostics: vscode.Di
             console.log(" => OK");
         } catch (e) {
             console.log(" => ERROR");
-            const range = new vscode.Range(completed.getLine()-1, 0, completed.getLine()-1, 5);
+            const range = new vscode.Range(completed.getLine()-1, 0, completed.getLine()-1, 100); // TODO Hacer longitud correctamente
             diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Warning));
         }        
     }
