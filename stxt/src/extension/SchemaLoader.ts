@@ -11,6 +11,7 @@ const SCHEMA_FILES_GLOB = '**/.stxt/@stxt.schema/*.stxt';
 
 const SCHEMA_PROVIDER: SchemaProviderMemory = new SchemaProviderMemory();
 
+
 export class SchemaLoaderExtension implements SchemaProvider {
     getSchema(namespace: string): Schema | null | undefined {
         return getSchema(namespace);
