@@ -7,12 +7,14 @@ import { Constants } from '../core/Constants';
 import { Node } from '../core/Node';
 import { SchemaLoaderExtension } from './SchemaLoader';
 
+/*
 const STXT_KEYS = [
     'author',
     'status',
     'version',
     'demo'
 ];
+*/
 
 let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();
 
@@ -110,13 +112,23 @@ function buscarSugerencias(parent: Node): vscode.CompletionItem[] {
     }
 
     const children = nodeDef.getChildren();
-
-    for (let [childName, childDef] of children.entries()) {
-        console.log(`Key: ${childName}, Value: ${childDef.getName()}`);
-    }
-
     const result: vscode.CompletionItem[] = [];
 
+    for (let [childName, childDef] of children.entries()) {
+        const item = new vscode.CompletionItem(childDef.getQualifiedName(), vscode.CompletionItemKind.Value);
+        item.detail = 'STXT key';
+
+        if (childDef.getNamespace() === parent.getNamespace()) {
+            console.log(`${childDef.getName()} :`);
+            item.insertText = `${childDef.getName()} :`;
+        } else {
+            console.log(`${childDef.getName()} (${childDef.getNamespace()}) :`);
+            item.insertText = `${childDef.getName()} (${childDef.getNamespace()}) :`;
+        }
+        result.push(item);
+    }
+
+    /*
     for (let index = 0; index < STXT_KEYS.length; index++) {
         const element = STXT_KEYS[index];
         const item = new vscode.CompletionItem(element, vscode.CompletionItemKind.Value);
@@ -125,6 +137,7 @@ function buscarSugerencias(parent: Node): vscode.CompletionItem[] {
 
         result.push(item);
     }
+    */
 
     return result;
 }

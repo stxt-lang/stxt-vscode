@@ -38,12 +38,14 @@ const vscode = __importStar(require("vscode"));
 const AnalysisDoc_1 = require("./AnalysisDoc");
 const Constants_1 = require("../core/Constants");
 const SchemaLoader_1 = require("./SchemaLoader");
+/*
 const STXT_KEYS = [
     'author',
     'status',
     'version',
     'demo'
 ];
+*/
 let schemaLoader = new SchemaLoader_1.SchemaLoaderExtension();
 class StxtCompletionProvider {
     provideCompletionItems(document, position) {
@@ -125,17 +127,30 @@ function buscarSugerencias(parent) {
         return [];
     }
     const children = nodeDef.getChildren();
-    for (let [childName, childDef] of children.entries()) {
-        console.log(`Key: ${childName}, Value: ${childDef.getName()}`);
-    }
     const result = [];
+    for (let [childName, childDef] of children.entries()) {
+        const item = new vscode.CompletionItem(childDef.getQualifiedName(), vscode.CompletionItemKind.Value);
+        item.detail = 'STXT key';
+        if (childDef.getNamespace() === parent.getNamespace()) {
+            console.log(`${childDef.getName()} :`);
+            item.insertText = `${childDef.getName()} :`;
+        }
+        else {
+            console.log(`${childDef.getName()} (${childDef.getNamespace()}) :`);
+            item.insertText = `${childDef.getName()} (${childDef.getNamespace()}) :`;
+        }
+        result.push(item);
+    }
+    /*
     for (let index = 0; index < STXT_KEYS.length; index++) {
         const element = STXT_KEYS[index];
         const item = new vscode.CompletionItem(element, vscode.CompletionItemKind.Value);
         item.insertText = `${element}: `;
         item.detail = 'STXT key';
+
         result.push(item);
     }
+    */
     return result;
 }
 //# sourceMappingURL=CompletionProvider.js.map
