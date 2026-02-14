@@ -143,13 +143,12 @@ function closeToLevel(stack: Node[], targetLevel: number, diagnostics: vscode.Di
 		    stack[stack.length - 1].addChild(completed);
         }
 
-        // TODO Validate grammar of completed
+        // Validate grammar of completed
         try {
-            console.log("Validate: " + completed.getQualifiedName());
-            SCHEMA_VALIDATOR.validate(completed);
-            console.log(" => OK");
+            if (completed.getNamespace()!=="") {
+                SCHEMA_VALIDATOR.validate(completed);
+            }
         } catch (e) {
-            console.log(" => ERROR");
             const range = new vscode.Range(completed.getLine()-1, 0, completed.getLine()-1, 100); // TODO Hacer longitud correctamente
             diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Warning));
         }        
