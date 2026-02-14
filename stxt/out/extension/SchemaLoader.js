@@ -40,9 +40,10 @@ const vscode = __importStar(require("vscode"));
 const Parser_1 = require("../core/Parser");
 const SchemaParser_1 = require("../schema/SchemaParser");
 const SchemaProviderMemory_1 = require("../schema/SchemaProviderMemory");
+const SchemaProviderMeta_1 = require("../schema/SchemaProviderMeta");
 const SCHEMA_DIR_REL = ['.stxt', '@stxt.schema'];
 const SCHEMA_FILES_GLOB = '**/.stxt/@stxt.schema/*.stxt';
-const SCHEMA_PROVIDER = new SchemaProviderMemory_1.SchemaProviderMemory();
+const SCHEMA_PROVIDER = new SchemaProviderMemory_1.SchemaProviderMemory(new SchemaProviderMeta_1.SchemaProviderMeta());
 class SchemaLoaderExtension {
     getSchema(namespace) {
         return getSchema(namespace);

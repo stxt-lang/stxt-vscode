@@ -5,11 +5,12 @@ import { SchemaParser } from '../schema/SchemaParser';
 import { Schema } from '../schema/Schema';
 import { SchemaProvider } from '../schema/SchemaProvider';
 import { SchemaProviderMemory } from '../schema/SchemaProviderMemory';
+import { SchemaProviderMeta } from '../schema/SchemaProviderMeta';
 
 const SCHEMA_DIR_REL = ['.stxt', '@stxt.schema'];
 const SCHEMA_FILES_GLOB = '**/.stxt/@stxt.schema/*.stxt';
 
-const SCHEMA_PROVIDER: SchemaProviderMemory = new SchemaProviderMemory();
+const SCHEMA_PROVIDER: SchemaProviderMemory = new SchemaProviderMemory(new SchemaProviderMeta());
 
 
 export class SchemaLoaderExtension implements SchemaProvider {
@@ -18,7 +19,7 @@ export class SchemaLoaderExtension implements SchemaProvider {
     }
 }
 
-export function getSchema(schema: string): Schema | undefined {
+export function getSchema(schema: string): Schema | undefined | null {
     return SCHEMA_PROVIDER.getSchema(schema);
 }
 

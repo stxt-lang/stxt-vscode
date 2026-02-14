@@ -5,25 +5,27 @@ import { Schema } from "./Schema";
 import { SchemaProvider } from "./SchemaProvider";
 
 export class SchemaProviderMemory implements SchemaProvider {
+    private readonly parentSchema: SchemaProvider;
+
+    constructor(parent: SchemaProvider) {
+        this.parentSchema = parent;
+    }
+
     private readonly schemas: Map<string, Schema> = new Map();
 
-    getSchema(namespace: string): Schema | undefined {
+    getSchema(namespace: string): Schema | undefined | null {
         const key = StringUtils.lowerCase(namespace);
-        return this.schemas.get(key);
+
+        let result: Schema | undefined | null = this.schemas.get(key);
+        if (!result) {
+            result = this.parentSchema.getSchema(namespace);
+        }
+        return result;
     }
 
     addSchema(schema: Schema): void {
         const key = schema.getNamespace();
         this.schemas.set(key, schema);
-    }
-
-    hasSchema(namespace: string): boolean {
-        const key = StringUtils.lowerCase(namespace);
-        return this.schemas.has(key);
-    }
-
-    getAllNamespaces(): string[] {
-        return Array.from(this.schemas.keys());
     }
 
     clear(): void {
