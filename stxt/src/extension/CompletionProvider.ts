@@ -6,6 +6,7 @@ import { LineIndent } from '../core/LineIndent';
 import { Constants } from '../core/Constants';
 import { Node } from '../core/Node';
 import { SchemaLoaderExtension } from './SchemaLoader';
+import { ChildDefinition } from '../schema/ChildDefinition';
 
 /*
 const STXT_KEYS = [
@@ -115,11 +116,12 @@ function buscarSugerencias(parent: Node): vscode.CompletionItem[] {
     const result: vscode.CompletionItem[] = [];
 
     for (let [childName, childDef] of children.entries()) {
-        const item = new vscode.CompletionItem(childDef.getName(), vscode.CompletionItemKind.Value);
+        const isText: boolean = isBlockText(childDef);
+        const item = new vscode.CompletionItem(childDef.getName(), isText ? vscode.CompletionItemKind.Variable: vscode.CompletionItemKind.Value);
         if (childDef.getNamespace() === parent.getNamespace()) {
-            item.insertText = `${childDef.getName()}: `;
+            item.insertText = `${childDef.getName()}${isText ? ">>": ":"} `;
         } else {
-            item.insertText = `${childDef.getName()} (${childDef.getNamespace()}): `;
+            item.insertText = `${childDef.getName()} (${childDef.getNamespace()})${isText ? ">>": ":"} `;
         }
         item.detail = childName;
         result.push(item);
@@ -128,3 +130,21 @@ function buscarSugerencias(parent: Node): vscode.CompletionItem[] {
     return result;
 }
 
+function isBlockText(childDef: ChildDefinition): boolean {
+    try {
+         const schema = schemaLoader.getSchema(childDef.getNamespace());
+         if (!schema) {
+            return false;
+         }
+
+         const nodeDef = schema.getNodeDefinition(childDef.getName());
+         if (!nodeDef) { 
+            return false;
+         }
+
+         const type = nodeDef.getType();
+         return type === "TEXT" || type === "BLOCK";
+    } catch (e) {
+        return false;
+    }
+}
