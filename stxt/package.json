@@ -1,8 +1,8 @@
 {
   "name": "stxt",
-  "displayName": "stxt",
+  "displayName": "STXT - Semantic Text",
   "description": "Semantic Text syntax (.stxt)",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "stxt-lang",
   "repository": {
     "type": "git",
@@ -13,7 +13,12 @@
     "vscode": "^1.109.0"
   },
   "categories": [
-    "Other"
+    "Programming Languages"
+  ],
+  "keywords": ["stxt", "semantic text", "language", "syntax"],
+  "icon": "images/icon.png",
+  "activationEvents": [
+    "onLanguage:stxt"
   ],
   "main": "./out/extension.js",
   "contributes": {

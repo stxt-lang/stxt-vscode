@@ -1,20 +1,75 @@
-# stxt README
+# STXT – Semantic Text
 
-Esta es la extensión para el lenguaje `STXT`.
+Support for the **STXT (Semantic Text)** language in Visual Studio Code.
 
-## Características
+STXT is a structured, indentation-based language designed for semantic configuration and content definition.
 
-* Validación de formato
-* Coloreado de elementos
-* Formateo automático
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 0.0.1
-
-Primera versión de la extensión
+More information: [https://stxt.dev](https://stxt.dev)
 
 ---
 
+## Features
+
+* ✅ Real-time validation
+* 🎨 Semantic syntax highlighting
+* 🧠 Context-aware hover information
+* ✍️ Document formatting
+* 🔧 Custom schema support (`.stxt/@stxt.schema`)
+* 📐 Indentation configured for STXT (1 TAB = 4 spaces)
+
+---
+
+## Example
+
+```stxt
+Title: Home
+    Author: Joan
+    Description: Example page
+
+    Content >>
+        This is a text block.
+        It supports multiple lines.
+
+# This is a comment
+```
+
+---
+
+## Formatting
+
+Use **Format Document** to normalize spacing and structure.
+
+STXT formatting preserves indentation and block semantics.
+
+---
+
+## Schemas
+
+STXT supports project-level schemas located at:
+
+```
+<workspace>/.stxt/@stxt.schema/
+```
+
+Schemas are loaded automatically and refreshed on change.
+
+---
+
+## Version 0.1.0
+
+Initial public release:
+
+* Core language support
+* Semantic tokens
+* Validation
+* Hover information
+* Formatter
+* Schema loading
+
+---
+
+## License
+
+MIT
+
+---
