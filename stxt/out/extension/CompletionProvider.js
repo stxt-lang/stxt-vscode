@@ -129,28 +129,16 @@ function buscarSugerencias(parent) {
     const children = nodeDef.getChildren();
     const result = [];
     for (let [childName, childDef] of children.entries()) {
-        const item = new vscode.CompletionItem(childDef.getQualifiedName(), vscode.CompletionItemKind.Value);
-        item.detail = 'STXT key';
+        const item = new vscode.CompletionItem(childDef.getName(), vscode.CompletionItemKind.Value);
         if (childDef.getNamespace() === parent.getNamespace()) {
-            console.log(`${childDef.getName()} :`);
-            item.insertText = `${childDef.getName()} :`;
+            item.insertText = `${childDef.getName()}: `;
         }
         else {
-            console.log(`${childDef.getName()} (${childDef.getNamespace()}) :`);
-            item.insertText = `${childDef.getName()} (${childDef.getNamespace()}) :`;
+            item.insertText = `${childDef.getName()} (${childDef.getNamespace()}): `;
         }
+        item.detail = childName;
         result.push(item);
     }
-    /*
-    for (let index = 0; index < STXT_KEYS.length; index++) {
-        const element = STXT_KEYS[index];
-        const item = new vscode.CompletionItem(element, vscode.CompletionItemKind.Value);
-        item.insertText = `${element}: `;
-        item.detail = 'STXT key';
-
-        result.push(item);
-    }
-    */
     return result;
 }
 //# sourceMappingURL=CompletionProvider.js.map
