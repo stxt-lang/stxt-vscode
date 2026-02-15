@@ -130,12 +130,22 @@ function buscarSugerencias(parent) {
     const result = [];
     for (let [childName, childDef] of children.entries()) {
         const isText = isBlockText(childDef);
-        const item = new vscode.CompletionItem(childDef.getName(), isText ? vscode.CompletionItemKind.Variable : vscode.CompletionItemKind.Value);
+        const item = new vscode.CompletionItem(childDef.getName(), isText ? vscode.CompletionItemKind.Module : vscode.CompletionItemKind.EnumMember);
         if (childDef.getNamespace() === parent.getNamespace()) {
-            item.insertText = `${childDef.getName()}${isText ? ">>" : ":"} `;
+            if (isText) {
+                item.insertText = `${childDef.getName()} >>\n\t`;
+            }
+            else {
+                item.insertText = `${childDef.getName()}: `;
+            }
         }
         else {
-            item.insertText = `${childDef.getName()} (${childDef.getNamespace()})${isText ? ">>" : ":"} `;
+            if (isText) {
+                item.insertText = `${childDef.getName()} (${childDef.getNamespace()})>>\n\t`;
+            }
+            else {
+                item.insertText = `${childDef.getName()} (${childDef.getNamespace()}): `;
+            }
         }
         item.detail = childName;
         result.push(item);
