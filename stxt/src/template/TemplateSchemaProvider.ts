@@ -4,7 +4,6 @@ import { Parser } from "../core/Parser";
 import { Node } from "../core/Node";
 
 import { SchemaValidator } from "../schema/SchemaValidator";
-
 import { SchemaException } from "../exceptions/SchemaException";
 
 import { MetaTemplateSchemaProvider } from "./MetaTemplateSchemaProvider";
@@ -12,21 +11,26 @@ import { TemplateParser } from "./TemplateParser";
 import { SchemaProviderMemory } from "../schema/SchemaProviderMemory";
 
 export class TemplateSchemaProvider extends SchemaProviderMemory {
-
     addSchemaFromTemplate(template: string): void {
-        // Creamos parser
         const parser = new Parser();
 
         const nodes: Node[] = parser.parse(template);
         if (nodes.length !== 1) {
             throw new SchemaException("INVALID_SCHEMA",`There are ${nodes.length}, and expected is 1`);
         }
-        // Validamos
+
+        // Validamos el template contra el meta-schema de templates
         const schemaValidator = new SchemaValidator(new MetaTemplateSchemaProvider(), true);
         schemaValidator.validate(nodes[0]);
 
-        // Obtenemos schema
+        // Generamos schema desde el template
         const sch = TemplateParser.transformNodeToSchema(nodes[0]);
+
+        // Check mínimo de seguridad (en Java también se controlaba el namespace esperado)
+        if (!sch.getNamespace() || sch.getNamespace().trim().length === 0) {
+            throw new SchemaException("INVALID_SCHEMA", "Schema namespace is empty");
+        }
+
         this.addSchema(sch);
     }
 }

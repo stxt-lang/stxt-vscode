@@ -10,17 +10,20 @@ const TemplateParser_1 = require("./TemplateParser");
 const SchemaProviderMemory_1 = require("../schema/SchemaProviderMemory");
 class TemplateSchemaProvider extends SchemaProviderMemory_1.SchemaProviderMemory {
     addSchemaFromTemplate(template) {
-        // Creamos parser
         const parser = new Parser_1.Parser();
         const nodes = parser.parse(template);
         if (nodes.length !== 1) {
             throw new SchemaException_1.SchemaException("INVALID_SCHEMA", `There are ${nodes.length}, and expected is 1`);
         }
-        // Validamos
+        // Validamos el template contra el meta-schema de templates
         const schemaValidator = new SchemaValidator_1.SchemaValidator(new MetaTemplateSchemaProvider_1.MetaTemplateSchemaProvider(), true);
         schemaValidator.validate(nodes[0]);
-        // Obtenemos schema
+        // Generamos schema desde el template
         const sch = TemplateParser_1.TemplateParser.transformNodeToSchema(nodes[0]);
+        // Check mínimo de seguridad (en Java también se controlaba el namespace esperado)
+        if (!sch.getNamespace() || sch.getNamespace().trim().length === 0) {
+            throw new SchemaException_1.SchemaException("INVALID_SCHEMA", "Schema namespace is empty");
+        }
         this.addSchema(sch);
     }
 }
