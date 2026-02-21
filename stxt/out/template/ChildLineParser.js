@@ -77,7 +77,7 @@ class ChildLineParser {
         // values
         let values = null;
         const valuesStr = m[3];
-        if (valuesStr != null) {
+        if (valuesStr !== null && valuesStr !== undefined) {
             const parts = valuesStr.split(",");
             const list = [];
             for (let part of parts) {
