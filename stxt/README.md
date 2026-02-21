@@ -5,7 +5,7 @@ Support for the **STXT (Semantic Text)** language in Visual Studio Code.
 STXT is a structured, indentation-based language designed for semantic configuration and content definition.
 
 More information: [https://stxt.dev](https://stxt.dev)
-Examples ready to use: [https://github.com/stxt-lang/stxt-web](https://github.com/stxt-lang/stxt-web)
+Ready-to-use examples: [https://github.com/stxt-lang/stxt-web](https://github.com/stxt-lang/stxt-web)
 
 ---
 
@@ -16,7 +16,7 @@ Examples ready to use: [https://github.com/stxt-lang/stxt-web](https://github.co
 * 🧠 Context-aware hover information
 * ✍️ Document formatting
 * 🔧 Custom schema support (`.stxt/@stxt.schema`)
-* 📐 Indentation configured for STXT (1 TAB = 4 spaces)
+* 📐 Indentation configured for STXT (1 tab = 4 spaces)
 
 ---
 
@@ -52,7 +52,7 @@ STXT supports project-level schemas located at:
 <workspace>/.stxt/@stxt.schema/
 ```
 
-Schemas are loaded automatically and refreshed on change.
+Schemas are loaded automatically and refreshed when changes are detected.
 
 ---
 
