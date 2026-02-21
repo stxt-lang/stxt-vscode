@@ -37,8 +37,6 @@ exports.SchemaLoaderExtension = void 0;
 exports.getSchema = getSchema;
 exports.registerSchemaLoader = registerSchemaLoader;
 const vscode = __importStar(require("vscode"));
-const Parser_1 = require("../core/Parser");
-const SchemaParser_1 = require("../schema/SchemaParser");
 const SchemaProviderMemory_1 = require("../schema/SchemaProviderMemory");
 const SchemaProviderMeta_1 = require("../schema/SchemaProviderMeta");
 const SCHEMA_DIR_REL = ['.stxt', '@stxt.schema'];
@@ -90,10 +88,7 @@ async function logSchemaFile(uri, reason) {
         const bytes = await vscode.workspace.fs.readFile(uri);
         const text = new TextDecoder('utf-8').decode(bytes);
         console.log(`\n[stxt] schema ${reason}: ${uri.toString()}\n${text.length} chars.`);
-        const parser = new Parser_1.Parser();
-        const node = parser.parse(text)[0];
-        const schema = SchemaParser_1.SchemaParser.transformNodeToSchema(node);
-        SCHEMA_PROVIDER.addSchema(schema);
+        SCHEMA_PROVIDER.addSchema(text);
     }
     catch (e) {
         console.log(`[stxt] schema ${reason}: could not read ${uri.toString()} (${String(e)})`);

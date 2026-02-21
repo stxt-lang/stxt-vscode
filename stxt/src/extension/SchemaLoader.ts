@@ -69,10 +69,7 @@ async function logSchemaFile(uri: vscode.Uri, reason: 'initial' | 'changed' | 'c
         const bytes = await vscode.workspace.fs.readFile(uri);
         const text = new TextDecoder('utf-8').decode(bytes);
         console.log(`\n[stxt] schema ${reason}: ${uri.toString()}\n${text.length} chars.`);
-        const parser: Parser = new Parser();
-        const node: Node = parser.parse(text)[0];
-        const schema: Schema = SchemaParser.transformNodeToSchema(node);
-        SCHEMA_PROVIDER.addSchema(schema);
+        SCHEMA_PROVIDER.addSchema(text);
 
     } catch (e) {
         console.log(`[stxt] schema ${reason}: could not read ${uri.toString()} (${String(e)})`);

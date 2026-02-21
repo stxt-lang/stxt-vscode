@@ -2,7 +2,11 @@
 // SchemaProviderMemory.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SchemaProviderMemory = void 0;
+const Parser_1 = require("../core/Parser");
 const StringUtils_1 = require("../core/StringUtils");
+const SchemaParser_1 = require("./SchemaParser");
+const SchemaProviderMeta_1 = require("./SchemaProviderMeta");
+const SchemaValidator_1 = require("./SchemaValidator");
 class SchemaProviderMemory {
     parentSchema;
     constructor(parent) {
@@ -17,7 +21,12 @@ class SchemaProviderMemory {
         }
         return result;
     }
-    addSchema(schema) {
+    addSchema(txt) {
+        const parser = new Parser_1.Parser();
+        const node = parser.parse(txt)[0];
+        const schema = SchemaParser_1.SchemaParser.transformNodeToSchema(node);
+        const schemaValidator = new SchemaValidator_1.SchemaValidator(new SchemaProviderMeta_1.SchemaProviderMeta(), true);
+        schemaValidator.validate(node);
         const key = schema.getNamespace();
         this.schemas.set(key, schema);
     }

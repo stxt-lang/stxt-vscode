@@ -11,7 +11,7 @@ import { TemplateParser } from "./TemplateParser";
 import { SchemaProviderMemory } from "../schema/SchemaProviderMemory";
 
 export class TemplateSchemaProvider extends SchemaProviderMemory {
-    addSchemaFromTemplate(template: string): void {
+    addTemplate(template: string): void {
         const parser = new Parser();
 
         const nodes: Node[] = parser.parse(template);
@@ -31,6 +31,6 @@ export class TemplateSchemaProvider extends SchemaProviderMemory {
             throw new SchemaException("INVALID_SCHEMA", "Schema namespace is empty");
         }
 
-        this.addSchema(sch);
+        this.schemas.set(sch.getNamespace(), sch);
     }
 }

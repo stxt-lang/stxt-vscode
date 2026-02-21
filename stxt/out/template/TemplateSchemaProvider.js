@@ -9,7 +9,7 @@ const MetaTemplateSchemaProvider_1 = require("./MetaTemplateSchemaProvider");
 const TemplateParser_1 = require("./TemplateParser");
 const SchemaProviderMemory_1 = require("../schema/SchemaProviderMemory");
 class TemplateSchemaProvider extends SchemaProviderMemory_1.SchemaProviderMemory {
-    addSchemaFromTemplate(template) {
+    addTemplate(template) {
         const parser = new Parser_1.Parser();
         const nodes = parser.parse(template);
         if (nodes.length !== 1) {
@@ -24,7 +24,7 @@ class TemplateSchemaProvider extends SchemaProviderMemory_1.SchemaProviderMemory
         if (!sch.getNamespace() || sch.getNamespace().trim().length === 0) {
             throw new SchemaException_1.SchemaException("INVALID_SCHEMA", "Schema namespace is empty");
         }
-        this.addSchema(sch);
+        this.schemas.set(sch.getNamespace(), sch);
     }
 }
 exports.TemplateSchemaProvider = TemplateSchemaProvider;
