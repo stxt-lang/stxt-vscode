@@ -48,6 +48,5 @@ function createLine(line: string, node: Node | undefined): string {
         }
     }
 
-
     return result;
 }

@@ -71,9 +71,7 @@ async function logSchemaFile(uri: vscode.Uri, reason: 'initial' | 'changed' | 'c
         console.log(`\n[stxt] schema ${reason}: ${uri.toString()}\n${text.length} chars.`);
         const parser: Parser = new Parser();
         const node: Node = parser.parse(text)[0];
-        //console.log("NODE: " + node);
         const schema: Schema = SchemaParser.transformNodeToSchema(node);
-        //console.log(`Schema: ${schema}`);
         SCHEMA_PROVIDER.addSchema(schema);
 
     } catch (e) {
