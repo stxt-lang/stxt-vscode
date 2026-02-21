@@ -1,0 +1,36 @@
+"use strict";
+// MetaTemplateSchemaProvider.ts
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MetaTemplateSchemaProvider = void 0;
+const Parser_1 = require("../core/Parser");
+const ResourceNotFoundException_1 = require("../exceptions/ResourceNotFoundException");
+const SchemaException_1 = require("../exceptions/SchemaException");
+const TemplateParser_1 = require("./TemplateParser");
+class MetaTemplateSchemaProvider {
+    static META_TEXT = `Template (@stxt.template): @stxt.template
+\tStructure >>
+\t\tTemplate (@stxt.template):
+\t\t\tStructure: (1) BLOCK
+`;
+    meta;
+    constructor() {
+        const parser = new Parser_1.Parser();
+        const nodes = parser.parse(MetaTemplateSchemaProvider.META_TEXT);
+        if (nodes.length !== 1) {
+            throw new SchemaException_1.SchemaException("META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);
+        }
+        this.meta = TemplateParser_1.TemplateParser.transformNodeToSchema(nodes[0]);
+    }
+    getSchema(namespace) {
+        if (namespace !== "@stxt.template") {
+            throw new ResourceNotFoundException_1.ResourceNotFoundException("@stxt.template", namespace);
+        }
+        // meta siempre existe si el constructor terminó, pero lo dejamos equivalente al Java
+        if (!this.meta) {
+            throw new SchemaException_1.SchemaException("META_SCHEMA_NOT_AVAILABLE", "Meta schema not available");
+        }
+        return this.meta;
+    }
+}
+exports.MetaTemplateSchemaProvider = MetaTemplateSchemaProvider;
+//# sourceMappingURL=MetaTemplateSchemaProvider.js.map
