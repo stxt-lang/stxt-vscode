@@ -15,7 +15,7 @@ Ready-to-use examples: [https://github.com/stxt-lang/stxt-web](https://github.co
 * 🎨 Semantic syntax highlighting
 * 🧠 Context-aware hover information
 * ✍️ Document formatting
-* 🔧 Custom schema support (`.stxt/@stxt.schema`)
+* 🔧 Custom schema and template support (`.stxt/@stxt.schema`, `.stxt/@stxt.template`)
 * 📐 Indentation configured for STXT (1 tab = 4 spaces)
 
 ---
@@ -44,7 +44,7 @@ STXT formatting preserves indentation and block semantics.
 
 ---
 
-## Schemas
+## Schemas and Templates
 
 STXT supports project-level schemas located at:
 
@@ -52,7 +52,24 @@ STXT supports project-level schemas located at:
 <workspace>/.stxt/@stxt.schema/
 ```
 
-Schemas are loaded automatically and refreshed when changes are detected.
+STXT also supports project-level templates located at:
+
+```
+<workspace>/.stxt/@stxt.template/
+```
+
+Schemas and templates are loaded automatically and refreshed when changes are detected.
+Schemas have higher priority than templates.
+
+---
+
+## Version 0.1.1
+
+Added in this release:
+
+* Template support
+* Template loading from `.stxt/@stxt.template`
+* Schema priority over templates
 
 ---
 
