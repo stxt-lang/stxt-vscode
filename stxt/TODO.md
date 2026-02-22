@@ -14,6 +14,7 @@
 * Bloqueo de ficheros (.lock), según configuración para .vscode: Configuration (@stxt .vscode). 
   Mostrará aviso global o algo, y se borrará al salir. También mostrará el usuario (de configuración). Quizá pueda hacers con un plugin externo.
 * Colores distintos para documentos con namespace y sin namespace
+* Colores distintos para namespace normal y namespace `@`
 * Parseo en proyecto node separado
 
 # Sobre STXT
