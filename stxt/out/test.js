@@ -22,4 +22,4 @@ async function main() {
     console.log("Main process END.");
 }
 main();
-//# sourceMappingURL=all.js.map
+//# sourceMappingURL=test.js.map
