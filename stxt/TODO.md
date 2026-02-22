@@ -1,8 +1,5 @@
 # Plugin VSCode
 * Markdown de elemento como explicación
-* Autocompletar
-    * Al inicio con todos
-    * A partir de prefijo (inicio o medio)
 * Mejor soporte para schema (validación en editor)
 * Mejor soporte para templates (validación en editor)
 * Aviso si un template está sobreescrito por un schema
