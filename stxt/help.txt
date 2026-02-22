@@ -3,3 +3,4 @@ Para crear package
 ******************
 
 vsce package
+https://marketplace.visualstudio.com/manage/publishers/stxt-lang
