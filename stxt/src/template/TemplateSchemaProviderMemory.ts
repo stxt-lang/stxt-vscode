@@ -9,8 +9,16 @@ import { SchemaException } from "../exceptions/SchemaException";
 import { MetaTemplateSchemaProvider } from "./MetaTemplateSchemaProvider";
 import { TemplateParser } from "./TemplateParser";
 import { SchemaProviderMemory } from "../schema/SchemaProviderMemory";
+import { SchemaProvider } from "../schema/SchemaProvider";
 
-export class TemplateSchemaProvider extends SchemaProviderMemory {
+export class TemplateSchemaProviderMemory extends SchemaProviderMemory {
+    constructor(parent?: SchemaProvider | null | undefined) {
+        if (!parent) {
+            parent = new MetaTemplateSchemaProvider();
+        }
+        super(parent);
+    }
+
     addTemplate(template: string): void {
         const parser = new Parser();
 
