@@ -56,7 +56,7 @@ function registerSchemaLoader(context) {
     void loadAllWorkspaceSchemas();
     // Watcher de cualquier fichero .stxt dentro del directorio
     const watcher = vscode.workspace.createFileSystemWatcher(SCHEMA_FILES_GLOB);
-    context.subscriptions.push(watcher, watcher.onDidCreate(uri => void logSchemaFile(uri, 'created')), watcher.onDidChange(uri => void logSchemaFile(uri, 'changed')), watcher.onDidDelete(uri => {
+    context.subscriptions.push(watcher, watcher.onDidCreate(uri => void addSchemaFile(uri, 'created')), watcher.onDidChange(uri => void addSchemaFile(uri, 'changed')), watcher.onDidDelete(uri => {
         console.log(`[stxt] schema deleted: ${uri.toString()}`);
     }));
 }
@@ -70,20 +70,18 @@ async function loadAllWorkspaceSchemas() {
 async function loadSchemasFromDir(dirUri) {
     try {
         const entries = await vscode.workspace.fs.readDirectory(dirUri);
-        // entries: Array<[name: string, type: vscode.FileType]>
-        for (const [name, type] of entries) {
-            if (type === vscode.FileType.File && name.endsWith('.stxt')) {
+        for (const [name] of entries) {
+            if (name.endsWith('.stxt')) {
                 const fileUri = vscode.Uri.joinPath(dirUri, name);
-                await logSchemaFile(fileUri, 'initial');
+                await addSchemaFile(fileUri, 'initial');
             }
         }
     }
     catch (e) {
-        // Normal si no existe la carpeta en el proyecto
         console.log(`[stxt] schema dir not found: ${dirUri.toString()} (${String(e)})`);
     }
 }
-async function logSchemaFile(uri, reason) {
+async function addSchemaFile(uri, reason) {
     try {
         const bytes = await vscode.workspace.fs.readFile(uri);
         const text = new TextDecoder('utf-8').decode(bytes);
