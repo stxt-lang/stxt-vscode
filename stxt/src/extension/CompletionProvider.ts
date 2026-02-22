@@ -5,6 +5,7 @@ import { Constants } from '../core/Constants';
 import { Node } from '../core/Node';
 import { SchemaLoaderExtension } from './SchemaLoader';
 import { ChildDefinition } from '../schema/ChildDefinition';
+import { StringUtils } from '../core/StringUtils';
 
 let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();
 
@@ -26,14 +27,13 @@ export class StxtCompletionProvider implements vscode.CompletionItemProvider {
             return [];
         }
 
-        // Si no está vacía no mostramos nada. 
-        // TODO Debemos hacerlo mejor para mostrar los que empiezan con el nombre que tenemos
-        if (linePrefix.trim() !== "") {
+        const completionContext = getCompletionContext(linePrefix);
+        if (!completionContext) {
             return [];
         }
 
         // Buscamos nivel del cursor
-        let level = getLevel(linePrefix);
+        let level = completionContext.level;
         console.log("Level: " + level);
 
         // Buscamos parent
@@ -51,14 +51,13 @@ export class StxtCompletionProvider implements vscode.CompletionItemProvider {
         if (parent) {
             console.log(`Parent *****: ${parent.getQualifiedName()} (${parent.getLine()})`);
 
-            return buscarSugerencias(parent);
+            return buscarSugerencias(parent, completionContext.prefix);
         }
 
         return [];
     }
 }
 
-// TODO Hacer mejor para mostrar el prefix también y así poder enseñar los que empiezan
 function getLevel(line: string): number {
     let level = 0;
     let spaces = 0;
@@ -88,7 +87,40 @@ function getLevel(line: string): number {
     return level;
 }
 
-function buscarSugerencias(parent: Node): vscode.CompletionItem[] {
+function getCompletionContext(linePrefix: string): { level: number, prefix: string } | null {
+    const trimmed = linePrefix.trimStart();
+    if (trimmed.startsWith(Constants.COMMENT_CHAR)) {
+        return null;
+    }
+
+    // Si estamos ya en el valor/texto, no sugerimos nodos.
+    if (trimmed.includes(Constants.SEP_NODE) || trimmed.includes('>>')) {
+        return null;
+    }
+
+    const level = getLevel(linePrefix);
+    const indentationLength = getIndentationLength(linePrefix);
+    const rawNodePrefix = linePrefix.slice(indentationLength);
+
+    // Permitimos texto para filtrar por prefijo de nombre.
+    const prefix = rawNodePrefix.replace(/\s*\(.*$/, '').trimEnd();
+
+    return { level, prefix };
+}
+
+function getIndentationLength(line: string): number {
+    let pointer = 0;
+    while (pointer < line.length) {
+        const c = line.charAt(pointer);
+        if (c !== Constants.SPACE && c !== Constants.TAB) {
+            break;
+        }
+        pointer++;
+    }
+    return pointer;
+}
+
+function buscarSugerencias(parent: Node, prefix: string): vscode.CompletionItem[] {
     console.log("Buscando esquema de " + parent.getQualifiedName());
     let schema = schemaLoader.getSchema(parent.getNamespace());
 
@@ -103,8 +135,12 @@ function buscarSugerencias(parent: Node): vscode.CompletionItem[] {
 
     const children = nodeDef.getChildren();
     const result: vscode.CompletionItem[] = [];
+    const normalizedPrefix = StringUtils.normalize(prefix);
 
     for (let [childName, childDef] of children.entries()) {
+        if (normalizedPrefix.length > 0 && !StringUtils.normalize(childDef.getName()).startsWith(normalizedPrefix)) {
+            continue;
+        }
         const isText: boolean = isBlockText(childDef);
         const item = new vscode.CompletionItem(childDef.getName(), isText ? vscode.CompletionItemKind.Module: vscode.CompletionItemKind.EnumMember);
         if (childDef.getNamespace() === parent.getNamespace()) {
