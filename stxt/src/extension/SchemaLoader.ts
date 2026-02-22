@@ -4,10 +4,9 @@ import { SchemaProvider } from '../schema/SchemaProvider';
 import { SchemaProviderMemory } from '../schema/SchemaProviderMemory';
 import { SchemaProviderMeta } from '../schema/SchemaProviderMeta';
 
-const SCHEMA_DIR_REL = ['.stxt', '@stxt.schema'];
+const SCHEMA_DIR_REL    = ['.stxt', '@stxt.schema'];
 const SCHEMA_FILES_GLOB = '**/.stxt/@stxt.schema/*.stxt';
-
-const SCHEMA_PROVIDER: SchemaProviderMemory = new SchemaProviderMemory(new SchemaProviderMeta());
+const SCHEMA_PROVIDER   = new SchemaProviderMemory();
 
 export class SchemaLoaderExtension implements SchemaProvider {
     getSchema(namespace: string): Schema | null | undefined {
@@ -35,10 +34,17 @@ export function registerSchemaLoader(context: vscode.ExtensionContext) {
 }
 
 async function loadAllWorkspaceSchemas() {
-    const folders = vscode.workspace.workspaceFolders ?? [];
-    for (const f of folders) {
-        const dirUri = vscode.Uri.joinPath(f.uri, ...SCHEMA_DIR_REL);
-        await loadSchemasFromDir(dirUri);
+    try {
+        console.log("Init loading workspace...");
+        const folders = vscode.workspace.workspaceFolders ?? [];
+        for (const f of folders) {
+            console.log(`Folder: ${f.uri}`);
+            const dirUri = vscode.Uri.joinPath(f.uri, ...SCHEMA_DIR_REL);
+            await loadSchemasFromDir(dirUri);
+        }
+        console.log("Ok loading workspace.");
+    } catch (e) {
+        console.log("Error loading all workspace", e);
     }
 }
 

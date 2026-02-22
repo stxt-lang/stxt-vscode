@@ -10,7 +10,12 @@ const SchemaValidator_1 = require("./SchemaValidator");
 class SchemaProviderMemory {
     parentSchema;
     constructor(parent) {
-        this.parentSchema = parent;
+        if (!parent) {
+            this.parentSchema = new SchemaProviderMeta_1.SchemaProviderMeta();
+        }
+        else {
+            this.parentSchema = parent;
+        }
     }
     schemas = new Map();
     getSchema(namespace) {

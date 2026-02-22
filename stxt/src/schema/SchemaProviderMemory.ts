@@ -12,8 +12,12 @@ import { SchemaValidator } from "./SchemaValidator";
 export class SchemaProviderMemory implements SchemaProvider {
     private readonly parentSchema: SchemaProvider;
 
-    constructor(parent: SchemaProvider) {
-        this.parentSchema = parent;
+    constructor(parent?: SchemaProvider | null | undefined) {
+        if (!parent) {
+            this.parentSchema = new SchemaProviderMeta();
+        } else {
+            this.parentSchema = parent;
+        }
     }
 
     protected readonly schemas: Map<string, Schema> = new Map();
