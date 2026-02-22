@@ -7,6 +7,7 @@ import { StxtToken } from './Tokens';
 import { createNode } from '../core/NodeCreator';
 import { SchemaValidator } from '../schema/SchemaValidator';
 import { SchemaLoaderExtension } from './SchemaLoader';
+import { diagnosticCollection } from '../extension';
 
 const lastAnalysisByUri = new Map<string, AnalysisResult>();
 
@@ -14,6 +15,15 @@ const SCHEMA_VALIDATOR = new SchemaValidator(new SchemaLoaderExtension());
 
 export function getLastAnalysis(document: vscode.TextDocument): AnalysisResult | undefined {
     return lastAnalysisByUri.get(document.uri.toString());
+}
+
+export function analysisAllDocs(): void{
+	for (const doc of vscode.workspace.textDocuments) {
+		if (doc.languageId === 'stxt') {
+			//console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
+			analisysDoc(doc, diagnosticCollection);
+		}
+	}
 }
 
 export function analisysDoc(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection): AnalysisResult {

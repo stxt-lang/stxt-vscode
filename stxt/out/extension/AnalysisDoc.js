@@ -34,16 +34,26 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLastAnalysis = getLastAnalysis;
+exports.analysisAllDocs = analysisAllDocs;
 exports.analisysDoc = analisysDoc;
 const vscode = __importStar(require("vscode"));
 const LineIndentParser_1 = require("../core/LineIndentParser");
 const NodeCreator_1 = require("../core/NodeCreator");
 const SchemaValidator_1 = require("../schema/SchemaValidator");
 const SchemaLoader_1 = require("./SchemaLoader");
+const extension_1 = require("../extension");
 const lastAnalysisByUri = new Map();
 const SCHEMA_VALIDATOR = new SchemaValidator_1.SchemaValidator(new SchemaLoader_1.SchemaLoaderExtension());
 function getLastAnalysis(document) {
     return lastAnalysisByUri.get(document.uri.toString());
+}
+function analysisAllDocs() {
+    for (const doc of vscode.workspace.textDocuments) {
+        if (doc.languageId === 'stxt') {
+            //console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
+            analisysDoc(doc, extension_1.diagnosticCollection);
+        }
+    }
 }
 function analisysDoc(document, diagnosticCollection) {
     //console.log("Parse init...");

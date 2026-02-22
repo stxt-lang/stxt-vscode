@@ -3,11 +3,11 @@ import { StxtSemanticTokensProvider } from './extension/SemanticTokensProvider';
 import { StxtFormattingProvider } from './extension/FormattingProvider';
 import { StxtCompletionProvider } from './extension/CompletionProvider';
 import { StxtHoverProvider } from './extension/HoverProvider';
-import { analisysDoc } from './extension/AnalysisDoc';
+import { analisysDoc, analysisAllDocs } from './extension/AnalysisDoc';
 import { tokenLegend } from './extension/Tokens';
 import { registerSchemaLoader } from './extension/SchemaLoader';
 
-let diagnosticCollection: vscode.DiagnosticCollection;
+export let diagnosticCollection: vscode.DiagnosticCollection;
 
 export function activate(context: vscode.ExtensionContext) {
 	//console.log('STXT extension activated');
@@ -62,13 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 		)
 	);
 
-	for (const doc of vscode.workspace.textDocuments) {
-		if (doc.languageId === 'stxt') {
-			//console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
-			analisysDoc(doc, diagnosticCollection);
-		}
-	}
-
+	analysisAllDocs();
 	registerSchemaLoader(context);
 }
 
