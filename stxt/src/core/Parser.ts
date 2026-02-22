@@ -1,11 +1,8 @@
 // Parser.ts
 
-import { readFile } from "fs/promises";
-import { ParseException } from "../exceptions/ParseException";
 import { Node } from "./Node";
-import { LineIndentParser } from "./LineIndentParser";
-import { LineIndent} from "./LineIndent";
-import { NameNamespaceParser } from "./NameNamespaceParser";
+import { parseLine } from "./LineIndentParser";
+import { LineIndent } from "./LineIndent";
 import { createNode } from "./NodeCreator";
 
 function removeUTF8BOM(content: string): string {
@@ -42,8 +39,8 @@ export class Parser {
 		const lastNodeText = lastNode ? lastNode.isTextNode() : false;
 
 		// Parseamos línea
-		const lineIndent: LineIndent | null = LineIndentParser.parseLine(line,lastNodeText,lastLevel,lineNumber);
-		
+		const lineIndent: LineIndent | null = parseLine(line, lastNodeText, lastLevel, lineNumber);
+
 		if (lineIndent == null) {
 			return;
 		}
@@ -73,8 +70,11 @@ export class Parser {
 			const completed = stack.pop()!;
 			completed.freeze();
 
-			if (stack.length === 0) documents.push(completed);
-			else stack[stack.length - 1].addChild(completed);
+			if (stack.length === 0) {
+				documents.push(completed);
+			} else {
+				stack[stack.length - 1].addChild(completed);
+			}
 		}
 	}
 }

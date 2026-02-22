@@ -1,63 +1,57 @@
 "use strict";
-// LineIndentParser.ts
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LineIndentParser = void 0;
+exports.parseLine = parseLine;
 const Constants_1 = require("./Constants");
 const StringUtils_1 = require("./StringUtils");
 const ParseException_1 = require("../exceptions/ParseException");
 const LineIndent_1 = require("./LineIndent");
-class LineIndentParser {
-    constructor() {
-    }
-    static parseLine(line, lastNodeBlock, lastLevel, numLine) {
-        let level = 0;
-        let spaces = 0;
-        let pointer = 0;
-        while (pointer < line.length) {
-            const c = line.charAt(pointer);
-            if (c === Constants_1.Constants.SPACE) {
-                spaces++;
-                if (spaces === Constants_1.Constants.TAB_SPACES) {
-                    level++;
-                    spaces = 0;
-                }
-            }
-            else if (c === Constants_1.Constants.TAB) {
+function parseLine(line, lastNodeBlock, lastLevel, numLine) {
+    let level = 0;
+    let spaces = 0;
+    let pointer = 0;
+    while (pointer < line.length) {
+        const c = line.charAt(pointer);
+        if (c === Constants_1.Constants.SPACE) {
+            spaces++;
+            if (spaces === Constants_1.Constants.TAB_SPACES) {
                 level++;
                 spaces = 0;
             }
-            else if (c === Constants_1.Constants.COMMENT_CHAR) {
-                return null;
-            }
-            else {
-                // Primer carácter no espacio/tab/comentario => fin de indentación
-                break;
-            }
-            pointer++;
-            // Dentro del bloque de texto
-            if (lastNodeBlock && level > lastLevel) {
-                return new LineIndent_1.LineIndent(level, (0, StringUtils_1.rightTrim)(line.substring(pointer)));
-            }
         }
-        // En este punto ya estamos fuera de bloque de texto (si existía)
-        // Empty
-        if (pointer === line.length) {
-            if (lastNodeBlock) {
-                return new LineIndent_1.LineIndent(lastLevel + 1, "");
-            }
+        else if (c === Constants_1.Constants.TAB) {
+            level++;
+            spaces = 0;
+        }
+        else if (c === Constants_1.Constants.COMMENT_CHAR) {
             return null;
         }
-        // Indentación no es múltiplo de 4 con espacios
-        if (spaces > 0) {
-            throw new ParseException_1.ParseException(numLine, "INVALID_NUMBER_SPACES", `There are ${spaces} spaces before node`);
+        else {
+            // Primer carácter no espacio/tab/comentario => fin de indentación
+            break;
         }
-        // Validamos level
-        if (level > lastLevel + 1) {
-            throw new ParseException_1.ParseException(numLine, "INDENTATION_LEVEL_NOT_VALID", `Level of indent incorrect: ${level}`);
+        pointer++;
+        // Dentro del bloque de texto
+        if (lastNodeBlock && level > lastLevel) {
+            return new LineIndent_1.LineIndent(level, (0, StringUtils_1.rightTrim)(line.substring(pointer)));
         }
-        // Caso general: devolver la línea sin la indentación consumida
-        return new LineIndent_1.LineIndent(level, line.substring(pointer).trim());
     }
+    // En este punto ya estamos fuera de bloque de texto (si existía)
+    // Empty
+    if (pointer === line.length) {
+        if (lastNodeBlock) {
+            return new LineIndent_1.LineIndent(lastLevel + 1, "");
+        }
+        return null;
+    }
+    // Indentación no es múltiplo de 4 con espacios
+    if (spaces > 0) {
+        throw new ParseException_1.ParseException(numLine, "INVALID_NUMBER_SPACES", `There are ${spaces} spaces before node`);
+    }
+    // Validamos level
+    if (level > lastLevel + 1) {
+        throw new ParseException_1.ParseException(numLine, "INDENTATION_LEVEL_NOT_VALID", `Level of indent incorrect: ${level}`);
+    }
+    // Caso general: devolver la línea sin la indentación consumida
+    return new LineIndent_1.LineIndent(level, line.substring(pointer).trim());
 }
-exports.LineIndentParser = LineIndentParser;
 //# sourceMappingURL=LineIndentParser.js.map

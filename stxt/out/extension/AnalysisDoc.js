@@ -62,7 +62,7 @@ function analisysDoc(document, diagnosticCollection) {
         // Parseamos línea
         let lineIndent = null;
         try {
-            lineIndent = LineIndentParser_1.LineIndentParser.parseLine(line, lastNodeText, lastLevel, lineNumber);
+            lineIndent = (0, LineIndentParser_1.parseLine)(line, lastNodeText, lastLevel, lineNumber);
         }
         catch (e) {
             //console.log("Error en " + lineNumber + e);

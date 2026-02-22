@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { Node } from '../core/Node';
 import { LineIndent } from '../core/LineIndent';
-import { LineIndentParser } from '../core/LineIndentParser';
+import { parseLine } from '../core/LineIndentParser';
 import { AnalysisResult } from './AnalysisResult';
 import { StxtToken } from './Tokens';
 import { createNode } from '../core/NodeCreator';
@@ -39,7 +39,7 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
         // Parseamos línea
         let lineIndent: LineIndent | null = null;
         try {
-            lineIndent = LineIndentParser.parseLine(line, lastNodeText, lastLevel, lineNumber);
+            lineIndent = parseLine(line, lastNodeText, lastLevel, lineNumber);
         }
         catch (e) {
             //console.log("Error en " + lineNumber + e);

@@ -28,7 +28,7 @@ class Parser {
         const lastLevel = lastNode ? lastNode.getLevel() : 0;
         const lastNodeText = lastNode ? lastNode.isTextNode() : false;
         // Parseamos línea
-        const lineIndent = LineIndentParser_1.LineIndentParser.parseLine(line, lastNodeText, lastLevel, lineNumber);
+        const lineIndent = (0, LineIndentParser_1.parseLine)(line, lastNodeText, lastLevel, lineNumber);
         if (lineIndent == null) {
             return;
         }
@@ -51,10 +51,12 @@ class Parser {
         while (stack.length > targetLevel) {
             const completed = stack.pop();
             completed.freeze();
-            if (stack.length === 0)
+            if (stack.length === 0) {
                 documents.push(completed);
-            else
+            }
+            else {
                 stack[stack.length - 1].addChild(completed);
+            }
         }
     }
 }
