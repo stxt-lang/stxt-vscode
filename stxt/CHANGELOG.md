@@ -9,6 +9,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Fix formating of INLINE node with value with `()`
 - Improved completion suggestions for nested levels when text is already typed on the current line (prefix filtering).
 - Added completion suggestions for top-level/root nodes, including prefix filtering.
+- Reduced non-STXT completion noise by disabling word-based suggestions in comments/strings for `stxt` defaults.
 
 ## [0.1.1]
 
