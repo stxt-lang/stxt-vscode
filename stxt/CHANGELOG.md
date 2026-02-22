@@ -8,6 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [0.1.2]
 
+- Fix formating of INLINE node with value with `()`
 
 ## [0.1.1]
 

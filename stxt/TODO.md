@@ -1,6 +1,5 @@
 # Plugin VSCode
 * Markdown de elemento como explicación
-* Format document no va bien si paréntesis en INLINE
 * Autocompletar
     * Al inicio con todos
     * A partir de prefijo (inicio o medio)
@@ -11,6 +10,7 @@
 * Cambio de parseo para documentos a medias
     * Listado de errores
     * Listado de warnings
+* Si no encuentra schema dice que no está en templates! Algo más genérico sería deseable
 * Unificar parseo de vscode con genérico a partir de errores y warnings
 * Al finalizar carga de templates y schemas hacer una recarga por si acaso de validación de documentos abiertos
 * Recarga correcta de schema/template al eliminar

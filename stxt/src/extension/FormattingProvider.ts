@@ -30,9 +30,9 @@ function createLine(line: string, node: Node | undefined): string {
     }
 
     let result = "\t".repeat(node.getLevel());
-    const indexNs = line.indexOf("(");
 
     if (node.isTextNode()) {
+        const indexNs = line.indexOf("(");
         if (indexNs !== -1) {
             result += node.getName() + " (" + node.getNamespace() + ") >>";
         }
@@ -40,6 +40,10 @@ function createLine(line: string, node: Node | undefined): string {
             result += node.getName() + " >>";
         }
     } else {
+        const indexPuntos = line.indexOf(":");
+        const lineKey = line.substring(0, indexPuntos);
+        const indexNs = lineKey.indexOf("(");
+
         if (indexNs !== -1) {
             result += node.getName() + " (" + node.getNamespace() + "): " + node.getValue();
         }
