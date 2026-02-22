@@ -1,21 +1,10 @@
 import * as vscode from 'vscode';
 import { getLastAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
-import { LineIndentParser } from '../core/LineIndentParser';
-import { LineIndent } from '../core/LineIndent';
 import { Constants } from '../core/Constants';
 import { Node } from '../core/Node';
 import { SchemaLoaderExtension } from './SchemaLoader';
 import { ChildDefinition } from '../schema/ChildDefinition';
-
-/*
-const STXT_KEYS = [
-    'author',
-    'status',
-    'version',
-    'demo'
-];
-*/
 
 let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();
 

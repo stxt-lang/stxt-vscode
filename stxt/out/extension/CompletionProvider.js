@@ -38,14 +38,6 @@ const vscode = __importStar(require("vscode"));
 const AnalysisDoc_1 = require("./AnalysisDoc");
 const Constants_1 = require("../core/Constants");
 const SchemaLoader_1 = require("./SchemaLoader");
-/*
-const STXT_KEYS = [
-    'author',
-    'status',
-    'version',
-    'demo'
-];
-*/
 let schemaLoader = new SchemaLoader_1.SchemaLoaderExtension();
 class StxtCompletionProvider {
     provideCompletionItems(document, position) {
