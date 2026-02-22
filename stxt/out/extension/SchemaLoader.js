@@ -78,20 +78,36 @@ function getSchemas() {
 // ****************
 // Register loaders
 // ****************
-function registerSchemaLoader(context) {
-    // Carga inicial
-    void loadAllWorkspaceSchemas();
-    void loadAllWorkspaceTemplates();
+async function registerSchemaLoader(context, onSchemasChanged) {
+    let reloadTimer;
+    let reloadQueue = Promise.resolve();
+    const scheduleReload = (reason) => {
+        if (reloadTimer) {
+            clearTimeout(reloadTimer);
+        }
+        reloadTimer = setTimeout(() => {
+            reloadQueue = reloadQueue
+                .then(() => reloadAllSchemaData(reason, onSchemasChanged))
+                .catch(e => {
+                console.log(`[stxt] reload queue error (${reason})`, e);
+            });
+        }, 120);
+    };
     // Watcher de cualquier fichero .stxt dentro del directorio
     const watcherSchema = vscode.workspace.createFileSystemWatcher(SCHEMA_FILES_GLOB);
-    context.subscriptions.push(watcherSchema, watcherSchema.onDidCreate(uri => void addSchemaFile(uri, 'created')), watcherSchema.onDidChange(uri => void addSchemaFile(uri, 'changed')), watcherSchema.onDidDelete(uri => {
-        console.log(`[stxt] schema deleted: ${uri.toString()}`);
-    }));
+    context.subscriptions.push(watcherSchema, watcherSchema.onDidCreate(() => scheduleReload('schema created')), watcherSchema.onDidChange(() => scheduleReload('schema changed')), watcherSchema.onDidDelete(() => scheduleReload('schema deleted')));
     // Watcher de cualquier fichero .stxt dentro del directorio
     const watcherTemplate = vscode.workspace.createFileSystemWatcher(TEMPLATE_FILES_GLOB);
-    context.subscriptions.push(watcherTemplate, watcherTemplate.onDidCreate(uri => void addTemplateFile(uri, 'created')), watcherTemplate.onDidChange(uri => void addTemplateFile(uri, 'changed')), watcherTemplate.onDidDelete(uri => {
-        console.log(`[stxt] template deleted: ${uri.toString()}`);
-    }));
+    context.subscriptions.push(watcherTemplate, watcherTemplate.onDidCreate(() => scheduleReload('template created')), watcherTemplate.onDidChange(() => scheduleReload('template changed')), watcherTemplate.onDidDelete(() => scheduleReload('template deleted')), {
+        dispose: () => {
+            if (reloadTimer) {
+                clearTimeout(reloadTimer);
+                reloadTimer = undefined;
+            }
+        }
+    });
+    // Carga inicial de schemas/templates y revalidación del workspace.
+    await reloadAllSchemaData('initial load', onSchemasChanged);
 }
 // ************
 // LOAD SCHEMAS
@@ -177,6 +193,22 @@ async function addTemplateFile(uri, reason) {
     }
     catch (e) {
         console.log(`[stxt] template ${reason}: could not read ${uri.toString()}:\n(${String(e)})`);
+    }
+}
+async function reloadAllSchemaData(reason, onSchemasChanged) {
+    try {
+        console.log(`[stxt] reloading schema data (${reason})...`);
+        SCHEMA_PROVIDER.clear();
+        TEMPLATE_PROVIDER.clear();
+        await Promise.all([
+            loadAllWorkspaceSchemas(),
+            loadAllWorkspaceTemplates()
+        ]);
+        await onSchemasChanged();
+        console.log(`[stxt] schema data reloaded (${reason}).`);
+    }
+    catch (e) {
+        console.log(`[stxt] error reloading schema data (${reason})`, e);
     }
 }
 //# sourceMappingURL=SchemaLoader.js.map

@@ -44,7 +44,7 @@ const HoverProvider_1 = require("./extension/HoverProvider");
 const AnalysisDoc_1 = require("./extension/AnalysisDoc");
 const Tokens_1 = require("./extension/Tokens");
 const SchemaLoader_1 = require("./extension/SchemaLoader");
-function activate(context) {
+async function activate(context) {
     //console.log('STXT extension activated');
     exports.diagnosticCollection = vscode.languages.createDiagnosticCollection('stxt');
     context.subscriptions.push(exports.diagnosticCollection);
@@ -68,8 +68,9 @@ function activate(context) {
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider('stxt', new CompletionProvider_1.StxtCompletionProvider(), '@' // carácter que dispara sugerencias
     ));
     context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('stxt', new FormattingProvider_1.StxtFormattingProvider()));
-    (0, AnalysisDoc_1.analysisAllDocs)();
-    (0, SchemaLoader_1.registerSchemaLoader)(context);
+    await (0, SchemaLoader_1.registerSchemaLoader)(context, () => {
+        (0, AnalysisDoc_1.analysisAllDocs)();
+    });
 }
 function deactivate() { }
 //# sourceMappingURL=extension.js.map

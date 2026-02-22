@@ -9,7 +9,7 @@ import { registerSchemaLoader } from './extension/SchemaLoader';
 
 export let diagnosticCollection: vscode.DiagnosticCollection;
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 	//console.log('STXT extension activated');
 
 	diagnosticCollection = vscode.languages.createDiagnosticCollection('stxt');
@@ -62,8 +62,9 @@ export function activate(context: vscode.ExtensionContext) {
 		)
 	);
 
-	analysisAllDocs();
-	registerSchemaLoader(context);
+	await registerSchemaLoader(context, () => {
+		analysisAllDocs();
+	});
 }
 
 export function deactivate() { }
