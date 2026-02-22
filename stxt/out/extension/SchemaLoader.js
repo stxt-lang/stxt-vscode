@@ -54,13 +54,13 @@ class SchemaLoaderExtension {
 exports.SchemaLoaderExtension = SchemaLoaderExtension;
 function getSchema(schema) {
     try {
-        console.log("Search schema..." + schema);
+        //console.log("Search schema..." + schema);
         const result = SCHEMA_PROVIDER.getSchema(schema);
         return result;
     }
     catch (e) {
         // Continuamos
-        console.log("Not found in schema\nContinue with template");
+        // console.log("Not found in schema\nContinue with template");
     }
     const result = TEMPLATE_PROVIDER.getSchema(schema);
     return result;
