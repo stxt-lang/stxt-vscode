@@ -1,5 +1,4 @@
 "use strict";
-// SchemaException.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SchemaException = void 0;
 class SchemaException extends Error {

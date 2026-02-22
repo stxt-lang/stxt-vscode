@@ -1,5 +1,4 @@
 "use strict";
-// ParseException.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParseException = void 0;
 class ParseException extends Error {
@@ -10,7 +9,6 @@ class ParseException extends Error {
         this.name = "ParseException";
         this.line = line;
         this.code = code;
-        // Necesario para que instanceof funcione correctamente al extender Error
         Object.setPrototypeOf(this, ParseException.prototype);
     }
     toString() {
