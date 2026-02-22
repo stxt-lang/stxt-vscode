@@ -44,10 +44,6 @@ class StxtCompletionProvider {
     provideCompletionItems(document, position) {
         const linePrefix = document.lineAt(position).text.slice(0, position.character);
         console.log(`Position: ${position.line}`);
-        // TODO Si es la primera línea no mostramos nada. Debemos enseñar todos los de primer nivel
-        if (position.line === 0) {
-            return [];
-        }
         // Si no hay análisis no mostramos nada
         let lastAnalisis = (0, AnalysisDoc_1.getLastAnalysis)(document);
         if (!lastAnalisis) {
@@ -60,6 +56,9 @@ class StxtCompletionProvider {
         // Buscamos nivel del cursor
         let level = completionContext.level;
         console.log("Level: " + level);
+        if (level === 0) {
+            return buscarSugerenciasPrimerNivel(completionContext.prefix);
+        }
         // Buscamos parent
         let parent = null;
         let line = position.line;
@@ -173,6 +172,72 @@ function buscarSugerencias(parent, prefix) {
         result.push(item);
     }
     return result;
+}
+function buscarSugerenciasPrimerNivel(prefix) {
+    const result = [];
+    const seen = new Set();
+    const normalizedPrefix = StringUtils_1.StringUtils.normalize(prefix);
+    for (const schema of (0, SchemaLoader_1.getSchemas)()) {
+        for (const nodeDef of getRootNodeDefinitions(schema)) {
+            if (normalizedPrefix.length > 0 && !nodeDef.getNormalizedName().startsWith(normalizedPrefix)) {
+                continue;
+            }
+            const key = `${schema.getNamespace()}:${nodeDef.getNormalizedName()}`;
+            if (seen.has(key)) {
+                continue;
+            }
+            seen.add(key);
+            result.push(createCompletionItem(nodeDef.getName(), schema.getNamespace(), isBlockTextNode(nodeDef), false));
+        }
+    }
+    return result;
+}
+function getRootNodeDefinitions(schema) {
+    const referencedLocalChildren = new Set();
+    for (const nodeDef of schema.getNodes().values()) {
+        for (const childDef of nodeDef.getChildren().values()) {
+            if (childDef.getNamespace() === schema.getNamespace()) {
+                referencedLocalChildren.add(childDef.getNormalizedName());
+            }
+        }
+    }
+    const roots = [];
+    for (const nodeDef of schema.getNodes().values()) {
+        if (!referencedLocalChildren.has(nodeDef.getNormalizedName())) {
+            roots.push(nodeDef);
+        }
+    }
+    if (roots.length > 0) {
+        return roots;
+    }
+    // Fallback si no podemos inferir raíces.
+    return Array.from(schema.getNodes().values());
+}
+function isBlockTextNode(nodeDef) {
+    const type = nodeDef.getType();
+    return type === "TEXT" || type === "BLOCK";
+}
+function createCompletionItem(name, namespace, isText, hideNamespaceWhenEmpty) {
+    const item = new vscode.CompletionItem(name, isText ? vscode.CompletionItemKind.Module : vscode.CompletionItemKind.EnumMember);
+    const includeNamespace = namespace.length > 0 && !hideNamespaceWhenEmpty;
+    if (includeNamespace) {
+        if (isText) {
+            item.insertText = `${name} (${namespace})>>\n\t`;
+        }
+        else {
+            item.insertText = `${name} (${namespace}): `;
+        }
+    }
+    else {
+        if (isText) {
+            item.insertText = `${name} >>\n\t`;
+        }
+        else {
+            item.insertText = `${name}: `;
+        }
+    }
+    item.detail = includeNamespace ? `${namespace}:${StringUtils_1.StringUtils.normalize(name)}` : StringUtils_1.StringUtils.normalize(name);
+    return item;
 }
 function isBlockText(childDef) {
     try {

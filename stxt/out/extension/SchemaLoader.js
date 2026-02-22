@@ -35,6 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SchemaLoaderExtension = void 0;
 exports.getSchema = getSchema;
+exports.getSchemas = getSchemas;
 exports.registerSchemaLoader = registerSchemaLoader;
 const vscode = __importStar(require("vscode"));
 const SchemaProviderMemory_1 = require("../schema/SchemaProviderMemory");
@@ -63,6 +64,16 @@ function getSchema(schema) {
     }
     const result = TEMPLATE_PROVIDER.getSchema(schema);
     return result;
+}
+function getSchemas() {
+    const merged = new Map();
+    for (const templateSchema of TEMPLATE_PROVIDER.getAllSchemas()) {
+        merged.set(templateSchema.getNamespace(), templateSchema);
+    }
+    for (const schema of SCHEMA_PROVIDER.getAllSchemas()) {
+        merged.set(schema.getNamespace(), schema);
+    }
+    return Array.from(merged.values());
 }
 // ****************
 // Register loaders

@@ -38,6 +38,9 @@ class SchemaProviderMemory {
     clear() {
         this.schemas.clear();
     }
+    getAllSchemas() {
+        return Array.from(this.schemas.values());
+    }
 }
 exports.SchemaProviderMemory = SchemaProviderMemory;
 //# sourceMappingURL=SchemaProviderMemory.js.map

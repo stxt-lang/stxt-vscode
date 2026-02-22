@@ -3,9 +3,11 @@ import { getLastAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
 import { Constants } from '../core/Constants';
 import { Node } from '../core/Node';
-import { SchemaLoaderExtension } from './SchemaLoader';
+import { getSchemas, SchemaLoaderExtension } from './SchemaLoader';
 import { ChildDefinition } from '../schema/ChildDefinition';
 import { StringUtils } from '../core/StringUtils';
+import { NodeDefinition } from '../schema/NodeDefinition';
+import { Schema } from '../schema/Schema';
 
 let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();
 
@@ -16,10 +18,6 @@ export class StxtCompletionProvider implements vscode.CompletionItemProvider {
         const linePrefix = document.lineAt(position).text.slice(0, position.character);
 
         console.log(`Position: ${position.line}`);
-        // TODO Si es la primera línea no mostramos nada. Debemos enseñar todos los de primer nivel
-        if (position.line === 0) {
-            return [];
-        }
 
         // Si no hay análisis no mostramos nada
         let lastAnalisis: AnalysisResult | undefined = getLastAnalysis(document);
@@ -35,6 +33,10 @@ export class StxtCompletionProvider implements vscode.CompletionItemProvider {
         // Buscamos nivel del cursor
         let level = completionContext.level;
         console.log("Level: " + level);
+
+        if (level === 0) {
+            return buscarSugerenciasPrimerNivel(completionContext.prefix);
+        }
 
         // Buscamos parent
         let parent = null;
@@ -161,6 +163,83 @@ function buscarSugerencias(parent: Node, prefix: string): vscode.CompletionItem[
     }
 
     return result;
+}
+
+function buscarSugerenciasPrimerNivel(prefix: string): vscode.CompletionItem[] {
+    const result: vscode.CompletionItem[] = [];
+    const seen = new Set<string>();
+    const normalizedPrefix = StringUtils.normalize(prefix);
+
+    for (const schema of getSchemas()) {
+        for (const nodeDef of getRootNodeDefinitions(schema)) {
+            if (normalizedPrefix.length > 0 && !nodeDef.getNormalizedName().startsWith(normalizedPrefix)) {
+                continue;
+            }
+
+            const key = `${schema.getNamespace()}:${nodeDef.getNormalizedName()}`;
+            if (seen.has(key)) {
+                continue;
+            }
+            seen.add(key);
+
+            result.push(createCompletionItem(nodeDef.getName(), schema.getNamespace(), isBlockTextNode(nodeDef), false));
+        }
+    }
+
+    return result;
+}
+
+function getRootNodeDefinitions(schema: Schema): NodeDefinition[] {
+    const referencedLocalChildren = new Set<string>();
+
+    for (const nodeDef of schema.getNodes().values()) {
+        for (const childDef of nodeDef.getChildren().values()) {
+            if (childDef.getNamespace() === schema.getNamespace()) {
+                referencedLocalChildren.add(childDef.getNormalizedName());
+            }
+        }
+    }
+
+    const roots: NodeDefinition[] = [];
+    for (const nodeDef of schema.getNodes().values()) {
+        if (!referencedLocalChildren.has(nodeDef.getNormalizedName())) {
+            roots.push(nodeDef);
+        }
+    }
+
+    if (roots.length > 0) {
+        return roots;
+    }
+
+    // Fallback si no podemos inferir raíces.
+    return Array.from(schema.getNodes().values());
+}
+
+function isBlockTextNode(nodeDef: NodeDefinition): boolean {
+    const type = nodeDef.getType();
+    return type === "TEXT" || type === "BLOCK";
+}
+
+function createCompletionItem(name: string, namespace: string, isText: boolean, hideNamespaceWhenEmpty: boolean): vscode.CompletionItem {
+    const item = new vscode.CompletionItem(name, isText ? vscode.CompletionItemKind.Module : vscode.CompletionItemKind.EnumMember);
+    const includeNamespace = namespace.length > 0 && !hideNamespaceWhenEmpty;
+
+    if (includeNamespace) {
+        if (isText) {
+            item.insertText = `${name} (${namespace})>>\n\t`;
+        } else {
+            item.insertText = `${name} (${namespace}): `;
+        }
+    } else {
+        if (isText) {
+            item.insertText = `${name} >>\n\t`;
+        } else {
+            item.insertText = `${name}: `;
+        }
+    }
+
+    item.detail = includeNamespace ? `${namespace}:${StringUtils.normalize(name)}` : StringUtils.normalize(name);
+    return item;
 }
 
 function isBlockText(childDef: ChildDefinition): boolean {

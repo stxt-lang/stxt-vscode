@@ -33,6 +33,20 @@ export function getSchema(schema: string): Schema | undefined | null {
     return result;
 }
 
+export function getSchemas(): ReadonlyArray<Schema> {
+    const merged = new Map<string, Schema>();
+
+    for (const templateSchema of TEMPLATE_PROVIDER.getAllSchemas()) {
+        merged.set(templateSchema.getNamespace(), templateSchema);
+    }
+
+    for (const schema of SCHEMA_PROVIDER.getAllSchemas()) {
+        merged.set(schema.getNamespace(), schema);
+    }
+
+    return Array.from(merged.values());
+}
+
 // ****************
 // Register loaders
 // ****************

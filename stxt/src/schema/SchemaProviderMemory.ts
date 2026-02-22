@@ -47,4 +47,8 @@ export class SchemaProviderMemory implements SchemaProvider {
     clear(): void {
         this.schemas.clear();
     }
+
+    getAllSchemas(): ReadonlyArray<Schema> {
+        return Array.from(this.schemas.values());
+    }
 }
