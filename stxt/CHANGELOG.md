@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.1.2]
+
 - Fix formating of INLINE node with value with `()`
 - Improved completion suggestions for nested levels when text is already typed on the current line (prefix filtering).
 - Added completion suggestions for top-level/root nodes, including prefix filtering.
