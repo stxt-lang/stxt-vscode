@@ -4,8 +4,8 @@ const promises_1 = require("fs/promises");
 const Parser_1 = require("./core/Parser");
 const NodeWriter_1 = require("./runtime/NodeWriter");
 async function main() {
-    const texto = await (0, promises_1.readFile)("demo.stxt", "utf-8");
-    //console.log(texto);
+    console.log("Main process INIT...");
+    const texto = await (0, promises_1.readFile)("test/demo.stxt", "utf-8");
     const parser = new Parser_1.Parser();
     const nodes = parser.parse(texto);
     for (let i = 0; i < nodes.length; i++) {
@@ -19,7 +19,7 @@ async function main() {
     }
     const str = NodeWriter_1.NodeWriter.toSTXTDocs(nodes, NodeWriter_1.IndentStyle.SPACES_4);
     console.log(str);
+    console.log("Main process END.");
 }
 main();
-console.log("Hola mundo!!");
 //# sourceMappingURL=all.js.map

@@ -4,8 +4,9 @@ import { Node } from "./core/Node";
 import { IndentStyle, NodeWriter } from "./runtime/NodeWriter";
 
 async function main() {
-    const texto: string = await readFile("demo.stxt", "utf-8");
-    //console.log(texto);
+    console.log("Main process INIT...");
+
+    const texto: string = await readFile("test/demo.stxt", "utf-8");
 
     const parser:Parser = new Parser();
     const nodes: Node[] = parser.parse(texto);
@@ -24,8 +25,8 @@ async function main() {
     }
     const str = NodeWriter.toSTXTDocs(nodes, IndentStyle.SPACES_4);
     console.log(str);
+    console.log("Main process END.");
 }
 
 main();
 
-console.log("Hola mundo!!");

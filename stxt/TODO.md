@@ -1,3 +1,4 @@
+# Plugin VSCode
 * Markdown de elemento como explicación
 * Format document no va bien si paréntesis en INLINE
 * Autocompletar
@@ -18,6 +19,7 @@
 * Colores distintos para documentos con namespace y sin namespace
 * Parseo en proyecto node separado
 
+# Sobre STXT
 * Revisar documentos
 * Revisar especificación
 * Pasar cambios a clases java (errores, etc.)
