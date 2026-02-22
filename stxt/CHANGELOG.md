@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Fix: node `Description` of `@stxt.template`.
+- Code refactors
+
 ## [0.1.2]
 
 - Fix formating of INLINE node with value with `()`

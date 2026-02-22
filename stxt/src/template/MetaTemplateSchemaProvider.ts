@@ -15,6 +15,7 @@ export class MetaTemplateSchemaProvider implements SchemaProvider {
   private static readonly META_TEXT = `Template (@stxt.template): @stxt.template
 \tStructure >>
 \t\tTemplate (@stxt.template):
+\t\t\tDescription: (?) TEXT
 \t\t\tStructure: (1) BLOCK
 `;
 
