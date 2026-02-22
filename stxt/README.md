@@ -63,26 +63,9 @@ Schemas have higher priority than templates.
 
 ---
 
-## Version 0.1.1
+## Release Notes
 
-Added in this release:
-
-* Template support
-* Template loading from `.stxt/@stxt.template`
-* Schema priority over templates
-
----
-
-## Version 0.1.0
-
-Initial public release:
-
-* Core language support
-* Semantic tokens
-* Validation
-* Hover information
-* Formatter
-* Schema loading
+See the full version history in [CHANGELOG.md](./CHANGELOG.md).
 
 ---
 
