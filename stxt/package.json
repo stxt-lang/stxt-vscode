@@ -17,9 +17,6 @@
   ],
   "keywords": ["stxt", "semantic text", "language", "syntax"],
   "icon": "images/icon.png",
-  "activationEvents": [
-    "onLanguage:stxt"
-  ],
   "main": "./out/extension.js",
   "contributes": {
     "languages": [
