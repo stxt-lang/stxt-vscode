@@ -19,7 +19,10 @@ export class SchemaParser {
             throw new SchemaException("NOT_STXT_SCHEMA", `Se espera schema(${Schema.SCHEMA_NAMESPACE}) y es ${nodeName}(${namespaceSchema})`);
         }
 
-        const schema = new Schema(node.getValue(), node.getLine());
+        // Obtenemos description
+        const descrip = node.getChild("description")?.getText();
+
+        const schema = new Schema(node.getValue(), node.getLine(), descrip);
 
         // Para validar
         const allNames = new Set<string>(); // Para validar que existan los childs
@@ -62,8 +65,9 @@ export class SchemaParser {
         if (typeNode) {
             type = typeNode.getValue();
         }
+        const description = n.getChild("description")?.getText();
 
-        const result = new NodeDefinition(name, type, n.getLine());
+        const result = new NodeDefinition(name, type, n.getLine(), description);
 
         const children = n.getChild("children");
         if (children) {

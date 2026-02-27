@@ -16,7 +16,7 @@ import { ChildLine } from "./ChildLine";
 export class TemplateParser {
 	static transformNodeToSchema(node: Node): Schema {
 		// Insertamos namespace
-		const result = new Schema(node.getValue(), node.getLine());
+		const result = new Schema(node.getValue(), node.getLine(), undefined);
 
 		// Buscamos nodo structure
 		const structure = node.getChild("structure");
@@ -74,7 +74,7 @@ export class TemplateParser {
 		if (!schemaNode) {
 			// Nuevo
 			const type = cl.getType() == null ? "INLINE" : cl.getType()!;
-			schemaNode = new NodeDefinition(node.getName(), type, node.getLine() + offset);
+			schemaNode = new NodeDefinition(node.getName(), type, node.getLine() + offset, undefined);
 			schema.addNodeDefinition(schemaNode);
 
 			const values = cl.getValues();

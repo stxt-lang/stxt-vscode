@@ -18,7 +18,9 @@ class SchemaParser {
         if (nodeName !== "schema" || namespaceSchema !== Schema_1.Schema.SCHEMA_NAMESPACE) {
             throw new SchemaException_1.SchemaException("NOT_STXT_SCHEMA", `Se espera schema(${Schema_1.Schema.SCHEMA_NAMESPACE}) y es ${nodeName}(${namespaceSchema})`);
         }
-        const schema = new Schema_1.Schema(node.getValue(), node.getLine());
+        // Obtenemos description
+        const descrip = node.getChild("description")?.getText();
+        const schema = new Schema_1.Schema(node.getValue(), node.getLine(), descrip);
         // Para validar
         const allNames = new Set(); // Para validar que existan los childs
         // Obtenemos los nodos
@@ -53,7 +55,8 @@ class SchemaParser {
         if (typeNode) {
             type = typeNode.getValue();
         }
-        const result = new NodeDefinition_1.NodeDefinition(name, type, n.getLine());
+        const description = n.getChild("description")?.getText();
+        const result = new NodeDefinition_1.NodeDefinition(name, type, n.getLine(), description);
         const children = n.getChild("children");
         if (children) {
             for (const child of children.getChildrenByName("child")) {

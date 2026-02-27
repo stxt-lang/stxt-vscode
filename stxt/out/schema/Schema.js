@@ -8,8 +8,10 @@ class Schema {
     static SCHEMA_NAMESPACE = "@stxt.schema";
     nodes = new Map();
     namespace;
-    constructor(namespace, line) {
+    description;
+    constructor(namespace, line, description) {
         this.namespace = StringUtils_1.StringUtils.lowerCase(namespace);
+        this.description = description;
         NamespaceValidator_1.NamespaceValidator.validateNamespaceFormat(this.namespace, line);
     }
     getNodes() {

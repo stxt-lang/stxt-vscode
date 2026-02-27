@@ -12,7 +12,7 @@ const ChildLineParser_1 = require("./ChildLineParser");
 class TemplateParser {
     static transformNodeToSchema(node) {
         // Insertamos namespace
-        const result = new Schema_1.Schema(node.getValue(), node.getLine());
+        const result = new Schema_1.Schema(node.getValue(), node.getLine(), undefined);
         // Buscamos nodo structure
         const structure = node.getChild("structure");
         if (!structure) {
@@ -51,7 +51,7 @@ class TemplateParser {
         if (!schemaNode) {
             // Nuevo
             const type = cl.getType() == null ? "INLINE" : cl.getType();
-            schemaNode = new NodeDefinition_1.NodeDefinition(node.getName(), type, node.getLine() + offset);
+            schemaNode = new NodeDefinition_1.NodeDefinition(node.getName(), type, node.getLine() + offset, undefined);
             schema.addNodeDefinition(schemaNode);
             const values = cl.getValues();
             if (values)

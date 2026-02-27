@@ -9,14 +9,16 @@ export class NodeDefinition {
     private readonly name: string;
     private readonly normalizedName: string;
     private readonly type: string;
+    private readonly description: string | undefined;
 
     private readonly children: Map<string, ChildDefinition> = new Map();
     private readonly values: Set<string> = new Set();
 
-    constructor(name: string, type: string, line: number) {
+    constructor(name: string, type: string, line: number, description: string | undefined) {
         this.name = StringUtils.compactSpaces(name);
         this.normalizedName = StringUtils.normalize(name);
         this.type = type;
+        this.description = description;
 
         if (this.normalizedName.length === 0) {
             throw new ParseException(line, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
@@ -67,6 +69,7 @@ export class NodeDefinition {
             name: this.getName(),
             normalizedName: this.getNormalizedName(),
             type: this.getType(),
+            description: this.description,
             children: Array.from(this.getChildren().values()).map(c => c.toJSON()),
             values: Array.from(this.getValues()),
         };

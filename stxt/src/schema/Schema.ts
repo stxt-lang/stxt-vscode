@@ -8,9 +8,11 @@ export class Schema {
 
     private readonly nodes: Map<string, NodeDefinition> = new Map();
     private readonly namespace: string;
+    private readonly description: string | undefined;
 
-    constructor(namespace: string | null | undefined, line: number) {
+    constructor(namespace: string | null | undefined, line: number, description: string | undefined) {
         this.namespace = StringUtils.lowerCase(namespace);
+        this.description = description;
         NamespaceValidator.validateNamespaceFormat(this.namespace, line);
     }
 

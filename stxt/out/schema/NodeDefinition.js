@@ -9,12 +9,14 @@ class NodeDefinition {
     name;
     normalizedName;
     type;
+    description;
     children = new Map();
     values = new Set();
-    constructor(name, type, line) {
+    constructor(name, type, line, description) {
         this.name = StringUtils_1.StringUtils.compactSpaces(name);
         this.normalizedName = StringUtils_1.StringUtils.normalize(name);
         this.type = type;
+        this.description = description;
         if (this.normalizedName.length === 0) {
             throw new ParseException_1.ParseException(line, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
         }
@@ -55,6 +57,7 @@ class NodeDefinition {
             name: this.getName(),
             normalizedName: this.getNormalizedName(),
             type: this.getType(),
+            description: this.description,
             children: Array.from(this.getChildren().values()).map(c => c.toJSON()),
             values: Array.from(this.getValues()),
         };
