@@ -6,8 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.1.3]
+
 - Fix: node `Description` of `@stxt.template`.
 - Code refactors
+- Automatic reloading after schema/template change
 
 ## [0.1.2]
 
