@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StxtHoverProvider = void 0;
 const vscode = __importStar(require("vscode"));
 const AnalysisDoc_1 = require("./AnalysisDoc");
+const SchemaLoader_1 = require("./SchemaLoader");
 class StxtHoverProvider {
     provideHover(document, position) {
         const analysis = (0, AnalysisDoc_1.getLastAnalysis)(document);
@@ -52,6 +53,19 @@ class StxtHoverProvider {
         md.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
         md.appendMarkdown(`- **Normalized:** \`${escapeMd(node.getNormalizedName())}\`\n`);
         md.appendMarkdown(`- **Qualified:** \`${escapeMd(node.getQualifiedName())}\`\n`);
+        if (node.getNamespace()) {
+            const schema = (0, SchemaLoader_1.getSchema)(node.getNamespace());
+            if (schema) {
+                const nodeDef = schema.getNodeDefinition(node.getName());
+                if (nodeDef) {
+                    const description = nodeDef.getDescription();
+                    if (description) {
+                        md.appendMarkdown(`\n---\n`);
+                        md.appendMarkdown(description);
+                    }
+                }
+            }
+        }
         const text = node.getText();
         md.appendMarkdown(`\n---\n`);
         md.appendMarkdown(node.isTextNode() ? `**Text**\n\n` : `- **Value:** \`${escapeMd(node.getValue())}\``);

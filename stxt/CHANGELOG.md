@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Schema description in hover
+
 ## [0.1.3]
 
 - Fix: node `Description` of `@stxt.template`.

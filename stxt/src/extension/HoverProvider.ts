@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import { getLastAnalysis } from './AnalysisDoc';
+import { getSchema, SchemaLoaderExtension } from './SchemaLoader';
+import { Schema } from '../schema/Schema';
 
 export class StxtHoverProvider implements vscode.HoverProvider {
 	provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Hover> {
@@ -21,6 +23,21 @@ export class StxtHoverProvider implements vscode.HoverProvider {
 		md.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
 		md.appendMarkdown(`- **Normalized:** \`${escapeMd(node.getNormalizedName())}\`\n`);
 		md.appendMarkdown(`- **Qualified:** \`${escapeMd(node.getQualifiedName())}\`\n`);
+
+		if (node.getNamespace()) {
+			const schema = getSchema(node.getNamespace());
+			if (schema) {
+				const nodeDef = schema.getNodeDefinition(node.getName());
+				if (nodeDef) {
+					const description = nodeDef.getDescription();
+					if (description) {
+						md.appendMarkdown(`\n---\n`);
+						md.appendMarkdown(description);			
+					}
+				}
+			}
+		}
+		
 
 		const text = node.getText();
 		md.appendMarkdown(`\n---\n`);

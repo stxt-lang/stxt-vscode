@@ -41,6 +41,10 @@ export class NodeDefinition {
         return this.children;
     }
 
+    getDescription(): string | undefined {
+        return this.description;
+    }
+
     addChildDefinition(childDefinition: ChildDefinition): void {
         const qname = childDefinition.getQualifiedName();
         if (this.children.has(qname)) {
