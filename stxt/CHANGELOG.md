@@ -7,6 +7,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 - Schema description in hover
+- Template validation
+- Schema validation
 
 ## [0.1.3]
 
