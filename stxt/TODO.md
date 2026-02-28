@@ -9,6 +9,7 @@
 * Colores distintos para documentos con namespace y sin namespace
 * Colores distintos para namespace normal y namespace `@`
 * Parseo en proyecto node separado
+* Metaschema: enum de valores de tipo disponibles
 
 # Sobre STXT
 * Revisar documentos
