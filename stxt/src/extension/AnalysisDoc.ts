@@ -8,6 +8,9 @@ import { createNode } from '../core/NodeCreator';
 import { SchemaValidator } from '../schema/SchemaValidator';
 import { SchemaLoaderExtension } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';
+import { Parser } from '../core/Parser';
+import { TemplateParser } from '../template/TemplateParser';
+import { ParseException } from '../exceptions/ParseException';
 
 const lastAnalysisByUri = new Map<string, AnalysisResult>();
 
@@ -133,6 +136,9 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
 
     closeToLevel(stack, 0, diagnostics);
 
+    // Validaciones de template
+    validateTemplate(document, diagnostics);
+
     // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
 
@@ -142,6 +148,31 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
 
     //console.log("Parse end.");
     return result;
+}
+
+function validateTemplate(document: vscode.TextDocument, diagnostics: vscode.Diagnostic[]): void {
+    // Final // TODO Hacer mejor!! Mirar listado de nodos con namespace, hacer todo del inicial
+    if (document.uri.toString().indexOf("stxt.template")!==-1) {
+        console.log("Is template");
+        try {
+            const p = new Parser();
+            const nodes = p.parse(document.getText());
+            if (nodes.length === 1) {
+                TemplateParser.transformNodeToSchema(nodes[0]);
+            }
+        } catch (e: unknown) {
+            if (e instanceof ParseException) {
+                const range = new vscode.Range(e.line-1, 0, e.line-1, 100);
+                diagnostics.push(new vscode.Diagnostic(range, `Parse error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
+            } else if (e instanceof Error) {
+                const range = new vscode.Range(0, 0, 0, 100);
+                diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
+            } else {
+                const range = new vscode.Range(0, 0, 0, 100);
+                diagnostics.push(new vscode.Diagnostic(range, `Error desconocido: ${String(e)}`, vscode.DiagnosticSeverity.Error));
+            }
+        }
+    }
 }
 
 function closeToLevel(stack: Node[], targetLevel: number, diagnostics: vscode.Diagnostic[]): void {
@@ -164,4 +195,3 @@ function closeToLevel(stack: Node[], targetLevel: number, diagnostics: vscode.Di
         }        
     }
 }
-
