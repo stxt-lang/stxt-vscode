@@ -45,6 +45,7 @@ const extension_1 = require("../extension");
 const Parser_1 = require("../core/Parser");
 const TemplateParser_1 = require("../template/TemplateParser");
 const ParseException_1 = require("../exceptions/ParseException");
+const SchemaParser_1 = require("../schema/SchemaParser");
 const lastAnalysisByUri = new Map();
 const SCHEMA_VALIDATOR = new SchemaValidator_1.SchemaValidator(new SchemaLoader_1.SchemaLoaderExtension());
 function getLastAnalysis(document) {
@@ -149,7 +150,8 @@ function analisysDoc(document, diagnosticCollection) {
     }
     ;
     closeToLevel(stack, 0, diagnostics);
-    // Validaciones de template
+    // Validaciones de template y schema
+    validateSchema(document, diagnostics);
     validateTemplate(document, diagnostics);
     // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
@@ -172,7 +174,36 @@ function validateTemplate(document, diagnostics) {
         }
         catch (e) {
             if (e instanceof ParseException_1.ParseException) {
-                const range = new vscode.Range(e.line - 1, 0, e.line - 1, 100);
+                const line = e.line > 0 ? e.line - 1 : 0;
+                const range = new vscode.Range(line, 0, line, 100);
+                diagnostics.push(new vscode.Diagnostic(range, `Parse error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
+            }
+            else if (e instanceof Error) {
+                const range = new vscode.Range(0, 0, 0, 100);
+                diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
+            }
+            else {
+                const range = new vscode.Range(0, 0, 0, 100);
+                diagnostics.push(new vscode.Diagnostic(range, `Error desconocido: ${String(e)}`, vscode.DiagnosticSeverity.Error));
+            }
+        }
+    }
+}
+function validateSchema(document, diagnostics) {
+    // Final // TODO Hacer mejor!! Mirar listado de nodos con namespace, hacer todo del inicial
+    if (document.uri.toString().indexOf("stxt.schema") !== -1) {
+        console.log("Is schema");
+        try {
+            const p = new Parser_1.Parser();
+            const nodes = p.parse(document.getText());
+            if (nodes.length === 1) {
+                SchemaParser_1.SchemaParser.transformNodeToSchema(nodes[0]);
+            }
+        }
+        catch (e) {
+            if (e instanceof ParseException_1.ParseException) {
+                const line = e.line > 0 ? e.line - 1 : 0;
+                const range = new vscode.Range(line, 0, line, 100);
                 diagnostics.push(new vscode.Diagnostic(range, `Parse error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
             }
             else if (e instanceof Error) {
