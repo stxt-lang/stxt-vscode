@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RuntimeException = void 0;
 class RuntimeException extends Error {
     code;
-    cause;
     constructor(code, message) {
         super(message);
         this.name = "RuntimeException";

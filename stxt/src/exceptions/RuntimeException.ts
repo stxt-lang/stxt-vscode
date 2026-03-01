@@ -1,6 +1,5 @@
 export class RuntimeException extends Error {
 	public readonly code: string;
-	public readonly cause?: unknown;
 
 	constructor(code: string, message: string) {
 		super(message);
