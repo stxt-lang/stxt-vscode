@@ -6,7 +6,7 @@ import { Node } from "../core/Node";
 import { Schema } from "../schema/Schema";
 import { SchemaProvider } from "../schema/SchemaProvider";
 
-import { ResourceNotFoundException } from "../exceptions/ResourceNotFoundException";
+import { RuntimeException } from "../exceptions/RuntimeException";
 import { SchemaException } from "../exceptions/SchemaException";
 
 import { TemplateParser } from "./TemplateParser";
@@ -37,7 +37,7 @@ export class MetaTemplateSchemaProvider implements SchemaProvider {
 
   getSchema(namespace: string): Schema {
     if (namespace !== "@stxt.template") {
-      throw new ResourceNotFoundException("@stxt.template", namespace);
+      throw new RuntimeException("RESOURCE_NOT_FOUND", `Not found '${namespace}' in namespace: @stxt.template`);
     }
 
     // meta siempre existe si el constructor terminó, pero lo dejamos equivalente al Java

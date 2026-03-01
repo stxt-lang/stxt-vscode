@@ -6,7 +6,7 @@ import { SchemaParser } from "./SchemaParser";
 import { Parser } from "../core/Parser";
 import { Node } from "../core/Node";
 import { SchemaException } from "../exceptions/SchemaException";
-import { ResourceNotFoundException } from "../exceptions/ResourceNotFoundException";
+import { RuntimeException } from "../exceptions/RuntimeException";
 
 export class SchemaProviderMeta implements SchemaProvider {
     private static readonly META_TEXT = `Schema (@stxt.schema): @stxt.schema
@@ -66,7 +66,7 @@ export class SchemaProviderMeta implements SchemaProvider {
 
     getSchema(namespace: string): Schema {
         if (namespace !== Schema.SCHEMA_NAMESPACE) {
-            throw new ResourceNotFoundException(Schema.SCHEMA_NAMESPACE, namespace);
+            throw new RuntimeException("RESOURCE_NOT_FOUND", `Not found '${namespace}' in namespace: ${Schema.SCHEMA_NAMESPACE}`);
         }
 
         if (!this.meta) {

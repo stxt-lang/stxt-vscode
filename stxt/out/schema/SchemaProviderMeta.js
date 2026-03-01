@@ -6,7 +6,7 @@ const Schema_1 = require("./Schema");
 const SchemaParser_1 = require("./SchemaParser");
 const Parser_1 = require("../core/Parser");
 const SchemaException_1 = require("../exceptions/SchemaException");
-const ResourceNotFoundException_1 = require("../exceptions/ResourceNotFoundException");
+const RuntimeException_1 = require("../exceptions/RuntimeException");
 class SchemaProviderMeta {
     static META_TEXT = `Schema (@stxt.schema): @stxt.schema
     Node: Schema
@@ -60,7 +60,7 @@ class SchemaProviderMeta {
     }
     getSchema(namespace) {
         if (namespace !== Schema_1.Schema.SCHEMA_NAMESPACE) {
-            throw new ResourceNotFoundException_1.ResourceNotFoundException(Schema_1.Schema.SCHEMA_NAMESPACE, namespace);
+            throw new RuntimeException_1.RuntimeException("RESOURCE_NOT_FOUND", `Not found '${namespace}' in namespace: ${Schema_1.Schema.SCHEMA_NAMESPACE}`);
         }
         if (!this.meta) {
             throw new SchemaException_1.SchemaException("META_SCHEMA_NOT_AVAILABLE", "Meta schema not available");

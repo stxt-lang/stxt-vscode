@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetaTemplateSchemaProvider = void 0;
 const Parser_1 = require("../core/Parser");
-const ResourceNotFoundException_1 = require("../exceptions/ResourceNotFoundException");
+const RuntimeException_1 = require("../exceptions/RuntimeException");
 const SchemaException_1 = require("../exceptions/SchemaException");
 const TemplateParser_1 = require("./TemplateParser");
 class MetaTemplateSchemaProvider {
@@ -24,7 +24,7 @@ class MetaTemplateSchemaProvider {
     }
     getSchema(namespace) {
         if (namespace !== "@stxt.template") {
-            throw new ResourceNotFoundException_1.ResourceNotFoundException("@stxt.template", namespace);
+            throw new RuntimeException_1.RuntimeException("RESOURCE_NOT_FOUND", `Not found '${namespace}' in namespace: @stxt.template`);
         }
         // meta siempre existe si el constructor terminó, pero lo dejamos equivalente al Java
         if (!this.meta) {
