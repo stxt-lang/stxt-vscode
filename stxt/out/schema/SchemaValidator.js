@@ -21,8 +21,9 @@ class SchemaValidator {
         this.validateAgainstSchema(node, sch);
         // Validamos children
         if (this.recursiveValidation) {
-            for (const n of node.getChildren())
+            for (const n of node.getChildren()) {
                 this.validate(n);
+            }
         }
     }
     validateAgainstSchema(node, sch) {

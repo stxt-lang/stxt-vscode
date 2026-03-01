@@ -12,6 +12,7 @@
 * Colores distintos para documentos con namespace y sin namespace
 * Colores distintos para namespace normal y namespace `@`
 * Parseo en proyecto node separado
+* Permitir un nodo ROOT?
 
 # Sobre STXT
 * Revisar documentos
