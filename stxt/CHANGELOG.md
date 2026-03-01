@@ -1,10 +1,12 @@
 # Change Log
 
-All notable changes to the "stxt" extension will be documented in this file.
+All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
+
+## [0.1.4]
 
 - Schema description in hover
 - Template validation
@@ -18,7 +20,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [0.1.2]
 
-- Fix formating of INLINE node with value with `()`
+- Fixed formating of `INLINE` node with value with chars `()`
 - Improved completion suggestions for nested levels when text is already typed on the current line (prefix filtering).
 - Added completion suggestions for top-level/root nodes, including prefix filtering.
 - Reduced non-STXT completion noise by disabling word-based suggestions in comments/strings for `stxt` defaults.
