@@ -3,7 +3,6 @@
 import { ParseException } from "../exceptions/ParseException";
 import { StringUtils } from "../core/StringUtils";
 import { ChildDefinition } from "./ChildDefinition";
-import { SchemaException } from "../exceptions/SchemaException";
 
 export class NodeDefinition {
     private readonly name: string;
@@ -48,7 +47,7 @@ export class NodeDefinition {
     addChildDefinition(childDefinition: ChildDefinition): void {
         const qname = childDefinition.getQualifiedName();
         if (this.children.has(qname)) {
-            throw new SchemaException("CHILD_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
+            throw new ParseException(0, "CHILD_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
         }
         this.children.set(qname, childDefinition);
     }

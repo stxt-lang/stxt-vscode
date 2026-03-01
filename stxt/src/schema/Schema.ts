@@ -1,6 +1,6 @@
 import { NamespaceValidator } from "../core/NamespaceValidator";
 import { StringUtils } from "../core/StringUtils";
-import { SchemaException } from "../exceptions/SchemaException";
+import { ParseException } from "../exceptions/ParseException";
 import { NodeDefinition } from "./NodeDefinition";
 
 export class Schema {
@@ -28,7 +28,7 @@ export class Schema {
         const qname = nodeDefinition.getNormalizedName();
 
         if (this.nodes.has(qname)) {
-            throw new SchemaException("NODE_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
+            throw new ParseException(0, "NODE_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
         }
 
         this.nodes.set(qname, nodeDefinition);

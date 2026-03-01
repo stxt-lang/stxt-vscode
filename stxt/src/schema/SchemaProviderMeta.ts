@@ -5,7 +5,7 @@ import { SchemaProvider } from "./SchemaProvider";
 import { SchemaParser } from "./SchemaParser";
 import { Parser } from "../core/Parser";
 import { Node } from "../core/Node";
-import { SchemaException } from "../exceptions/SchemaException";
+import { ParseException } from "../exceptions/ParseException";
 import { RuntimeException } from "../exceptions/RuntimeException";
 
 export class SchemaProviderMeta implements SchemaProvider {
@@ -58,7 +58,7 @@ export class SchemaProviderMeta implements SchemaProvider {
         const nodes: Node[] = parser.parse(SchemaProviderMeta.META_TEXT);
 
         if (nodes.length !== 1) {
-            throw new SchemaException("META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);
+            throw new ParseException(0, "META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);
         }
 
         this.meta = SchemaParser.transformNodeToSchema(nodes[0]);
@@ -70,7 +70,7 @@ export class SchemaProviderMeta implements SchemaProvider {
         }
 
         if (!this.meta) {
-            throw new SchemaException("META_SCHEMA_NOT_AVAILABLE", "Meta schema not available");
+            throw new ParseException(0, "META_SCHEMA_NOT_AVAILABLE", "Meta schema not available");
         }
 
         return this.meta;

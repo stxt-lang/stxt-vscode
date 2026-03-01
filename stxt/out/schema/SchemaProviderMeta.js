@@ -5,7 +5,7 @@ exports.SchemaProviderMeta = void 0;
 const Schema_1 = require("./Schema");
 const SchemaParser_1 = require("./SchemaParser");
 const Parser_1 = require("../core/Parser");
-const SchemaException_1 = require("../exceptions/SchemaException");
+const ParseException_1 = require("../exceptions/ParseException");
 const RuntimeException_1 = require("../exceptions/RuntimeException");
 class SchemaProviderMeta {
     static META_TEXT = `Schema (@stxt.schema): @stxt.schema
@@ -54,7 +54,7 @@ class SchemaProviderMeta {
         const parser = new Parser_1.Parser();
         const nodes = parser.parse(SchemaProviderMeta.META_TEXT);
         if (nodes.length !== 1) {
-            throw new SchemaException_1.SchemaException("META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);
+            throw new ParseException_1.ParseException(0, "META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);
         }
         this.meta = SchemaParser_1.SchemaParser.transformNodeToSchema(nodes[0]);
     }
@@ -63,7 +63,7 @@ class SchemaProviderMeta {
             throw new RuntimeException_1.RuntimeException("RESOURCE_NOT_FOUND", `Not found '${namespace}' in namespace: ${Schema_1.Schema.SCHEMA_NAMESPACE}`);
         }
         if (!this.meta) {
-            throw new SchemaException_1.SchemaException("META_SCHEMA_NOT_AVAILABLE", "Meta schema not available");
+            throw new ParseException_1.ParseException(0, "META_SCHEMA_NOT_AVAILABLE", "Meta schema not available");
         }
         return this.meta;
     }

@@ -4,7 +4,6 @@ exports.SchemaParser = void 0;
 const Schema_1 = require("./Schema");
 const NodeDefinition_1 = require("./NodeDefinition");
 const ChildDefinition_1 = require("./ChildDefinition");
-const SchemaException_1 = require("../exceptions/SchemaException");
 const ParseException_1 = require("../exceptions/ParseException");
 const RuntimeException_1 = require("../exceptions/RuntimeException");
 const NameNamespaceParser_1 = require("../core/NameNamespaceParser");
@@ -15,7 +14,7 @@ class SchemaParser {
         const namespaceSchema = node.getNamespace();
         // Obtenemos name y namespace
         if (nodeName !== "schema" || namespaceSchema !== Schema_1.Schema.SCHEMA_NAMESPACE) {
-            throw new SchemaException_1.SchemaException("NOT_STXT_SCHEMA", `Se espera schema(${Schema_1.Schema.SCHEMA_NAMESPACE}) y es ${nodeName}(${namespaceSchema})`);
+            throw new ParseException_1.ParseException(node.getLine(), "NOT_STXT_SCHEMA", `Se espera schema(${Schema_1.Schema.SCHEMA_NAMESPACE}) y es ${nodeName}(${namespaceSchema})`);
         }
         // Obtenemos description
         const descrip = node.getChild("description")?.getText();

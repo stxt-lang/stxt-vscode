@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Schema = void 0;
 const NamespaceValidator_1 = require("../core/NamespaceValidator");
 const StringUtils_1 = require("../core/StringUtils");
-const SchemaException_1 = require("../exceptions/SchemaException");
+const ParseException_1 = require("../exceptions/ParseException");
 class Schema {
     static SCHEMA_NAMESPACE = "@stxt.schema";
     nodes = new Map();
@@ -23,7 +23,7 @@ class Schema {
     addNodeDefinition(nodeDefinition) {
         const qname = nodeDefinition.getNormalizedName();
         if (this.nodes.has(qname)) {
-            throw new SchemaException_1.SchemaException("NODE_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
+            throw new ParseException_1.ParseException(0, "NODE_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
         }
         this.nodes.set(qname, nodeDefinition);
     }

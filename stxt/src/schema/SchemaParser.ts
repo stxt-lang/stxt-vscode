@@ -2,7 +2,6 @@ import { Schema } from "./Schema";
 import { NodeDefinition } from "./NodeDefinition";
 import { ChildDefinition } from "./ChildDefinition";
 import { Node } from "../core/Node";
-import { SchemaException } from "../exceptions/SchemaException";
 import { ParseException } from "../exceptions/ParseException";
 import { RuntimeException } from "../exceptions/RuntimeException";
 import { NameNamespaceParser } from "../core/NameNamespaceParser";
@@ -15,7 +14,7 @@ export class SchemaParser {
 
         // Obtenemos name y namespace
         if (nodeName !== "schema" || namespaceSchema !== Schema.SCHEMA_NAMESPACE) {
-            throw new SchemaException("NOT_STXT_SCHEMA", `Se espera schema(${Schema.SCHEMA_NAMESPACE}) y es ${nodeName}(${namespaceSchema})`);
+            throw new ParseException(node.getLine(), "NOT_STXT_SCHEMA", `Se espera schema(${Schema.SCHEMA_NAMESPACE}) y es ${nodeName}(${namespaceSchema})`);
         }
 
         // Obtenemos description

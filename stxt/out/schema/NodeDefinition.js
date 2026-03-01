@@ -4,7 +4,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NodeDefinition = void 0;
 const ParseException_1 = require("../exceptions/ParseException");
 const StringUtils_1 = require("../core/StringUtils");
-const SchemaException_1 = require("../exceptions/SchemaException");
 class NodeDefinition {
     name;
     normalizedName;
@@ -39,7 +38,7 @@ class NodeDefinition {
     addChildDefinition(childDefinition) {
         const qname = childDefinition.getQualifiedName();
         if (this.children.has(qname)) {
-            throw new SchemaException_1.SchemaException("CHILD_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
+            throw new ParseException_1.ParseException(0, "CHILD_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
         }
         this.children.set(qname, childDefinition);
     }

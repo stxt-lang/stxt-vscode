@@ -6,8 +6,8 @@ import { Node } from "../core/Node";
 import { Schema } from "../schema/Schema";
 import { SchemaProvider } from "../schema/SchemaProvider";
 
+import { ParseException } from "../exceptions/ParseException";
 import { RuntimeException } from "../exceptions/RuntimeException";
-import { SchemaException } from "../exceptions/SchemaException";
 
 import { TemplateParser } from "./TemplateParser";
 
@@ -26,7 +26,8 @@ export class MetaTemplateSchemaProvider implements SchemaProvider {
     const nodes: Node[] = parser.parse(MetaTemplateSchemaProvider.META_TEXT);
 
     if (nodes.length !== 1) {
-      throw new SchemaException(
+      throw new ParseException(
+        0,
         "META_SCHEMA_INVALID",
         `Meta schema must produce exactly 1 document, got ${nodes.length}`
       );
@@ -42,7 +43,7 @@ export class MetaTemplateSchemaProvider implements SchemaProvider {
 
     // meta siempre existe si el constructor terminó, pero lo dejamos equivalente al Java
     if (!this.meta) {
-      throw new SchemaException("META_SCHEMA_NOT_AVAILABLE", "Meta schema not available");
+      throw new ParseException(0, "META_SCHEMA_NOT_AVAILABLE", "Meta schema not available");
     }
 
     return this.meta;

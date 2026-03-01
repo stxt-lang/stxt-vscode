@@ -3,8 +3,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetaTemplateSchemaProvider = void 0;
 const Parser_1 = require("../core/Parser");
+const ParseException_1 = require("../exceptions/ParseException");
 const RuntimeException_1 = require("../exceptions/RuntimeException");
-const SchemaException_1 = require("../exceptions/SchemaException");
 const TemplateParser_1 = require("./TemplateParser");
 class MetaTemplateSchemaProvider {
     static META_TEXT = `Template (@stxt.template): @stxt.template
@@ -18,7 +18,7 @@ class MetaTemplateSchemaProvider {
         const parser = new Parser_1.Parser();
         const nodes = parser.parse(MetaTemplateSchemaProvider.META_TEXT);
         if (nodes.length !== 1) {
-            throw new SchemaException_1.SchemaException("META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);
+            throw new ParseException_1.ParseException(0, "META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);
         }
         this.meta = TemplateParser_1.TemplateParser.transformNodeToSchema(nodes[0]);
     }
@@ -28,7 +28,7 @@ class MetaTemplateSchemaProvider {
         }
         // meta siempre existe si el constructor terminó, pero lo dejamos equivalente al Java
         if (!this.meta) {
-            throw new SchemaException_1.SchemaException("META_SCHEMA_NOT_AVAILABLE", "Meta schema not available");
+            throw new ParseException_1.ParseException(0, "META_SCHEMA_NOT_AVAILABLE", "Meta schema not available");
         }
         return this.meta;
     }
