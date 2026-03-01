@@ -4,12 +4,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 const LineIndentParser_1 = require("./LineIndentParser");
 const NodeCreator_1 = require("./NodeCreator");
-function removeUTF8BOM(content) {
-    return content.charCodeAt(0) === 0xfeff ? content.slice(1) : content;
-}
 class Parser {
     parse(content) {
-        content = removeUTF8BOM(content);
+        content = this.removeUTF8BOM(content);
         const stack = [];
         const documents = [];
         let lineNumber = 0;
@@ -58,6 +55,9 @@ class Parser {
                 stack[stack.length - 1].addChild(completed);
             }
         }
+    }
+    removeUTF8BOM(content) {
+        return content.charCodeAt(0) === 0xfeff ? content.slice(1) : content;
     }
 }
 exports.Parser = Parser;
