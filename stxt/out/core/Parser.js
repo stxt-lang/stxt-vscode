@@ -5,6 +5,14 @@ exports.Parser = void 0;
 const LineIndentParser_1 = require("./LineIndentParser");
 const NodeCreator_1 = require("./NodeCreator");
 class Parser {
+    observers = [];
+    validators = [];
+    registerObserver(observer) {
+        this.observers.push(observer);
+    }
+    registerValidator(validator) {
+        this.validators.push(validator);
+    }
     parse(content) {
         content = this.removeUTF8BOM(content);
         const stack = [];
@@ -26,7 +34,7 @@ class Parser {
         const lastNodeText = lastNode ? lastNode.isTextNode() : false;
         // Parseamos línea
         const lineIndent = (0, LineIndentParser_1.parseLine)(line, lastNodeText, lastLevel, lineNumber);
-        if (lineIndent == null) {
+        if (lineIndent === null) {
             return;
         }
         const currentLevel = lineIndent.indentLevel;
@@ -41,6 +49,10 @@ class Parser {
         // Creamos el nuevo nodo y lo dejamos "abierto" en la pila (NO lo adjuntamos aún)
         const parent = stack.length === 0 ? null : stack[stack.length - 1];
         const node = (0, NodeCreator_1.createNode)(lineIndent, lineNumber, currentLevel, parent);
+        // Pasamos a observers
+        this.observers.forEach(observer => {
+            observer.onCreate(node);
+        });
         // Añadimos a stack
         stack.push(node);
     }
@@ -48,12 +60,20 @@ class Parser {
         while (stack.length > targetLevel) {
             const completed = stack.pop();
             completed.freeze();
+            // Pasamos validators
+            this.validators.forEach(validator => {
+                validator.validate(completed);
+            });
             if (stack.length === 0) {
                 documents.push(completed);
             }
             else {
                 stack[stack.length - 1].addChild(completed);
             }
+            // Pasamos a observers
+            this.observers.forEach(observer => {
+                observer.onFinish(completed);
+            });
         }
     }
     removeUTF8BOM(content) {

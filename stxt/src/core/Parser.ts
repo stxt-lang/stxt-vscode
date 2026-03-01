@@ -4,8 +4,20 @@ import { Node } from "./Node";
 import { parseLine } from "./LineIndentParser";
 import { LineIndent } from "./LineIndent";
 import { createNode } from "./NodeCreator";
+import { Observer } from "../processors/Observer";
+import { Validator } from "../processors/Validator";
 
 export class Parser {
+	private observers: Observer[] = [];
+	private validators: Validator[] = [];
+
+	public registerObserver(observer: Observer): void {
+		this.observers.push(observer);
+	}
+
+	public registerValidator(validator: Validator): void {
+		this.validators.push(validator);
+	}
 
 	parse(content: string): Node[] {
 		content = this.removeUTF8BOM(content);
@@ -37,7 +49,7 @@ export class Parser {
 		// Parseamos línea
 		const lineIndent: LineIndent | null = parseLine(line, lastNodeText, lastLevel, lineNumber);
 
-		if (lineIndent == null) {
+		if (lineIndent === null) {
 			return;
 		}
 
@@ -57,6 +69,11 @@ export class Parser {
 		const parent: Node | null = stack.length === 0 ? null : stack[stack.length - 1];
 		const node = createNode(lineIndent, lineNumber, currentLevel, parent);
 
+		// Pasamos a observers
+		this.observers.forEach(observer => {
+			observer.onCreate(node);
+		});
+
 		// Añadimos a stack
 		stack.push(node);
 	}
@@ -66,11 +83,21 @@ export class Parser {
 			const completed = stack.pop()!;
 			completed.freeze();
 
+			// Pasamos validators
+			this.validators.forEach(validator => {
+				validator.validate(completed);
+			});
+
 			if (stack.length === 0) {
 				documents.push(completed);
 			} else {
 				stack[stack.length - 1].addChild(completed);
 			}
+
+			// Pasamos a observers
+			this.observers.forEach(observer => {
+				observer.onFinish(completed);
+			});
 		}
 	}
 	private removeUTF8BOM(content: string): string {
