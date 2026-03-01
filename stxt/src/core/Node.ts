@@ -96,9 +96,13 @@ export class Node {
 	}
 
 	freeze(): void {
-		if (this.isFrozen) return;
+		if (this.isFrozen) {
+			return;
+		}
 
-		for (const n of this.children) n.freeze();
+		for (const n of this.children) {
+			n.freeze();
+		}
 
 		Object.freeze(this.children);
 		Object.freeze(this.textLines);
@@ -111,7 +115,9 @@ export class Node {
 		if (result.length > 1) {
 			throw new Error("More than 1 child. Use getChildren");
 		}
-		if (result.length === 0) return null;
+		if (result.length === 0) {
+			return null;
+		}
 		return result[0];
 	}
 
@@ -121,7 +127,9 @@ export class Node {
 		const result: Node[] = [];
 
 		for (const child of this.children) {
-			if (child.getNormalizedName() === key) result.push(child);
+			if (child.getNormalizedName() === key) {
+				result.push(child);
+			}
 		}
 		return result;
 	}
@@ -131,10 +139,16 @@ export class Node {
 		s += `line=${this.line}`;
 		s += `, level=${this.level}`;
 		s += `, name='${this.name}'`;
-		if (this.namespace.length > 0) s += `, ns='${this.namespace}'`;
+		if (this.namespace.length > 0) {
+			s += `, ns='${this.namespace}'`;
+		}
 		s += `, text=${this.textNode}`;
-		if (!this.textNode && this.value.length > 0) s += `, value='${this.value}'`;
-		if (this.textNode) s += `, lines=${this.textLines.length}`;
+		if (!this.textNode && this.value.length > 0) {
+			s += `, value='${this.value}'`;
+		}
+		if (this.textNode) {
+			s += `, lines=${this.textLines.length}`;
+		}
 		s += `, children=${this.children.length}`;
 		s += "}";
 		return s;
