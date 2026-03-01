@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChildDefinition = void 0;
 const NamespaceValidator_1 = require("../core/NamespaceValidator");
-const ParseException_1 = require("../exceptions/ParseException");
+const ValidationException_1 = require("../exceptions/ValidationException");
 const StringUtils_1 = require("../core/StringUtils");
 class ChildDefinition {
     normalizedName;
@@ -19,7 +19,7 @@ class ChildDefinition {
         this.max = max;
         NamespaceValidator_1.NamespaceValidator.validateNamespaceFormat(this.namespace, numLine);
         if (this.normalizedName.length === 0) {
-            throw new ParseException_1.ParseException(numLine, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
+            throw new ValidationException_1.ValidationException(numLine, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
         }
     }
     getName() {

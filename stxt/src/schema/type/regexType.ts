@@ -3,7 +3,7 @@
 import { Type } from "../Type";
 import { Node } from "../../core/Node";
 import { NodeDefinition } from "../NodeDefinition";
-import { ParseException } from "../../exceptions/ParseException";
+import { ValidationException } from "../../exceptions/ValidationException";
 
 export function regexType(name: string, pattern: RegExp, error: string): Type {
     return {
@@ -12,7 +12,7 @@ export function regexType(name: string, pattern: RegExp, error: string): Type {
         validate(ndef: NodeDefinition, n: Node): void {
             const value = n.getText();
             if (!pattern.test(value)) {
-                throw new ParseException(
+                throw new ValidationException(
                     n.getLine(),
                     "INVALID_VALUE",
                     `${n.getName()}: ${error} (${value})`

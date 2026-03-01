@@ -4,7 +4,7 @@ exports.SchemaParser = void 0;
 const Schema_1 = require("./Schema");
 const NodeDefinition_1 = require("./NodeDefinition");
 const ChildDefinition_1 = require("./ChildDefinition");
-const ParseException_1 = require("../exceptions/ParseException");
+const ValidationException_1 = require("../exceptions/ValidationException");
 const RuntimeException_1 = require("../exceptions/RuntimeException");
 const NameNamespaceParser_1 = require("../core/NameNamespaceParser");
 class SchemaParser {
@@ -14,7 +14,7 @@ class SchemaParser {
         const namespaceSchema = node.getNamespace();
         // Obtenemos name y namespace
         if (nodeName !== "schema" || namespaceSchema !== Schema_1.Schema.SCHEMA_NAMESPACE) {
-            throw new ParseException_1.ParseException(node.getLine(), "NOT_STXT_SCHEMA", `Se espera schema(${Schema_1.Schema.SCHEMA_NAMESPACE}) y es ${nodeName}(${namespaceSchema})`);
+            throw new ValidationException_1.ValidationException(node.getLine(), "NOT_STXT_SCHEMA", `Se espera schema(${Schema_1.Schema.SCHEMA_NAMESPACE}) y es ${nodeName}(${namespaceSchema})`);
         }
         // Obtenemos description
         const descrip = node.getChild("description")?.getText();
@@ -39,7 +39,7 @@ class SchemaParser {
                         throw new RuntimeException_1.RuntimeException("CHILD_DEFINITION_API_MISMATCH", "ChildDefinition.getNormalizedName() is missing in TypeScript version. Add it to ChildDefinition.");
                     }
                     if (!allNames.has(childNorm)) {
-                        throw new ParseException_1.ParseException(0, "CHILD_NOT_DEFINED", `Child ${childNorm} not defined in ${schema.getNamespace()}`);
+                        throw new ValidationException_1.ValidationException(0, "CHILD_NOT_DEFINED", `Child ${childNorm} not defined in ${schema.getNamespace()}`);
                     }
                 }
             }
@@ -65,7 +65,7 @@ class SchemaParser {
         let valuesNodes = n.getChildrenByName("values");
         if (valuesNodes && valuesNodes.length > 0) {
             if (type !== "ENUM") {
-                throw new ParseException_1.ParseException(n.getLine(), "VALUES_ONLY_SUPPORTED_BY_ENUM", `Values only supported for type ENUM, not for type ${type}`);
+                throw new ValidationException_1.ValidationException(n.getLine(), "VALUES_ONLY_SUPPORTED_BY_ENUM", `Values only supported for type ENUM, not for type ${type}`);
             }
             if (valuesNodes.length > 1) {
                 throw new RuntimeException_1.RuntimeException("INVALID_SIZE_VALUES", `Unexpected number of values: ${valuesNodes.length}`);
@@ -80,7 +80,7 @@ class SchemaParser {
         }
         // Miramos enum
         if (type === "ENUM" && (!valuesNodes || valuesNodes.length === 0)) {
-            throw new ParseException_1.ParseException(n.getLine(), "VALUES_EMPTY_FOR_ENUM", "ENUM Type must include values");
+            throw new ValidationException_1.ValidationException(n.getLine(), "VALUES_EMPTY_FOR_ENUM", "ENUM Type must include values");
         }
         return result;
     }
@@ -100,7 +100,7 @@ class SchemaParser {
         const raw = n.getValue();
         const parsed = Number.parseInt(raw, 10);
         if (Number.isNaN(parsed)) {
-            throw new ParseException_1.ParseException(node.getLine(), "INVALID_INTEGER", `Integer not valid: ${raw}`);
+            throw new ValidationException_1.ValidationException(node.getLine(), "INVALID_INTEGER", `Integer not valid: ${raw}`);
         }
         return parsed;
     }

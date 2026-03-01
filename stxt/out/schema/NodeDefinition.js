@@ -2,7 +2,7 @@
 // NodeDefinition.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NodeDefinition = void 0;
-const ParseException_1 = require("../exceptions/ParseException");
+const ValidationException_1 = require("../exceptions/ValidationException");
 const StringUtils_1 = require("../core/StringUtils");
 class NodeDefinition {
     name;
@@ -17,7 +17,7 @@ class NodeDefinition {
         this.type = type;
         this.description = description;
         if (this.normalizedName.length === 0) {
-            throw new ParseException_1.ParseException(line, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
+            throw new ValidationException_1.ValidationException(line, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
         }
     }
     getName() {
@@ -38,7 +38,7 @@ class NodeDefinition {
     addChildDefinition(childDefinition) {
         const qname = childDefinition.getQualifiedName();
         if (this.children.has(qname)) {
-            throw new ParseException_1.ParseException(0, "CHILD_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
+            throw new ValidationException_1.ValidationException(0, "CHILD_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
         }
         this.children.set(qname, childDefinition);
     }

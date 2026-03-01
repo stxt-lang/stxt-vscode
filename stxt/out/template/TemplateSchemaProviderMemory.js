@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TemplateSchemaProviderMemory = void 0;
 const Parser_1 = require("../core/Parser");
 const SchemaValidator_1 = require("../schema/SchemaValidator");
-const ParseException_1 = require("../exceptions/ParseException");
+const ValidationException_1 = require("../exceptions/ValidationException");
 const MetaTemplateSchemaProvider_1 = require("./MetaTemplateSchemaProvider");
 const TemplateParser_1 = require("./TemplateParser");
 const SchemaProviderMemory_1 = require("../schema/SchemaProviderMemory");
@@ -19,7 +19,7 @@ class TemplateSchemaProviderMemory extends SchemaProviderMemory_1.SchemaProvider
         const parser = new Parser_1.Parser();
         const nodes = parser.parse(template);
         if (nodes.length !== 1) {
-            throw new ParseException_1.ParseException(0, "INVALID_SCHEMA", `There are ${nodes.length}, and expected is 1`);
+            throw new ValidationException_1.ValidationException(0, "INVALID_SCHEMA", `There are ${nodes.length}, and expected is 1`);
         }
         // Validamos el template contra el meta-schema de templates
         const schemaValidator = new SchemaValidator_1.SchemaValidator(new MetaTemplateSchemaProvider_1.MetaTemplateSchemaProvider(), true);
@@ -28,7 +28,7 @@ class TemplateSchemaProviderMemory extends SchemaProviderMemory_1.SchemaProvider
         const sch = TemplateParser_1.TemplateParser.transformNodeToSchema(nodes[0]);
         // Check mínimo de seguridad (en Java también se controlaba el namespace esperado)
         if (!sch.getNamespace() || sch.getNamespace().trim().length === 0) {
-            throw new ParseException_1.ParseException(0, "INVALID_SCHEMA", "Schema namespace is empty");
+            throw new ValidationException_1.ValidationException(0, "INVALID_SCHEMA", "Schema namespace is empty");
         }
         this.schemas.set(sch.getNamespace(), sch);
     }

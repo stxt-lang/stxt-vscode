@@ -2,7 +2,7 @@
 // type/HEXADECIMAL.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HEXADECIMAL = void 0;
-const ParseException_1 = require("../../exceptions/ParseException");
+const ValidationException_1 = require("../../exceptions/ValidationException");
 const StringUtils_1 = require("../../core/StringUtils");
 exports.HEXADECIMAL = {
     getName() {
@@ -36,6 +36,6 @@ exports.HEXADECIMAL = {
     },
 };
 function invalid(n, msg) {
-    return new ParseException_1.ParseException(n.getLine(), "INVALID_VALUE", `${n.getName()}: ${msg}`);
+    return new ValidationException_1.ValidationException(n.getLine(), "INVALID_VALUE", `${n.getName()}: ${msg}`);
 }
 //# sourceMappingURL=HEXADECIMAL.js.map

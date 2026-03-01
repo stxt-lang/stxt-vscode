@@ -1,7 +1,7 @@
 // type/TEXT.ts
 
 import { Node } from "../../core/Node";
-import { ParseException } from "../../exceptions/ParseException";
+import { ValidationException } from "../../exceptions/ValidationException";
 import { NodeDefinition } from "../NodeDefinition";
 import { Type } from "../Type";
 
@@ -12,7 +12,7 @@ export const TEXT: Type = {
 
   validate(ndef: NodeDefinition, n: Node): void {
     if (n.getChildren().length > 0) {
-      throw new ParseException(
+      throw new ValidationException(
         n.getLine(),
         "NOT_ALLOWED_CHILDREN_TEXT",
         `Not allowed children nodes in node ${n.getQualifiedName()}`

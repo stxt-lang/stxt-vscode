@@ -2,7 +2,7 @@
 // type/URL.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URL = void 0;
-const ParseException_1 = require("../../exceptions/ParseException");
+const ValidationException_1 = require("../../exceptions/ValidationException");
 const RuntimeException_1 = require("../../exceptions/RuntimeException");
 exports.URL = {
     getName() {
@@ -18,7 +18,7 @@ exports.URL = {
             }
         }
         catch {
-            throw new ParseException_1.ParseException(n.getLine(), "INVALID_VALUE", `Invalid URL: ${url}`);
+            throw new ValidationException_1.ValidationException(n.getLine(), "INVALID_VALUE", `Invalid URL: ${url}`);
         }
     },
 };

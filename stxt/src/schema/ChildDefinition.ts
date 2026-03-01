@@ -1,7 +1,7 @@
 // ChildDefinition.ts
 
 import { NamespaceValidator } from "../core/NamespaceValidator";
-import { ParseException } from "../exceptions/ParseException";
+import { ValidationException } from "../exceptions/ValidationException";
 import { StringUtils } from "../core/StringUtils";
 
 export class ChildDefinition {
@@ -21,7 +21,7 @@ export class ChildDefinition {
 		NamespaceValidator.validateNamespaceFormat(this.namespace, numLine);
 
 		if (this.normalizedName.length === 0) {
-			throw new ParseException(numLine, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
+			throw new ValidationException(numLine, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
 		}
 	}
 

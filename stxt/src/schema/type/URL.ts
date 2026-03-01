@@ -1,7 +1,7 @@
 // type/URL.ts
 
 import { Node } from "../../core/Node";
-import { ParseException } from "../../exceptions/ParseException";
+import { ValidationException } from "../../exceptions/ValidationException";
 import { RuntimeException } from "../../exceptions/RuntimeException";
 import { NodeDefinition } from "../NodeDefinition";
 import { Type } from "../Type";
@@ -23,7 +23,7 @@ export const URL: Type = {
         throw new RuntimeException("INVALID_URL_STRUCTURE", "Invalid URL structure");
       }
     } catch {
-      throw new ParseException(
+      throw new ValidationException(
         n.getLine(),
         "INVALID_VALUE",
         `Invalid URL: ${url}`

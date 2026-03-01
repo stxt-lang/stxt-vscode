@@ -2,7 +2,7 @@
 // ChildLineParser.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChildLineParser = void 0;
-const ParseException_1 = require("../exceptions/ParseException");
+const ValidationException_1 = require("../exceptions/ValidationException");
 const ChildLine_1 = require("./ChildLine");
 class ChildLineParser {
     constructor() { }
@@ -13,7 +13,7 @@ class ChildLineParser {
         }
         const m = ChildLineParser.CHILD_LINE_PATTERN.exec(rawLine);
         if (!m) {
-            throw new ParseException_1.ParseException(lineNumber, "INVALID_CHILD_LINE", `Line not valid: ${rawLine}`);
+            throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_LINE", `Line not valid: ${rawLine}`);
         }
         // m[1]=count, m[2]=type, m[3]=values
         let type = m[2]?.trim() ?? "";
@@ -38,7 +38,7 @@ class ChildLineParser {
         else if (count.endsWith("+")) {
             const expectedNum = parseInt(count.substring(0, count.length - 1), 10);
             if (Number.isNaN(expectedNum)) {
-                throw new ParseException_1.ParseException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
+                throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
             }
             min = expectedNum;
             max = null;
@@ -46,7 +46,7 @@ class ChildLineParser {
         else if (count.endsWith("-")) {
             const expectedNum = parseInt(count.substring(0, count.length - 1), 10);
             if (Number.isNaN(expectedNum)) {
-                throw new ParseException_1.ParseException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
+                throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
             }
             min = null;
             max = expectedNum;
@@ -57,19 +57,19 @@ class ChildLineParser {
                 const aNum = parseInt(a.trim(), 10);
                 const bNum = parseInt(b.trim(), 10);
                 if (Number.isNaN(aNum) || Number.isNaN(bNum)) {
-                    throw new ParseException_1.ParseException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
+                    throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
                 }
                 min = aNum;
                 max = bNum;
             }
             catch {
-                throw new ParseException_1.ParseException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
+                throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
             }
         }
         else {
             const expectedNum = parseInt(count, 10);
             if (Number.isNaN(expectedNum)) {
-                throw new ParseException_1.ParseException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
+                throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
             }
             min = expectedNum;
             max = expectedNum;
@@ -86,7 +86,7 @@ class ChildLineParser {
                     continue;
                 }
                 if (list.includes(part)) {
-                    throw new ParseException_1.ParseException(lineNumber, "VALUE_DUPLICATED", `The values ${part} is duplicated`);
+                    throw new ValidationException_1.ValidationException(lineNumber, "VALUE_DUPLICATED", `The values ${part} is duplicated`);
                 }
                 list.push(part);
             }

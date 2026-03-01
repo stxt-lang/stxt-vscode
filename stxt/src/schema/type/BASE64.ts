@@ -1,7 +1,7 @@
 // type/BASE64.ts
 
 import { Node } from "../../core/Node";
-import { ParseException } from "../../exceptions/ParseException";
+import { ValidationException } from "../../exceptions/ValidationException";
 import { RuntimeException } from "../../exceptions/RuntimeException";
 import { NodeDefinition } from "../NodeDefinition";
 import { Type } from "../Type";
@@ -31,7 +31,7 @@ export const BASE64: Type = {
                 throw new RuntimeException("INVALID_BASE64", "Invalid base64");
             }
         } catch {
-            throw new ParseException(n.getLine(), "INVALID_VALUE", `Node '${n.getName()}' Invalid Base64`);
+            throw new ValidationException(n.getLine(), "INVALID_VALUE", `Node '${n.getName()}' Invalid Base64`);
         }
     },
 };

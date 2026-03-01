@@ -1,6 +1,6 @@
 // NodeDefinition.ts
 
-import { ParseException } from "../exceptions/ParseException";
+import { ValidationException } from "../exceptions/ValidationException";
 import { StringUtils } from "../core/StringUtils";
 import { ChildDefinition } from "./ChildDefinition";
 
@@ -20,7 +20,7 @@ export class NodeDefinition {
         this.description = description;
 
         if (this.normalizedName.length === 0) {
-            throw new ParseException(line, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
+            throw new ValidationException(line, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
         }
     }
 
@@ -47,7 +47,7 @@ export class NodeDefinition {
     addChildDefinition(childDefinition: ChildDefinition): void {
         const qname = childDefinition.getQualifiedName();
         if (this.children.has(qname)) {
-            throw new ParseException(0, "CHILD_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
+            throw new ValidationException(0, "CHILD_DEF_ALREADY_DEFINED", `Exists a previous node definition with: ${qname}`);
         }
         this.children.set(qname, childDefinition);
     }

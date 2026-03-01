@@ -2,7 +2,7 @@
 
 import { Node } from "../core/Node";
 import { Parser } from "../core/Parser";
-import { ParseException } from "../exceptions/ParseException";
+import { ValidationException } from "../exceptions/ValidationException";
 
 import { ChildDefinition } from "../schema/ChildDefinition";
 import { NodeDefinition } from "../schema/NodeDefinition";
@@ -21,7 +21,7 @@ export class TemplateParser {
 		// Buscamos nodo structure
 		const structure = node.getChild("structure");
 		if (!structure) {
-			throw new ParseException(
+			throw new ValidationException(
 				node.getLine(),
 				"TEMPLATE_STRUCTURE_REQUIRED",
 				"Template must define 'Structure >>'"
@@ -50,14 +50,14 @@ export class TemplateParser {
 		let cl: ChildLine = ChildLineParser.parse(node.getValue(), node.getLine() + offset);
 
 		if (namespace.length === 0) {
-			throw new ParseException(node.getLine() + offset, "EMPTY_NAMESPACE", "Not allowed empty namespaces");
+			throw new ValidationException(node.getLine() + offset, "EMPTY_NAMESPACE", "Not allowed empty namespaces");
 		}
 
 		if (namespace !== schema.getNamespace()) {
 			// Validamos type vacío
 			const type = cl.getType();
 			if (type != null && type.trim().length > 0) {
-				throw new ParseException(
+				throw new ValidationException(
 					node.getLine() + offset,
 					"TYPE_DEFINITION_NOT_ALLOWED",
 					"Not allowed type definition in external namespaces"
@@ -82,7 +82,7 @@ export class TemplateParser {
 		} else {
 			let type = cl.getType();
 			if (!type || !type.startsWith("@")) {
-				throw new ParseException(
+				throw new ValidationException(
 					node.getLine() + offset,
 					"NODE_DEFINED_MULTIPLE_TIMES",
 					`Multiple node reference must start with @: ${node.getName()}`
@@ -94,7 +94,7 @@ export class TemplateParser {
 
 			if (type === node.getNormalizedName()) return; // OK Definition
 
-			throw new ParseException(
+			throw new ValidationException(
 				node.getLine() + offset,
 				"NODE_REFERENCE_NOT_VALID",
 				`Reference must be '@${node.getName()}', not '${type}'`
