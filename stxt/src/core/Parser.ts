@@ -5,14 +5,10 @@ import { parseLine } from "./LineIndentParser";
 import { LineIndent } from "./LineIndent";
 import { createNode } from "./NodeCreator";
 
-function removeUTF8BOM(content: string): string {
-	return content.charCodeAt(0) === 0xfeff ? content.slice(1) : content;
-}
-
 export class Parser {
 
 	parse(content: string): Node[] {
-		content = removeUTF8BOM(content);
+		content = this.removeUTF8BOM(content);
 
 		const stack: Node[] = [];
 		const documents: Node[] = [];
@@ -77,4 +73,9 @@ export class Parser {
 			}
 		}
 	}
+	private removeUTF8BOM(content: string): string {
+		return content.charCodeAt(0) === 0xfeff ? content.slice(1) : content;
+	}
 }
+
+
