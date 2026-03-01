@@ -2,7 +2,8 @@
 // type/BASE64.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BASE64 = void 0;
-const ValidationException_1 = require("../../exceptions/ValidationException");
+const ParseException_1 = require("../../exceptions/ParseException");
+const RuntimeException_1 = require("../../exceptions/RuntimeException");
 const StringUtils_1 = require("../../core/StringUtils");
 exports.BASE64 = {
     getName() {
@@ -20,11 +21,11 @@ exports.BASE64 = {
             const normalizedInput = raw.replace(/=+$/, "");
             const normalizedReencoded = reencoded.replace(/=+$/, "");
             if (normalizedInput !== normalizedReencoded) {
-                throw new Error("Invalid base64");
+                throw new RuntimeException_1.RuntimeException("INVALID_BASE64", "Invalid base64");
             }
         }
         catch {
-            throw new ValidationException_1.ValidationException(n.getLine(), "INVALID_VALUE", `Node '${n.getName()}' Invalid Base64`);
+            throw new ParseException_1.ParseException(n.getLine(), "INVALID_VALUE", `Node '${n.getName()}' Invalid Base64`);
         }
     },
 };

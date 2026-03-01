@@ -3,9 +3,8 @@ import { NodeDefinition } from "./NodeDefinition";
 import { ChildDefinition } from "./ChildDefinition";
 import { Node } from "../core/Node";
 import { SchemaException } from "../exceptions/SchemaException";
-import { ValidationException } from "../exceptions/ValidationException";
 import { ParseException } from "../exceptions/ParseException";
-import { STXTException } from "../exceptions/STXTException";
+import { RuntimeException } from "../exceptions/RuntimeException";
 import { NameNamespaceParser } from "../core/NameNamespaceParser";
 
 export class SchemaParser {
@@ -44,11 +43,14 @@ export class SchemaParser {
                     const childNorm = (schChild as any).getNormalizedName?.() as string | undefined;
 
                     if (!childNorm) {
-                        throw new Error("ChildDefinition.getNormalizedName() is missing in TypeScript version. Add it to ChildDefinition.");
+                        throw new RuntimeException(
+                            "CHILD_DEFINITION_API_MISMATCH",
+                            "ChildDefinition.getNormalizedName() is missing in TypeScript version. Add it to ChildDefinition."
+                        );
                     }
 
                     if (!allNames.has(childNorm)) {
-                        throw new ValidationException(0, "CHILD_NOT_DEFINED", `Child ${childNorm} not defined in ${schema.getNamespace()}`);
+                        throw new ParseException(0, "CHILD_NOT_DEFINED", `Child ${childNorm} not defined in ${schema.getNamespace()}`);
                     }
                 }
             }
@@ -84,7 +86,7 @@ export class SchemaParser {
             }
 
             if (valuesNodes.length > 1) {
-                throw new STXTException("INVALID_SIZE_VALUES", `Unexpected number of values: ${valuesNodes.length}`);
+                throw new RuntimeException("INVALID_SIZE_VALUES", `Unexpected number of values: ${valuesNodes.length}`);
             }
 
             const valuesNode = valuesNodes[0];

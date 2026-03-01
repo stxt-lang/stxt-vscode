@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResourceNotFoundException = void 0;
-const STXTException_1 = require("./STXTException");
-class ResourceNotFoundException extends STXTException_1.STXTException {
+const RuntimeException_1 = require("./RuntimeException");
+class ResourceNotFoundException extends RuntimeException_1.RuntimeException {
     namespaceValue;
     resource;
     constructor(namespace, resource) {

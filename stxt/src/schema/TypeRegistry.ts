@@ -1,5 +1,5 @@
 import { Type } from "./Type";
-import { STXTException } from "../exceptions/STXTException";
+import { RuntimeException } from "../exceptions/RuntimeException";
 
 import { INLINE } from "./type/INLINE";
 import { BLOCK } from "./type/BLOCK";
@@ -54,7 +54,7 @@ export class TypeRegistry {
         const name = instance.getName();
 
         if (this.REGISTRY.has(name)) {
-            throw new STXTException("DUPLICATED_TYPE", `Type already defined: ${name}`);
+            throw new RuntimeException("DUPLICATED_TYPE", `Type already defined: ${name}`);
         }
 
         this.REGISTRY.set(name, instance);

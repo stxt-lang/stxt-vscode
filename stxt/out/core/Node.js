@@ -77,10 +77,12 @@ class Node {
         return this.isTextNode() ? this.textLines.join("\n") : this.value;
     }
     freeze() {
-        if (this.isFrozen)
+        if (this.isFrozen) {
             return;
-        for (const n of this.children)
+        }
+        for (const n of this.children) {
             n.freeze();
+        }
         Object.freeze(this.children);
         Object.freeze(this.textLines);
         this.isFrozen = true;
@@ -90,8 +92,9 @@ class Node {
         if (result.length > 1) {
             throw new Error("More than 1 child. Use getChildren");
         }
-        if (result.length === 0)
+        if (result.length === 0) {
             return null;
+        }
         return result[0];
     }
     // Fast access methods to children
@@ -99,8 +102,9 @@ class Node {
         const key = StringUtils_1.StringUtils.normalize(cname);
         const result = [];
         for (const child of this.children) {
-            if (child.getNormalizedName() === key)
+            if (child.getNormalizedName() === key) {
                 result.push(child);
+            }
         }
         return result;
     }
@@ -109,13 +113,16 @@ class Node {
         s += `line=${this.line}`;
         s += `, level=${this.level}`;
         s += `, name='${this.name}'`;
-        if (this.namespace.length > 0)
+        if (this.namespace.length > 0) {
             s += `, ns='${this.namespace}'`;
+        }
         s += `, text=${this.textNode}`;
-        if (!this.textNode && this.value.length > 0)
+        if (!this.textNode && this.value.length > 0) {
             s += `, value='${this.value}'`;
-        if (this.textNode)
+        }
+        if (this.textNode) {
             s += `, lines=${this.textLines.length}`;
+        }
         s += `, children=${this.children.length}`;
         s += "}";
         return s;

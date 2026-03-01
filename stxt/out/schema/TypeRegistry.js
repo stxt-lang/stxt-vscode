@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TypeRegistry = void 0;
-const STXTException_1 = require("../exceptions/STXTException");
+const RuntimeException_1 = require("../exceptions/RuntimeException");
 const INLINE_1 = require("./type/INLINE");
 const BLOCK_1 = require("./type/BLOCK");
 const TEXT_1 = require("./type/TEXT");
@@ -48,7 +48,7 @@ class TypeRegistry {
     static register(instance) {
         const name = instance.getName();
         if (this.REGISTRY.has(name)) {
-            throw new STXTException_1.STXTException("DUPLICATED_TYPE", `Type already defined: ${name}`);
+            throw new RuntimeException_1.RuntimeException("DUPLICATED_TYPE", `Type already defined: ${name}`);
         }
         this.REGISTRY.set(name, instance);
     }

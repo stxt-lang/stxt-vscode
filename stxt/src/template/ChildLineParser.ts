@@ -1,6 +1,7 @@
 // ChildLineParser.ts
 
 import { ParseException } from "../exceptions/ParseException";
+import { RuntimeException } from "../exceptions/RuntimeException";
 import { ChildLine } from "./ChildLine";
 
 export class ChildLineParser {
@@ -58,7 +59,7 @@ export class ChildLineParser {
                 const aNum = parseInt(a.trim(), 10);
                 const bNum = parseInt(b.trim(), 10);
                 if (Number.isNaN(aNum) || Number.isNaN(bNum)) {
-                    throw new Error();
+                    throw new ParseException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
                 }
                 min = aNum;
                 max = bNum;

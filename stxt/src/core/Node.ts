@@ -1,6 +1,7 @@
 // Node.ts
 
 import { ParseException } from "../exceptions/ParseException";
+import { RuntimeException } from "../exceptions/RuntimeException";
 import { NamespaceValidator } from "./NamespaceValidator";
 import { StringUtils } from "./StringUtils";
 
@@ -30,7 +31,7 @@ export class Node {
 		NamespaceValidator.validateNamespaceFormat(this.namespace, line);
 
 		if (this.value.length > 0 && this.isTextNode()) {
-			throw new Error("Not empty value with textNode");
+			throw new RuntimeException("INLINE_VALUE_NOT_VALID", "Not empty value with textNode");
 		}
 
 		if (this.normalizedName.length === 0) {
@@ -66,7 +67,7 @@ export class Node {
 
 	addChild(node: Node): void {
 		if (this.isFrozen) {
-			throw new Error("Node is frozen");
+			throw new RuntimeException("NODE_FROZEN", "Node is frozen");
 		}
 		this.children.push(node);
 	}
@@ -113,7 +114,7 @@ export class Node {
 	getChild(cname: string): Node | null {
 		const result = this.getChildrenByName(cname);
 		if (result.length > 1) {
-			throw new Error("More than 1 child. Use getChildren");
+			throw new RuntimeException("AMBIGUOUS_CHILD", "More than 1 child. Use getChildren");
 		}
 		if (result.length === 0) {
 			return null;

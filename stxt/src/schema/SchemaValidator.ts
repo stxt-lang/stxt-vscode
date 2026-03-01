@@ -1,5 +1,5 @@
 import { Node } from "../core/Node";
-import { ValidationException } from "../exceptions/ValidationException";
+import { ParseException } from "../exceptions/ParseException";
 import { Validator } from "../processors/Validator";
 
 import { SchemaProvider } from "./SchemaProvider";
@@ -25,7 +25,7 @@ export class SchemaValidator implements Validator {
         const sch = this.schemaProvider.getSchema(namespace);
 
         if (!sch) {
-            throw new ValidationException(node.getLine(),"SCHEMA_NOT_FOUND",`Not found schema: ${namespace}`);
+            throw new ParseException(node.getLine(),"SCHEMA_NOT_FOUND",`Not found schema: ${namespace}`);
         }
 
         // Validamos nodo
@@ -44,7 +44,7 @@ export class SchemaValidator implements Validator {
 
         if (!schemaNode) {
             const error = `NOT EXIST NODE ${node.getNormalizedName()} for namespace ${sch.getNamespace()}`;
-            throw new ValidationException(node.getLine(), "NODE_NOT_EXIST_IN_SCHEMA", error);
+            throw new ParseException(node.getLine(), "NODE_NOT_EXIST_IN_SCHEMA", error);
         }
 
         SchemaValidator.validateValue(schemaNode, node);
@@ -56,7 +56,7 @@ export class SchemaValidator implements Validator {
 
         const validator: Type | undefined = TypeRegistry.get(nodeType);
         if (!validator) {
-            throw new ValidationException(n.getLine(),"TYPE_NOT_SUPPORTED",`Node type not supported: ${nodeType}`);
+            throw new ParseException(n.getLine(),"TYPE_NOT_SUPPORTED",`Node type not supported: ${nodeType}`);
         }
 
         validator.validate(nsNode, n);
@@ -80,11 +80,11 @@ export class SchemaValidator implements Validator {
         const max = chNode.getMax(); // number | null
 
         if (min != null && num < min) {
-            throw new ValidationException(node.getLine(),"INVALID_NUMBER",`${num} nodes of '${chNode.getQualifiedName()}' and min is ${min}`);
+            throw new ParseException(node.getLine(),"INVALID_NUMBER",`${num} nodes of '${chNode.getQualifiedName()}' and min is ${min}`);
         }
 
         if (max != null && num > max) {
-            throw new ValidationException(node.getLine(),"INVALID_NUMBER",`${num} nodes of '${chNode.getQualifiedName()}' and max is ${max}`);
+            throw new ParseException(node.getLine(),"INVALID_NUMBER",`${num} nodes of '${chNode.getQualifiedName()}' and max is ${max}`);
         }
     }
 }

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SchemaValidator = void 0;
-const ValidationException_1 = require("../exceptions/ValidationException");
+const ParseException_1 = require("../exceptions/ParseException");
 const TypeRegistry_1 = require("./TypeRegistry");
 class SchemaValidator {
     schemaProvider;
@@ -15,7 +15,7 @@ class SchemaValidator {
         const namespace = node.getNamespace();
         const sch = this.schemaProvider.getSchema(namespace);
         if (!sch) {
-            throw new ValidationException_1.ValidationException(node.getLine(), "SCHEMA_NOT_FOUND", `Not found schema: ${namespace}`);
+            throw new ParseException_1.ParseException(node.getLine(), "SCHEMA_NOT_FOUND", `Not found schema: ${namespace}`);
         }
         // Validamos nodo
         this.validateAgainstSchema(node, sch);
@@ -30,7 +30,7 @@ class SchemaValidator {
         const schemaNode = sch.getNodeDefinition(node.getNormalizedName());
         if (!schemaNode) {
             const error = `NOT EXIST NODE ${node.getNormalizedName()} for namespace ${sch.getNamespace()}`;
-            throw new ValidationException_1.ValidationException(node.getLine(), "NODE_NOT_EXIST_IN_SCHEMA", error);
+            throw new ParseException_1.ParseException(node.getLine(), "NODE_NOT_EXIST_IN_SCHEMA", error);
         }
         SchemaValidator.validateValue(schemaNode, node);
         SchemaValidator.validateCount(schemaNode, node);
@@ -39,7 +39,7 @@ class SchemaValidator {
         const nodeType = nsNode.getType();
         const validator = TypeRegistry_1.TypeRegistry.get(nodeType);
         if (!validator) {
-            throw new ValidationException_1.ValidationException(n.getLine(), "TYPE_NOT_SUPPORTED", `Node type not supported: ${nodeType}`);
+            throw new ParseException_1.ParseException(n.getLine(), "TYPE_NOT_SUPPORTED", `Node type not supported: ${nodeType}`);
         }
         validator.validate(nsNode, n);
     }
@@ -57,10 +57,10 @@ class SchemaValidator {
         const min = chNode.getMin(); // number | null
         const max = chNode.getMax(); // number | null
         if (min != null && num < min) {
-            throw new ValidationException_1.ValidationException(node.getLine(), "INVALID_NUMBER", `${num} nodes of '${chNode.getQualifiedName()}' and min is ${min}`);
+            throw new ParseException_1.ParseException(node.getLine(), "INVALID_NUMBER", `${num} nodes of '${chNode.getQualifiedName()}' and min is ${min}`);
         }
         if (max != null && num > max) {
-            throw new ValidationException_1.ValidationException(node.getLine(), "INVALID_NUMBER", `${num} nodes of '${chNode.getQualifiedName()}' and max is ${max}`);
+            throw new ParseException_1.ParseException(node.getLine(), "INVALID_NUMBER", `${num} nodes of '${chNode.getQualifiedName()}' and max is ${max}`);
         }
     }
 }

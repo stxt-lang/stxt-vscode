@@ -2,7 +2,8 @@
 // type/URL.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.URL = void 0;
-const ValidationException_1 = require("../../exceptions/ValidationException");
+const ParseException_1 = require("../../exceptions/ParseException");
+const RuntimeException_1 = require("../../exceptions/RuntimeException");
 exports.URL = {
     getName() {
         return "URL";
@@ -13,11 +14,11 @@ exports.URL = {
             const parsed = new globalThis.URL(url);
             const ok = !!parsed.protocol && !!parsed.hostname;
             if (!ok) {
-                throw new Error("Invalid URL structure");
+                throw new RuntimeException_1.RuntimeException("INVALID_URL_STRUCTURE", "Invalid URL structure");
             }
         }
         catch {
-            throw new ValidationException_1.ValidationException(n.getLine(), "INVALID_VALUE", `Invalid URL: ${url}`);
+            throw new ParseException_1.ParseException(n.getLine(), "INVALID_VALUE", `Invalid URL: ${url}`);
         }
     },
 };

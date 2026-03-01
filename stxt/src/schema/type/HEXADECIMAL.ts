@@ -1,7 +1,7 @@
 // type/HEXADECIMAL.ts
 
 import { Node } from "../../core/Node";
-import { ValidationException } from "../../exceptions/ValidationException";
+import { ParseException } from "../../exceptions/ParseException";
 import { NodeDefinition } from "../NodeDefinition";
 import { Type } from "../Type";
 import { StringUtils } from "../../core/StringUtils";
@@ -44,6 +44,6 @@ export const HEXADECIMAL: Type = {
   },
 };
 
-function invalid(n: Node, msg: string): ValidationException {
-  return new ValidationException(n.getLine(), "INVALID_VALUE", `${n.getName()}: ${msg}`);
+function invalid(n: Node, msg: string): ParseException {
+  return new ParseException(n.getLine(), "INVALID_VALUE", `${n.getName()}: ${msg}`);
 }

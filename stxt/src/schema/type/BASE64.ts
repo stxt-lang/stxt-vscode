@@ -1,7 +1,8 @@
 // type/BASE64.ts
 
 import { Node } from "../../core/Node";
-import { ValidationException } from "../../exceptions/ValidationException";
+import { ParseException } from "../../exceptions/ParseException";
+import { RuntimeException } from "../../exceptions/RuntimeException";
 import { NodeDefinition } from "../NodeDefinition";
 import { Type } from "../Type";
 import { StringUtils } from "../../core/StringUtils";
@@ -27,10 +28,10 @@ export const BASE64: Type = {
             const normalizedReencoded = reencoded.replace(/=+$/, "");
 
             if (normalizedInput !== normalizedReencoded) {
-                throw new Error("Invalid base64");
+                throw new RuntimeException("INVALID_BASE64", "Invalid base64");
             }
         } catch {
-            throw new ValidationException(n.getLine(), "INVALID_VALUE", `Node '${n.getName()}' Invalid Base64`);
+            throw new ParseException(n.getLine(), "INVALID_VALUE", `Node '${n.getName()}' Invalid Base64`);
         }
     },
 };

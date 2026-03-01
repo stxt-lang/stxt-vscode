@@ -5,9 +5,8 @@ const Schema_1 = require("./Schema");
 const NodeDefinition_1 = require("./NodeDefinition");
 const ChildDefinition_1 = require("./ChildDefinition");
 const SchemaException_1 = require("../exceptions/SchemaException");
-const ValidationException_1 = require("../exceptions/ValidationException");
 const ParseException_1 = require("../exceptions/ParseException");
-const STXTException_1 = require("../exceptions/STXTException");
+const RuntimeException_1 = require("../exceptions/RuntimeException");
 const NameNamespaceParser_1 = require("../core/NameNamespaceParser");
 class SchemaParser {
     static transformNodeToSchema(node) {
@@ -38,10 +37,10 @@ class SchemaParser {
                     // Para mantener el comportamiento, se recomienda añadir getNormalizedName() a ChildDefinition.
                     const childNorm = schChild.getNormalizedName?.();
                     if (!childNorm) {
-                        throw new Error("ChildDefinition.getNormalizedName() is missing in TypeScript version. Add it to ChildDefinition.");
+                        throw new RuntimeException_1.RuntimeException("CHILD_DEFINITION_API_MISMATCH", "ChildDefinition.getNormalizedName() is missing in TypeScript version. Add it to ChildDefinition.");
                     }
                     if (!allNames.has(childNorm)) {
-                        throw new ValidationException_1.ValidationException(0, "CHILD_NOT_DEFINED", `Child ${childNorm} not defined in ${schema.getNamespace()}`);
+                        throw new ParseException_1.ParseException(0, "CHILD_NOT_DEFINED", `Child ${childNorm} not defined in ${schema.getNamespace()}`);
                     }
                 }
             }
@@ -70,7 +69,7 @@ class SchemaParser {
                 throw new ParseException_1.ParseException(n.getLine(), "VALUES_ONLY_SUPPORTED_BY_ENUM", `Values only supported for type ENUM, not for type ${type}`);
             }
             if (valuesNodes.length > 1) {
-                throw new STXTException_1.STXTException("INVALID_SIZE_VALUES", `Unexpected number of values: ${valuesNodes.length}`);
+                throw new RuntimeException_1.RuntimeException("INVALID_SIZE_VALUES", `Unexpected number of values: ${valuesNodes.length}`);
             }
             const valuesNode = valuesNodes[0];
             const values = valuesNode.getChildrenByName("value");

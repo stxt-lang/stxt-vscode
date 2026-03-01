@@ -1,6 +1,6 @@
-import { STXTException } from "./STXTException";
+import { RuntimeException } from "./RuntimeException";
 
-export class ResourceNotFoundException extends STXTException {
+export class ResourceNotFoundException extends RuntimeException {
     private readonly namespaceValue: string;
     private readonly resource: string;
 
