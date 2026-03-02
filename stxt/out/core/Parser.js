@@ -1,5 +1,4 @@
 "use strict";
-// Parser.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 const LineIndentParser_1 = require("./LineIndentParser");
@@ -33,7 +32,7 @@ class Parser {
         const lastLevel = lastNode ? lastNode.getLevel() : 0;
         const lastNodeText = lastNode ? lastNode.isTextNode() : false;
         // Parseamos línea
-        const lineIndent = (0, LineIndentParser_1.parseLine)(line, lastNodeText, lastLevel, lineNumber);
+        const lineIndent = (0, LineIndentParser_1.parseLineIndent)(line, lastNodeText, lastLevel, lineNumber);
         if (lineIndent === null) {
             return;
         }

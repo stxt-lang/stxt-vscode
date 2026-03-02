@@ -1,5 +1,4 @@
 "use strict";
-// SchemaProviderMeta.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SchemaProviderMeta = void 0;
 const Schema_1 = require("./Schema");

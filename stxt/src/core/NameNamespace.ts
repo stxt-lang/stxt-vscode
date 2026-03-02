@@ -1,5 +1,3 @@
-// NameNamespace.ts
-
 export class NameNamespace {
   private readonly name: string;
   private readonly namespace: string;

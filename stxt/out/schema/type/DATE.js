@@ -1,5 +1,4 @@
 "use strict";
-// type/DATE.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DATE = void 0;
 const regexType_1 = require("./regexType");

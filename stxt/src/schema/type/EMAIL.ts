@@ -1,5 +1,3 @@
-// type/EMAIL.ts
-
 import { regexType } from "./regexType";
 
 export const EMAIL = regexType("EMAIL",

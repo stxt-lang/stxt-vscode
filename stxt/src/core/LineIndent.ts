@@ -1,4 +1,3 @@
-// LineIndent.ts
 export class LineIndent {
 	// Igual que en Java: campos públicos e inmutables
 	public readonly indentLevel: number;

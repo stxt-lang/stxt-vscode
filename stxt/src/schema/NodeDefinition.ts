@@ -1,5 +1,3 @@
-// NodeDefinition.ts
-
 import { ValidationException } from "../exceptions/ValidationException";
 import { StringUtils } from "../core/StringUtils";
 import { ChildDefinition } from "./ChildDefinition";

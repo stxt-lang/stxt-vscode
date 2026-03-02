@@ -1,5 +1,4 @@
 "use strict";
-// Node.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Node = void 0;
 const ParseException_1 = require("../exceptions/ParseException");

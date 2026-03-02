@@ -1,5 +1,4 @@
 "use strict";
-// NodeDefinition.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NodeDefinition = void 0;
 const ValidationException_1 = require("../exceptions/ValidationException");

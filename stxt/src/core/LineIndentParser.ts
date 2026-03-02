@@ -3,7 +3,7 @@ import { rightTrim } from "./StringUtils";
 import { ParseException } from "../exceptions/ParseException";
 import { LineIndent } from "./LineIndent";
 
-export function parseLine(line: string, lastNodeBlock: boolean, lastLevel: number, numLine: number): LineIndent | null {
+export function parseLineIndent(line: string, lastNodeBlock: boolean, lastLevel: number, numLine: number): LineIndent | null {
 	let level = 0;
 	let spaces = 0;
 	let pointer = 0;

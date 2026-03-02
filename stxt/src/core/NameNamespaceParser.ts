@@ -1,5 +1,3 @@
-// NameNamespaceParser.ts
-
 import { ParseException } from "../exceptions/ParseException";
 import { NameNamespace } from "./NameNamespace";
 

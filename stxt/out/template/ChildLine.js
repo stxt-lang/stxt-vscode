@@ -1,5 +1,4 @@
 "use strict";
-// ChildLine.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChildLine = void 0;
 class ChildLine {

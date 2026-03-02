@@ -1,5 +1,4 @@
 "use strict";
-// type/TEXT.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TEXT = void 0;
 const ValidationException_1 = require("../../exceptions/ValidationException");

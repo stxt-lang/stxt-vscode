@@ -1,5 +1,4 @@
 "use strict";
-// type/BOOLEAN.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BOOLEAN = void 0;
 const regexType_1 = require("./regexType");

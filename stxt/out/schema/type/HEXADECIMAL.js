@@ -1,5 +1,4 @@
 "use strict";
-// type/HEXADECIMAL.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HEXADECIMAL = void 0;
 const ValidationException_1 = require("../../exceptions/ValidationException");

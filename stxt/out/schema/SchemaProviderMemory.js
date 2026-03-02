@@ -1,5 +1,4 @@
 "use strict";
-// SchemaProviderMemory.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SchemaProviderMemory = void 0;
 const Parser_1 = require("../core/Parser");

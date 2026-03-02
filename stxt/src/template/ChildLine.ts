@@ -1,17 +1,10 @@
-// ChildLine.ts
-
 export class ChildLine {
     private readonly min: number | null;
     private readonly max: number | null;
     private readonly values: string[] | null;
     private readonly type: string | null;
 
-    constructor(
-        type: string | null,
-        min: number | null,
-        max: number | null,
-        values: string[] | null
-    ) {
+    constructor(type: string | null, min: number | null, max: number | null, values: string[] | null) {
         this.type = type;
         this.min = min;
         this.max = max;

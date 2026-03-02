@@ -1,5 +1,4 @@
 "use strict";
-// type/TIMESTAMP.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TIMESTAMP = void 0;
 const regexType_1 = require("./regexType");

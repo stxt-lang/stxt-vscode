@@ -1,5 +1,3 @@
-// SchemaProviderMeta.ts
-
 import { Schema } from "./Schema";
 import { SchemaProvider } from "./SchemaProvider";
 import { SchemaParser } from "./SchemaParser";

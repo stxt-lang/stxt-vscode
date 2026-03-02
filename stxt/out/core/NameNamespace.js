@@ -1,5 +1,4 @@
 "use strict";
-// NameNamespace.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NameNamespace = void 0;
 class NameNamespace {

@@ -1,5 +1,4 @@
 "use strict";
-// type/GROUP.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GROUP = void 0;
 const ValidationException_1 = require("../../exceptions/ValidationException");

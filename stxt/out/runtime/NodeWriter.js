@@ -1,5 +1,4 @@
 "use strict";
-// NodeWriter.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NodeWriter = exports.IndentStyle = void 0;
 var IndentStyle;

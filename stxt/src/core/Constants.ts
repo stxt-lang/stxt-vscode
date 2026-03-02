@@ -1,5 +1,3 @@
-// Constants.ts
-
 export class Constants {
 	static readonly COMMENT_CHAR: string = "#";
 	static readonly TAB_SPACES: number = 4;

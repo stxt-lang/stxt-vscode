@@ -1,5 +1,3 @@
-// Observer.ts
-
 import { Node } from "../core/Node";
 
 export interface Observer {

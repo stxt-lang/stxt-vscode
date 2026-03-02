@@ -1,5 +1,4 @@
 "use strict";
-// type/EMAIL.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EMAIL = void 0;
 const regexType_1 = require("./regexType");

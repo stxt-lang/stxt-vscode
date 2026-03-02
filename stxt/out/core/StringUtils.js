@@ -1,5 +1,4 @@
 "use strict";
-// StringUtils.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.normalize = exports.compactSpaces = exports.lowerCase = exports.cleanSpaces = exports.rightTrim = exports.StringUtils = void 0;
 const DIACRITICS = /[\u0300-\u036f]+/g;

@@ -1,7 +1,4 @@
-// ChildLineParser.ts
-
 import { ValidationException } from "../exceptions/ValidationException";
-import { RuntimeException } from "../exceptions/RuntimeException";
 import { ChildLine } from "./ChildLine";
 
 export class ChildLineParser {

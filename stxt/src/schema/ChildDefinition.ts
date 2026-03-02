@@ -1,5 +1,3 @@
-// ChildDefinition.ts
-
 import { NamespaceValidator } from "../core/NamespaceValidator";
 import { ValidationException } from "../exceptions/ValidationException";
 import { StringUtils } from "../core/StringUtils";

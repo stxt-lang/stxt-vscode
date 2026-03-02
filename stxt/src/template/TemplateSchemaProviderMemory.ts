@@ -12,6 +12,7 @@ import { SchemaProviderMemory } from "../schema/SchemaProviderMemory";
 import { SchemaProvider } from "../schema/SchemaProvider";
 
 export class TemplateSchemaProviderMemory extends SchemaProviderMemory {
+    
     constructor(parent?: SchemaProvider | null | undefined) {
         if (!parent) {
             parent = new MetaTemplateSchemaProvider();

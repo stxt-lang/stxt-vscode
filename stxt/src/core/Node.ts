@@ -1,5 +1,3 @@
-// Node.ts
-
 import { ParseException } from "../exceptions/ParseException";
 import { RuntimeException } from "../exceptions/RuntimeException";
 import { NamespaceValidator } from "./NamespaceValidator";

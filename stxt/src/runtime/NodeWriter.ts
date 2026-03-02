@@ -1,5 +1,3 @@
-// NodeWriter.ts
-
 import { Node } from "../core/Node";
 
 export enum IndentStyle {

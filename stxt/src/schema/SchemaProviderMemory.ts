@@ -1,5 +1,3 @@
-// SchemaProviderMemory.ts
-
 import { Node } from "../core/Node";
 import { Parser } from "../core/Parser";
 import { StringUtils } from "../core/StringUtils";

@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { getLastAnalysis } from './AnalysisDoc';
-import { getSchema, SchemaLoaderExtension } from './SchemaLoader';
-import { Schema } from '../schema/Schema';
+import { getSchema } from './SchemaLoader';
 
 export class StxtHoverProvider implements vscode.HoverProvider {
 	provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Hover> {

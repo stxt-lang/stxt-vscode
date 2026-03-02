@@ -1,5 +1,4 @@
 "use strict";
-// TemplateParser.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TemplateParser = void 0;
 const Parser_1 = require("../core/Parser");
@@ -23,8 +22,9 @@ class TemplateParser {
         // Parseamos para los nodos
         const nodes = new Parser_1.Parser().parse(text);
         // Vamos iterando todos los nodos insertando
-        for (const n of nodes)
+        for (const n of nodes) {
             this.addToSchema(result, n, offset);
+        }
         // Retornamos resultado
         return result;
     }
@@ -54,9 +54,11 @@ class TemplateParser {
             schemaNode = new NodeDefinition_1.NodeDefinition(node.getName(), type, node.getLine() + offset, undefined);
             schema.addNodeDefinition(schemaNode);
             const values = cl.getValues();
-            if (values)
-                for (const v of values)
+            if (values) {
+                for (const v of values) {
                     schemaNode.addValue(v);
+                }
+            }
         }
         else {
             let type = cl.getType();
@@ -65,8 +67,9 @@ class TemplateParser {
             }
             type = type.substring(1);
             type = StringUtils_1.StringUtils.normalize(type);
-            if (type === node.getNormalizedName())
+            if (type === node.getNormalizedName()) {
                 return; // OK Definition
+            }
             throw new ValidationException_1.ValidationException(node.getLine() + offset, "NODE_REFERENCE_NOT_VALID", `Reference must be '@${node.getName()}', not '${type}'`);
         }
         // Una vez ya existe, si tiene hijos los intentamos crear.

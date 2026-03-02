@@ -1,5 +1,3 @@
-// TemplateParser.ts
-
 import { Node } from "../core/Node";
 import { Parser } from "../core/Parser";
 import { ValidationException } from "../exceptions/ValidationException";
@@ -35,7 +33,9 @@ export class TemplateParser {
 		const nodes: Node[] = new Parser().parse(text);
 
 		// Vamos iterando todos los nodos insertando
-		for (const n of nodes) this.addToSchema(result, n, offset);
+		for (const n of nodes) {
+			this.addToSchema(result, n, offset);
+		}
 
 		// Retornamos resultado
 		return result;
@@ -57,11 +57,7 @@ export class TemplateParser {
 			// Validamos type vacío
 			const type = cl.getType();
 			if (type != null && type.trim().length > 0) {
-				throw new ValidationException(
-					node.getLine() + offset,
-					"TYPE_DEFINITION_NOT_ALLOWED",
-					"Not allowed type definition in external namespaces"
-				);
+				throw new ValidationException(node.getLine() + offset,"TYPE_DEFINITION_NOT_ALLOWED","Not allowed type definition in external namespaces");
 			}
 
 			// No hacemos nada con creación de nodos que no son de @stxt.template!!
@@ -78,27 +74,25 @@ export class TemplateParser {
 			schema.addNodeDefinition(schemaNode);
 
 			const values = cl.getValues();
-			if (values) for (const v of values) schemaNode.addValue(v);
+			if (values) {
+				for (const v of values) {
+					schemaNode.addValue(v);
+				}
+			}
 		} else {
 			let type = cl.getType();
 			if (!type || !type.startsWith("@")) {
-				throw new ValidationException(
-					node.getLine() + offset,
-					"NODE_DEFINED_MULTIPLE_TIMES",
-					`Multiple node reference must start with @: ${node.getName()}`
-				);
+				throw new ValidationException(node.getLine() + offset,"NODE_DEFINED_MULTIPLE_TIMES",`Multiple node reference must start with @: ${node.getName()}`);
 			}
 
 			type = type.substring(1);
 			type = StringUtils.normalize(type);
 
-			if (type === node.getNormalizedName()) return; // OK Definition
+			if (type === node.getNormalizedName()) {
+				return; // OK Definition
+			} 
 
-			throw new ValidationException(
-				node.getLine() + offset,
-				"NODE_REFERENCE_NOT_VALID",
-				`Reference must be '@${node.getName()}', not '${type}'`
-			);
+			throw new ValidationException(node.getLine() + offset,"NODE_REFERENCE_NOT_VALID",`Reference must be '@${node.getName()}', not '${type}'`);
 		}
 
 		// Una vez ya existe, si tiene hijos los intentamos crear.
@@ -111,13 +105,7 @@ export class TemplateParser {
 			const childName = child.getName();
 			const childNamespace = child.getNamespace();
 
-			const schChild = new ChildDefinition(
-				childName,
-				childNamespace,
-				cl.getMin(),
-				cl.getMax(),
-				child.getLine() + offset
-			);
+			const schChild = new ChildDefinition(childName,	childNamespace,	cl.getMin(), cl.getMax(), child.getLine() + offset);
 			schemaNode.addChildDefinition(schChild);
 
 			this.addToSchema(schema, child, offset);

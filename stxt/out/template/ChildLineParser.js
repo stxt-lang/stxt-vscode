@@ -1,5 +1,4 @@
 "use strict";
-// ChildLineParser.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChildLineParser = void 0;
 const ValidationException_1 = require("../exceptions/ValidationException");

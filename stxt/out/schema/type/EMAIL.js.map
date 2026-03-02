@@ -1,1 +1,1 @@
-{"version":3,"file":"EMAIL.js","sourceRoot":"","sources":["../../../src/schema/type/EMAIL.ts"],"names":[],"mappings":";AAAA,gBAAgB;;;AAEhB,2CAAwC;AAE3B,QAAA,KAAK,GAAG,IAAA,qBAAS,EAAC,OAAO,EAClC,gIAAgI,EAClI,eAAe,CAChB,CAAC"}
+{"version":3,"file":"EMAIL.js","sourceRoot":"","sources":["../../../src/schema/type/EMAIL.ts"],"names":[],"mappings":";;;AAAA,2CAAwC;AAE3B,QAAA,KAAK,GAAG,IAAA,qBAAS,EAAC,OAAO,EAClC,gIAAgI,EAClI,eAAe,CAChB,CAAC"}

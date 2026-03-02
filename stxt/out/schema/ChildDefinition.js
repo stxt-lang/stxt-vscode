@@ -1,5 +1,4 @@
 "use strict";
-// ChildDefinition.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChildDefinition = void 0;
 const NamespaceValidator_1 = require("../core/NamespaceValidator");

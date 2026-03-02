@@ -1,5 +1,4 @@
 "use strict";
-// type/regexType.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.regexType = regexType;
 const ValidationException_1 = require("../../exceptions/ValidationException");

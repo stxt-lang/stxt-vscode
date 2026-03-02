@@ -1,7 +1,5 @@
-// Parser.ts
-
 import { Node } from "./Node";
-import { parseLine } from "./LineIndentParser";
+import { parseLineIndent } from "./LineIndentParser";
 import { LineIndent } from "./LineIndent";
 import { createNode } from "./NodeCreator";
 import { Observer } from "../processors/Observer";
@@ -47,7 +45,7 @@ export class Parser {
 		const lastNodeText = lastNode ? lastNode.isTextNode() : false;
 
 		// Parseamos línea
-		const lineIndent: LineIndent | null = parseLine(line, lastNodeText, lastLevel, lineNumber);
+		const lineIndent: LineIndent | null = parseLineIndent(line, lastNodeText, lastLevel, lineNumber);
 
 		if (lineIndent === null) {
 			return;

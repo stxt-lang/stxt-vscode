@@ -1,5 +1,4 @@
 "use strict";
-// type/INLINE.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.INLINE = void 0;
 const ValidationException_1 = require("../../exceptions/ValidationException");

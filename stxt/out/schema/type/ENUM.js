@@ -1,5 +1,4 @@
 "use strict";
-// type/ENUM.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ENUM = void 0;
 const ValidationException_1 = require("../../exceptions/ValidationException");

@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseLine = parseLine;
+exports.parseLineIndent = parseLineIndent;
 const Constants_1 = require("./Constants");
 const StringUtils_1 = require("./StringUtils");
 const ParseException_1 = require("../exceptions/ParseException");
 const LineIndent_1 = require("./LineIndent");
-function parseLine(line, lastNodeBlock, lastLevel, numLine) {
+function parseLineIndent(line, lastNodeBlock, lastLevel, numLine) {
     let level = 0;
     let spaces = 0;
     let pointer = 0;

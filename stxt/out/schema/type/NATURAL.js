@@ -1,5 +1,4 @@
 "use strict";
-// type/NATURAL.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NATURAL = void 0;
 const regexType_1 = require("./regexType");

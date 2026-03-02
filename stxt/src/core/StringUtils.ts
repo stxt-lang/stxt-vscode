@@ -1,5 +1,3 @@
-// StringUtils.ts
-
 const DIACRITICS = /[\u0300-\u036f]+/g;
 
 export class StringUtils {
