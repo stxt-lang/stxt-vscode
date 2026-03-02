@@ -93,16 +93,19 @@ export class Parser {
 			// Añadimos a stack
 			stack.push(node);
 		} catch (e: unknown) {
-			if (e instanceof ParseException) {
-				result.addError(e);
-			} else if (e instanceof Error) {
-				// Convertir errores genéricos a ParseException
-				result.addError(new ParseException(lineNumber, "UNEXPECTED_ERROR", e.message));
-			} else {
-				// Error desconocido
-				result.addError(new ParseException(lineNumber, "UNKNOWN_ERROR", String(e)));
-			}
-			// Continuamos con la siguiente línea
+			this.handleError(e, lineNumber, result);
+		}
+	}
+
+	private handleError(e: unknown, line: number, result: ParseResult, errorCode: string = "UNEXPECTED_ERROR", unknownErrorCode: string = "UNKNOWN_ERROR"): void {
+		if (e instanceof ParseException) {
+			result.addError(e);
+		} else if (e instanceof Error) {
+			// Convertir errores genéricos a ParseException
+			result.addError(new ParseException(line, errorCode, e.message));
+		} else {
+			// Error desconocido
+			result.addError(new ParseException(line, unknownErrorCode, String(e)));
 		}
 	}
 
@@ -116,15 +119,7 @@ export class Parser {
 				try {
 					validator.validate(completed);
 				} catch (e: unknown) {
-					if (e instanceof ParseException) {
-						result.addError(e);
-					} else if (e instanceof Error) {
-						// Convertir errores genéricos a ParseException
-						result.addError(new ParseException(completed.getLine(), "VALIDATION_ERROR", e.message));
-					} else {
-						// Error desconocido
-						result.addError(new ParseException(completed.getLine(), "UNKNOWN_VALIDATION_ERROR", String(e)));
-					}
+					this.handleError(e, completed.getLine(), result, "VALIDATION_ERROR", "UNKNOWN_VALIDATION_ERROR");
 				}
 			});
 
