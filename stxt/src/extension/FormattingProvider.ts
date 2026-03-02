@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { getLastAnalysis } from './AnalysisDoc';
 import type { Node } from '../core/Node';
-import { rightTrim } from '../core/StringUtils';
+import { StringUtils } from '../core/StringUtils';
 
 export class StxtFormattingProvider implements vscode.DocumentFormattingEditProvider {
 
@@ -26,7 +26,7 @@ export class StxtFormattingProvider implements vscode.DocumentFormattingEditProv
 // Placeholder para que compile:
 function createLine(line: string, node: Node | undefined): string {
     if (!node) {
-        return rightTrim(line);
+        return StringUtils.rightTrim(line);
     }
 
     let result = "\t".repeat(node.getLevel());

@@ -56,7 +56,7 @@ exports.StxtFormattingProvider = StxtFormattingProvider;
 // Placeholder para que compile:
 function createLine(line, node) {
     if (!node) {
-        return (0, StringUtils_1.rightTrim)(line);
+        return StringUtils_1.StringUtils.rightTrim(line);
     }
     let result = "\t".repeat(node.getLevel());
     if (node.isTextNode()) {

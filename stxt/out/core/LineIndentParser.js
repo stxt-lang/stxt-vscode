@@ -32,7 +32,7 @@ function parseLineIndent(line, lastNodeBlock, lastLevel, numLine) {
         pointer++;
         // Dentro del bloque de texto
         if (lastNodeBlock && level > lastLevel) {
-            return new LineIndent_1.LineIndent(level, (0, StringUtils_1.rightTrim)(line.substring(pointer)));
+            return new LineIndent_1.LineIndent(level, StringUtils_1.StringUtils.rightTrim(line.substring(pointer)));
         }
     }
     // En este punto ya estamos fuera de bloque de texto (si existía)

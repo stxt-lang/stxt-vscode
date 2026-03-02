@@ -1,5 +1,5 @@
 import { Constants } from "./Constants";
-import { rightTrim } from "./StringUtils";
+import { StringUtils } from "./StringUtils";
 import { ParseException } from "../exceptions/ParseException";
 import { LineIndent } from "./LineIndent";
 
@@ -31,7 +31,7 @@ export function parseLineIndent(line: string, lastNodeBlock: boolean, lastLevel:
 
 		// Dentro del bloque de texto
 		if (lastNodeBlock && level > lastLevel) {
-			return new LineIndent(level, rightTrim(line.substring(pointer)));
+			return new LineIndent(level, StringUtils.rightTrim(line.substring(pointer)));
 		}
 	}
 

@@ -65,8 +65,3 @@ export class StringUtils {
 	}
 }
 
-export const rightTrim = StringUtils.rightTrim;
-export const cleanSpaces = StringUtils.cleanSpaces;
-export const lowerCase = StringUtils.lowerCase;
-export const compactSpaces = StringUtils.compactSpaces;
-export const normalize = StringUtils.normalize;

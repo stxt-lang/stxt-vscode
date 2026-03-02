@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalize = exports.compactSpaces = exports.lowerCase = exports.cleanSpaces = exports.rightTrim = exports.StringUtils = void 0;
+exports.StringUtils = void 0;
 const DIACRITICS = /[\u0300-\u036f]+/g;
 class StringUtils {
     constructor() {
@@ -57,9 +57,4 @@ class StringUtils {
     }
 }
 exports.StringUtils = StringUtils;
-exports.rightTrim = StringUtils.rightTrim;
-exports.cleanSpaces = StringUtils.cleanSpaces;
-exports.lowerCase = StringUtils.lowerCase;
-exports.compactSpaces = StringUtils.compactSpaces;
-exports.normalize = StringUtils.normalize;
 //# sourceMappingURL=StringUtils.js.map
