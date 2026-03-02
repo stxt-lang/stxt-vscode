@@ -154,44 +154,23 @@ function generateTokensForNode(node: Node, lineIndex: number, document: vscode.T
 }
 
 function validateTemplate(document: vscode.TextDocument, diagnostics: vscode.Diagnostic[]): void {
-    // Final // TODO Hacer mejor!! Mirar listado de nodos con namespace, hacer todo del inicial
-    if (document.uri.toString().indexOf("stxt.template") !== -1) {
-        console.log("Is template");
-        const p = new Parser();
-        const result = p.parseResult(document.getText());
-
-        // Agregar errores de parsing
-        for (const error of result.getErrors()) {
-            const line = error.line > 0 ? error.line - 1 : 0;
-            const range = new vscode.Range(line, 0, line, 100);
-            diagnostics.push(new vscode.Diagnostic(range, `Parse error [${error.code}]: ${error.message}`, vscode.DiagnosticSeverity.Error));
-        }
-
-        // Si hay exactamente un nodo, intentar transformarlo
-        if (result.getNodes().length === 1 && !result.hasErrors()) {
-            try {
-                TemplateParser.transformNodeToSchema(result.getNodes()[0]);
-            } catch (e: unknown) {
-                if (e instanceof ParseException) {
-                    const line = e.line > 0 ? e.line - 1 : 0;
-                    const range = new vscode.Range(line, 0, line, 100);
-                    diagnostics.push(new vscode.Diagnostic(range, `Template error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
-                } else if (e instanceof Error) {
-                    const range = new vscode.Range(0, 0, 0, 100);
-                    diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
-                } else {
-                    const range = new vscode.Range(0, 0, 0, 100);
-                    diagnostics.push(new vscode.Diagnostic(range, `Error desconocido: ${String(e)}`, vscode.DiagnosticSeverity.Error));
-                }
-            }
-        }
-    }
+    validateSpecialDocument(document, diagnostics, "stxt.template", "Template", (node) => {
+        TemplateParser.transformNodeToSchema(node);
+    });
 }
 
 function validateSchema(document: vscode.TextDocument, diagnostics: vscode.Diagnostic[]): void {
+    validateSpecialDocument(document, diagnostics, "stxt.schema", "Schema", (node) => {
+        SchemaParser.transformNodeToSchema(node);
+    });
+}
+
+function validateSpecialDocument(document: vscode.TextDocument, diagnostics: vscode.Diagnostic[], fileIdentifier: string, typeName: string,
+     transformer: (node: Node) => void): void {
+        
     // Final // TODO Hacer mejor!! Mirar listado de nodos con namespace, hacer todo del inicial
-    if (document.uri.toString().indexOf("stxt.schema") !== -1) {
-        console.log("Is schema");
+    if (document.uri.toString().indexOf(fileIdentifier) !== -1) {
+        console.log(`Is ${typeName}`);
         const p = new Parser();
         const result = p.parseResult(document.getText());
 
@@ -205,12 +184,12 @@ function validateSchema(document: vscode.TextDocument, diagnostics: vscode.Diagn
         // Si hay exactamente un nodo, intentar transformarlo
         if (result.getNodes().length === 1 && !result.hasErrors()) {
             try {
-                SchemaParser.transformNodeToSchema(result.getNodes()[0]);
+                transformer(result.getNodes()[0]);
             } catch (e: unknown) {
                 if (e instanceof ParseException) {
                     const line = e.line > 0 ? e.line - 1 : 0;
                     const range = new vscode.Range(line, 0, line, 100);
-                    diagnostics.push(new vscode.Diagnostic(range, `Schema error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
+                    diagnostics.push(new vscode.Diagnostic(range, `${typeName} error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
                 } else if (e instanceof Error) {
                     const range = new vscode.Range(0, 0, 0, 100);
                     diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
@@ -222,3 +201,4 @@ function validateSchema(document: vscode.TextDocument, diagnostics: vscode.Diagn
         }
     }
 }
+
