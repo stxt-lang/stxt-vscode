@@ -30,7 +30,7 @@ export class TemplateParser {
 		const offset = structure.getLine();
 
 		// Parseamos para los nodos
-		const nodes: Node[] = new Parser().parse(text);
+		const nodes: Node[] = new Parser().parse(text).getNodes();
 
 		// Vamos iterando todos los nodos insertando
 		for (const n of nodes) {

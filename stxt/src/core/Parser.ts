@@ -4,6 +4,7 @@ import { LineIndent } from "./LineIndent";
 import { createNode } from "./NodeCreator";
 import { Observer } from "../processors/Observer";
 import { Validator } from "../processors/Validator";
+import { ParseResult } from "./ParseResult";
 
 export class Parser {
 	private observers: Observer[] = [];
@@ -17,9 +18,10 @@ export class Parser {
 		this.validators.push(validator);
 	}
 
-	parse(content: string): Node[] {
+	parse(content: string): ParseResult {
 		content = this.removeUTF8BOM(content);
 
+		const result = new ParseResult();
 		const stack: Node[] = [];
 		const documents: Node[] = [];
 
@@ -35,8 +37,13 @@ export class Parser {
 		// Cerrar todos los nodos pendientes al EOF
 		this.closeToLevel(stack, documents, 0);
 
-		// Retorno documentos
-		return documents;
+		// Agregar nodos al resultado
+		for (const doc of documents) {
+			result.addNode(doc);
+		}
+
+		// Retorno resultado
+		return result;
 	}
 
 	private processLine(line: string, lineNumber: number, stack: Node[], documents: Node[]): void {

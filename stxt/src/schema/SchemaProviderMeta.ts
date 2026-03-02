@@ -53,7 +53,7 @@ export class SchemaProviderMeta implements SchemaProvider {
 
     constructor() {
         const parser = new Parser();
-        const nodes: Node[] = parser.parse(SchemaProviderMeta.META_TEXT);
+        const nodes: Node[] = parser.parse(SchemaProviderMeta.META_TEXT).getNodes();
 
         if (nodes.length !== 1) {
             throw new ValidationException(0, "META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);

@@ -9,7 +9,7 @@ async function main() {
     const texto: string = await readFile("test/demo.stxt", "utf-8");
 
     const parser:Parser = new Parser();
-    const nodes: Node[] = parser.parse(texto);
+    const nodes: Node[] = parser.parse(texto).getNodes();
 
     for(let i = 0; i<nodes.length; i++)
     {

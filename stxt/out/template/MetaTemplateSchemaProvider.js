@@ -15,7 +15,7 @@ class MetaTemplateSchemaProvider {
     meta;
     constructor() {
         const parser = new Parser_1.Parser();
-        const nodes = parser.parse(MetaTemplateSchemaProvider.META_TEXT);
+        const nodes = parser.parse(MetaTemplateSchemaProvider.META_TEXT).getNodes();
         if (nodes.length !== 1) {
             throw new ValidationException_1.ValidationException(0, "META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);
         }

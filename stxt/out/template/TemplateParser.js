@@ -20,7 +20,7 @@ class TemplateParser {
         const text = structure.getText();
         const offset = structure.getLine();
         // Parseamos para los nodos
-        const nodes = new Parser_1.Parser().parse(text);
+        const nodes = new Parser_1.Parser().parse(text).getNodes();
         // Vamos iterando todos los nodos insertando
         for (const n of nodes) {
             this.addToSchema(result, n, offset);

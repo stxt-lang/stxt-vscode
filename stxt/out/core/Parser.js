@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 const LineIndentParser_1 = require("./LineIndentParser");
 const NodeCreator_1 = require("./NodeCreator");
+const ParseResult_1 = require("./ParseResult");
 class Parser {
     observers = [];
     validators = [];
@@ -14,6 +15,7 @@ class Parser {
     }
     parse(content) {
         content = this.removeUTF8BOM(content);
+        const result = new ParseResult_1.ParseResult();
         const stack = [];
         const documents = [];
         let lineNumber = 0;
@@ -24,8 +26,12 @@ class Parser {
         }
         // Cerrar todos los nodos pendientes al EOF
         this.closeToLevel(stack, documents, 0);
-        // Retorno documentos
-        return documents;
+        // Agregar nodos al resultado
+        for (const doc of documents) {
+            result.addNode(doc);
+        }
+        // Retorno resultado
+        return result;
     }
     processLine(line, lineNumber, stack, documents) {
         const lastNode = stack.length === 0 ? null : stack[stack.length - 1];

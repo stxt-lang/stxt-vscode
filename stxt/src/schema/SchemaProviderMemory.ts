@@ -32,7 +32,7 @@ export class SchemaProviderMemory implements SchemaProvider {
 
     addSchema(txt: string): void {
         const parser: Parser = new Parser();
-        const node: Node = parser.parse(txt)[0];
+        const node: Node = parser.parse(txt).getNodes()[0];
         const schema: Schema = SchemaParser.transformNodeToSchema(node);
 
         const schemaValidator = new SchemaValidator(new SchemaProviderMeta(), true);
