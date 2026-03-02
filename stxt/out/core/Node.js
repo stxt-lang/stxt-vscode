@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Node = void 0;
 const ParseException_1 = require("../exceptions/ParseException");
+const RuntimeException_1 = require("../exceptions/RuntimeException");
 const NamespaceValidator_1 = require("./NamespaceValidator");
 const StringUtils_1 = require("./StringUtils");
 class Node {
@@ -26,7 +27,7 @@ class Node {
         this.textNode = textNode;
         NamespaceValidator_1.NamespaceValidator.validateNamespaceFormat(this.namespace, line);
         if (this.value.length > 0 && this.isTextNode()) {
-            throw new Error("Not empty value with textNode");
+            throw new RuntimeException_1.RuntimeException("INLINE_VALUE_NOT_VALID", "Not empty value with textNode");
         }
         if (this.normalizedName.length === 0) {
             throw new ParseException_1.ParseException(line, "INVALID_NODE_NAME", `Node name not valid: ${name}`);
@@ -54,7 +55,7 @@ class Node {
     }
     addChild(node) {
         if (this.isFrozen) {
-            throw new Error("Node is frozen");
+            throw new RuntimeException_1.RuntimeException("NODE_FROZEN", "Node is frozen");
         }
         this.children.push(node);
     }
@@ -90,7 +91,7 @@ class Node {
     getChild(cname) {
         const result = this.getChildrenByName(cname);
         if (result.length > 1) {
-            throw new Error("More than 1 child. Use getChildren");
+            throw new RuntimeException_1.RuntimeException("AMBIGUOUS_CHILD", "More than 1 child. Use getChildren");
         }
         if (result.length === 0) {
             return null;
