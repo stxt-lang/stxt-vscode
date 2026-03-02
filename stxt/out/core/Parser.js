@@ -14,6 +14,14 @@ class Parser {
         this.validators.push(validator);
     }
     parse(content) {
+        const result = this.parseResult(content);
+        if (result.hasErrors()) {
+            const error = result.getErrors()[0];
+            throw error;
+        }
+        return result.getNodes();
+    }
+    parseResult(content) {
         content = this.removeUTF8BOM(content);
         const result = new ParseResult_1.ParseResult();
         const stack = [];

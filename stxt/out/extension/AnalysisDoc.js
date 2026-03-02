@@ -167,7 +167,7 @@ function validateTemplate(document, diagnostics) {
         console.log("Is template");
         try {
             const p = new Parser_1.Parser();
-            const nodes = p.parse(document.getText()).getNodes();
+            const nodes = p.parse(document.getText());
             if (nodes.length === 1) {
                 TemplateParser_1.TemplateParser.transformNodeToSchema(nodes[0]);
             }
@@ -195,7 +195,7 @@ function validateSchema(document, diagnostics) {
         console.log("Is schema");
         try {
             const p = new Parser_1.Parser();
-            const nodes = p.parse(document.getText()).getNodes();
+            const nodes = p.parse(document.getText());
             if (nodes.length === 1) {
                 SchemaParser_1.SchemaParser.transformNodeToSchema(nodes[0]);
             }

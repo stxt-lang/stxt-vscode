@@ -17,7 +17,7 @@ class TemplateSchemaProviderMemory extends SchemaProviderMemory_1.SchemaProvider
     }
     addTemplate(template) {
         const parser = new Parser_1.Parser();
-        const nodes = parser.parse(template).getNodes();
+        const nodes = parser.parse(template);
         if (nodes.length !== 1) {
             throw new ValidationException_1.ValidationException(0, "INVALID_SCHEMA", `There are ${nodes.length}, and expected is 1`);
         }

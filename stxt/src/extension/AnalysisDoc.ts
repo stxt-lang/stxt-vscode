@@ -158,7 +158,7 @@ function validateTemplate(document: vscode.TextDocument, diagnostics: vscode.Dia
         console.log("Is template");
         try {
             const p = new Parser();
-            const nodes = p.parse(document.getText()).getNodes();
+            const nodes = p.parse(document.getText());
             if (nodes.length === 1) {
                 TemplateParser.transformNodeToSchema(nodes[0]);
             }
@@ -184,7 +184,7 @@ function validateSchema(document: vscode.TextDocument, diagnostics: vscode.Diagn
         console.log("Is schema");
         try {
             const p = new Parser();
-            const nodes = p.parse(document.getText()).getNodes();
+            const nodes = p.parse(document.getText());
             if (nodes.length === 1) {
                 SchemaParser.transformNodeToSchema(nodes[0]);
             }

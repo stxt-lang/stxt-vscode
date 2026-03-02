@@ -23,7 +23,7 @@ export class TemplateSchemaProviderMemory extends SchemaProviderMemory {
     addTemplate(template: string): void {
         const parser = new Parser();
 
-        const nodes: Node[] = parser.parse(template).getNodes();
+        const nodes: Node[] = parser.parse(template);
         if (nodes.length !== 1) {
             throw new ValidationException(0, "INVALID_SCHEMA", `There are ${nodes.length}, and expected is 1`);
         }

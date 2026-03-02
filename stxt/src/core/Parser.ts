@@ -5,6 +5,7 @@ import { createNode } from "./NodeCreator";
 import { Observer } from "../processors/Observer";
 import { Validator } from "../processors/Validator";
 import { ParseResult } from "./ParseResult";
+import { ParseException } from "../exceptions/ParseException";
 
 export class Parser {
 	private observers: Observer[] = [];
@@ -18,7 +19,16 @@ export class Parser {
 		this.validators.push(validator);
 	}
 
-	parse(content: string): ParseResult {
+	parse(content: string): Node[] {
+		const result = this.parseResult(content);
+		if (result.hasErrors()) {
+			const error: ParseException = result.getErrors()[0];
+			throw error;
+		}
+		return result.getNodes();
+	}
+
+	parseResult(content: string): ParseResult {
 		content = this.removeUTF8BOM(content);
 
 		const result = new ParseResult();

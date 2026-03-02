@@ -27,7 +27,7 @@ class SchemaProviderMemory {
     }
     addSchema(txt) {
         const parser = new Parser_1.Parser();
-        const node = parser.parse(txt).getNodes()[0];
+        const node = parser.parse(txt)[0];
         const schema = SchemaParser_1.SchemaParser.transformNodeToSchema(node);
         const schemaValidator = new SchemaValidator_1.SchemaValidator(new SchemaProviderMeta_1.SchemaProviderMeta(), true);
         schemaValidator.validate(node);

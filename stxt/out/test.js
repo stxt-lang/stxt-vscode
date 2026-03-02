@@ -7,7 +7,7 @@ async function main() {
     console.log("Main process INIT...");
     const texto = await (0, promises_1.readFile)("test/demo.stxt", "utf-8");
     const parser = new Parser_1.Parser();
-    const nodes = parser.parse(texto).getNodes();
+    const nodes = parser.parse(texto);
     for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
         console.log(`Node ${i + 1}: ${node}`);

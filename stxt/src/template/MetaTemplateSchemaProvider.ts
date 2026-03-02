@@ -21,7 +21,7 @@ export class MetaTemplateSchemaProvider implements SchemaProvider {
 
 	constructor() {
 		const parser = new Parser();
-		const nodes: Node[] = parser.parse(MetaTemplateSchemaProvider.META_TEXT).getNodes();
+		const nodes: Node[] = parser.parse(MetaTemplateSchemaProvider.META_TEXT);
 
 		if (nodes.length !== 1) {
 			throw new ValidationException(
