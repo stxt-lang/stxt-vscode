@@ -37,8 +37,6 @@ exports.getLastAnalysis = getLastAnalysis;
 exports.analysisAllDocs = analysisAllDocs;
 exports.analisysDoc = analisysDoc;
 const vscode = __importStar(require("vscode"));
-const LineIndentParser_1 = require("../core/LineIndentParser");
-const NodeCreator_1 = require("../core/NodeCreator");
 const SchemaValidator_1 = require("../schema/SchemaValidator");
 const SchemaLoader_1 = require("./SchemaLoader");
 const extension_1 = require("../extension");
@@ -48,6 +46,19 @@ const ParseException_1 = require("../exceptions/ParseException");
 const SchemaParser_1 = require("../schema/SchemaParser");
 const lastAnalysisByUri = new Map();
 const SCHEMA_VALIDATOR = new SchemaValidator_1.SchemaValidator(new SchemaLoader_1.SchemaLoaderExtension());
+// Wrapper del validador que solo valida nodos con namespace
+class ConditionalValidator {
+    schemaValidator;
+    constructor(schemaValidator) {
+        this.schemaValidator = schemaValidator;
+    }
+    validate(node) {
+        // Solo validar si tiene namespace
+        if (node.getNamespace() !== "") {
+            this.schemaValidator.validate(node);
+        }
+    }
+}
 function getLastAnalysis(document) {
     return lastAnalysisByUri.get(document.uri.toString());
 }
@@ -64,93 +75,41 @@ function analisysDoc(document, diagnosticCollection) {
     const diagnostics = [];
     const tokens = [];
     const nodeByLine = new Map();
+    // Parsear documento con validación de schema
+    const parser = new Parser_1.Parser();
+    parser.registerValidator(new ConditionalValidator(SCHEMA_VALIDATOR));
+    const parseResult = parser.parseResult(document.getText());
+    // Convertir errores a diagnostics
+    for (const error of parseResult.getErrors()) {
+        const line = error.line > 0 ? error.line - 1 : 0;
+        const lineText = document.lineAt(line).text;
+        const range = new vscode.Range(line, 0, line, lineText.length);
+        const severity = error.name === 'ValidationException'
+            ? vscode.DiagnosticSeverity.Warning
+            : vscode.DiagnosticSeverity.Error;
+        diagnostics.push(new vscode.Diagnostic(range, `[${error.code}]: ${error.message}`, severity));
+    }
+    // Construir tokens y nodeByLine desde los nodos parseados
+    const nodesToProcess = [...parseResult.getNodes()];
+    while (nodesToProcess.length > 0) {
+        const node = nodesToProcess.shift();
+        const lineIndex = node.getLine() - 1;
+        nodeByLine.set(lineIndex, node);
+        // Generar tokens para este nodo
+        generateTokensForNode(node, lineIndex, document, tokens);
+        // Añadir hijos a la cola de procesamiento
+        nodesToProcess.push(...node.getChildren());
+    }
+    // Generar tokens para comentarios (líneas que empiezan con #)
     const lines = document.getText().split(/\r?\n/);
-    const stack = [];
-    for (let index = 0; index < lines.length; index++) {
-        const line = lines[index];
-        const lineNumber = index + 1;
-        //console.log(`${lineNumber}: ${line}`);
-        const lastNode = stack.length === 0 ? null : stack[stack.length - 1];
-        const lastLevel = lastNode ? lastNode.getLevel() : 0;
-        const lastNodeText = lastNode ? lastNode.isTextNode() : false;
-        // Parseamos línea
-        let lineIndent = null;
-        try {
-            lineIndent = (0, LineIndentParser_1.parseLineIndent)(line, lastNodeText, lastLevel, lineNumber);
-        }
-        catch (e) {
-            //console.log("Error en " + lineNumber + e);
-            const range = new vscode.Range(index, 0, index, line.length);
-            diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Error));
-            continue;
-        }
-        // Es un comentario
-        if (lineIndent === null) {
-            tokens.push({ line: index, startChar: 0, length: line.length, type: 'comment' });
-            continue;
-        }
-        const currentLevel = lineIndent.indentLevel;
-        // Cerramos nodos hasta el nivel actual (esto "finaliza" y adjunta al padre/documentos)
-        closeToLevel(stack, currentLevel, diagnostics);
-        // Si estamos dentro de un nodo texto, y el nivel indica que sigue siendo texto,
-        // añadimos línea de texto y no creamos nodo.
-        if (lastNodeText && currentLevel > lastLevel) {
-            lastNode.addTextLine(lineIndent.lineWithoutIndent);
-            //tokens.push({line: index, startChar: 0, length: line.length, type: 'string'});
-            continue;
-        }
-        try {
-            // Creamos el nuevo nodo y lo dejamos "abierto" en la pila (NO lo adjuntamos aún)
-            const parent = stack.length === 0 ? null : stack[stack.length - 1];
-            // Añadimos a stack
-            const currentNode = (0, NodeCreator_1.createNode)(lineIndent, lineNumber, currentLevel, parent);
-            stack.push(currentNode);
-            nodeByLine.set(index, currentNode);
-            if (currentNode.isTextNode()) {
-                const sepIndx = line.indexOf(">>");
-                const head = line.substring(0, sepIndx); // "Clave (namespace) " (incluye espacios)
-                const nsOpen = head.indexOf('(');
-                const nsClose = head.indexOf(')');
-                if (nsOpen !== -1 && nsClose !== -1) {
-                    tokens.push({ line: index, startChar: 0, length: nsOpen, type: 'macro' });
-                    tokens.push({ line: index, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
-                    tokens.push({ line: index, startChar: nsClose + 1, length: line.length - nsClose - 1, type: 'macro' });
-                }
-                else {
-                    tokens.push({ line: index, startChar: 0, length: sepIndx, type: 'macro' });
-                    tokens.push({ line: index, startChar: sepIndx, length: 2, type: 'macro' });
-                }
-            }
-            else {
-                const colon = line.indexOf(':');
-                const head = line.substring(0, colon); // "Clave (namespace)"
-                const nsOpen = head.indexOf('(');
-                const nsClose = head.indexOf(')');
-                if (nsOpen !== -1 && nsClose !== -1) {
-                    tokens.push({ line: index, startChar: 0, length: nsOpen, type: 'property' });
-                    tokens.push({ line: index, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
-                    tokens.push({ line: index, startChar: nsClose + 1, length: colon - (nsClose + 1) + 1, type: 'property' });
-                }
-                else {
-                    tokens.push({ line: index, startChar: 0, length: colon, type: 'property' });
-                    tokens.push({ line: index, startChar: colon, length: 1, type: 'property' });
-                }
-                const valueStart = colon + 1;
-                if (valueStart < line.length) {
-                    tokens.push({ line: index, startChar: valueStart, length: line.length - valueStart, type: 'string' });
-                }
-            }
-        }
-        catch (e) {
-            //console.log("Error en " + lineNumber + e);
-            const range = new vscode.Range(index, 0, index, line.length);
-            diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Error));
-            continue;
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmedLine = line.trim();
+        if (trimmedLine.startsWith('#')) {
+            tokens.push({ line: i, startChar: 0, length: line.length, type: 'comment' });
         }
     }
-    ;
-    closeToLevel(stack, 0, diagnostics);
-    // Validaciones de template y schema
+    // Validaciones adicionales de template y schema
     validateSchema(document, diagnostics);
     validateTemplate(document, diagnostics);
     // Fin de diagnosis
@@ -161,30 +120,80 @@ function analisysDoc(document, diagnosticCollection) {
     //console.log("Parse end.");
     return result;
 }
+function generateTokensForNode(node, lineIndex, document, tokens) {
+    const line = document.lineAt(lineIndex).text;
+    if (node.isTextNode()) {
+        const sepIndx = line.indexOf(">>");
+        if (sepIndx === -1) {
+            return;
+        }
+        const head = line.substring(0, sepIndx);
+        const nsOpen = head.indexOf('(');
+        const nsClose = head.indexOf(')');
+        if (nsOpen !== -1 && nsClose !== -1) {
+            tokens.push({ line: lineIndex, startChar: 0, length: nsOpen, type: 'macro' });
+            tokens.push({ line: lineIndex, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
+            tokens.push({ line: lineIndex, startChar: nsClose + 1, length: line.length - nsClose - 1, type: 'macro' });
+        }
+        else {
+            tokens.push({ line: lineIndex, startChar: 0, length: sepIndx, type: 'macro' });
+            tokens.push({ line: lineIndex, startChar: sepIndx, length: 2, type: 'macro' });
+        }
+    }
+    else {
+        const colon = line.indexOf(':');
+        if (colon === -1) {
+            return;
+        }
+        const head = line.substring(0, colon);
+        const nsOpen = head.indexOf('(');
+        const nsClose = head.indexOf(')');
+        if (nsOpen !== -1 && nsClose !== -1) {
+            tokens.push({ line: lineIndex, startChar: 0, length: nsOpen, type: 'property' });
+            tokens.push({ line: lineIndex, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
+            tokens.push({ line: lineIndex, startChar: nsClose + 1, length: colon - (nsClose + 1) + 1, type: 'property' });
+        }
+        else {
+            tokens.push({ line: lineIndex, startChar: 0, length: colon, type: 'property' });
+            tokens.push({ line: lineIndex, startChar: colon, length: 1, type: 'property' });
+        }
+        const valueStart = colon + 1;
+        if (valueStart < line.length) {
+            tokens.push({ line: lineIndex, startChar: valueStart, length: line.length - valueStart, type: 'string' });
+        }
+    }
+}
 function validateTemplate(document, diagnostics) {
     // Final // TODO Hacer mejor!! Mirar listado de nodos con namespace, hacer todo del inicial
     if (document.uri.toString().indexOf("stxt.template") !== -1) {
         console.log("Is template");
-        try {
-            const p = new Parser_1.Parser();
-            const nodes = p.parse(document.getText());
-            if (nodes.length === 1) {
-                TemplateParser_1.TemplateParser.transformNodeToSchema(nodes[0]);
-            }
+        const p = new Parser_1.Parser();
+        const result = p.parseResult(document.getText());
+        // Agregar errores de parsing
+        for (const error of result.getErrors()) {
+            const line = error.line > 0 ? error.line - 1 : 0;
+            const range = new vscode.Range(line, 0, line, 100);
+            diagnostics.push(new vscode.Diagnostic(range, `Parse error [${error.code}]: ${error.message}`, vscode.DiagnosticSeverity.Error));
         }
-        catch (e) {
-            if (e instanceof ParseException_1.ParseException) {
-                const line = e.line > 0 ? e.line - 1 : 0;
-                const range = new vscode.Range(line, 0, line, 100);
-                diagnostics.push(new vscode.Diagnostic(range, `Parse error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
+        // Si hay exactamente un nodo, intentar transformarlo
+        if (result.getNodes().length === 1 && !result.hasErrors()) {
+            try {
+                TemplateParser_1.TemplateParser.transformNodeToSchema(result.getNodes()[0]);
             }
-            else if (e instanceof Error) {
-                const range = new vscode.Range(0, 0, 0, 100);
-                diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
-            }
-            else {
-                const range = new vscode.Range(0, 0, 0, 100);
-                diagnostics.push(new vscode.Diagnostic(range, `Error desconocido: ${String(e)}`, vscode.DiagnosticSeverity.Error));
+            catch (e) {
+                if (e instanceof ParseException_1.ParseException) {
+                    const line = e.line > 0 ? e.line - 1 : 0;
+                    const range = new vscode.Range(line, 0, line, 100);
+                    diagnostics.push(new vscode.Diagnostic(range, `Template error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
+                }
+                else if (e instanceof Error) {
+                    const range = new vscode.Range(0, 0, 0, 100);
+                    diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
+                }
+                else {
+                    const range = new vscode.Range(0, 0, 0, 100);
+                    diagnostics.push(new vscode.Diagnostic(range, `Error desconocido: ${String(e)}`, vscode.DiagnosticSeverity.Error));
+                }
             }
         }
     }
@@ -193,46 +202,34 @@ function validateSchema(document, diagnostics) {
     // Final // TODO Hacer mejor!! Mirar listado de nodos con namespace, hacer todo del inicial
     if (document.uri.toString().indexOf("stxt.schema") !== -1) {
         console.log("Is schema");
-        try {
-            const p = new Parser_1.Parser();
-            const nodes = p.parse(document.getText());
-            if (nodes.length === 1) {
-                SchemaParser_1.SchemaParser.transformNodeToSchema(nodes[0]);
-            }
+        const p = new Parser_1.Parser();
+        const result = p.parseResult(document.getText());
+        // Agregar errores de parsing
+        for (const error of result.getErrors()) {
+            const line = error.line > 0 ? error.line - 1 : 0;
+            const range = new vscode.Range(line, 0, line, 100);
+            diagnostics.push(new vscode.Diagnostic(range, `Parse error [${error.code}]: ${error.message}`, vscode.DiagnosticSeverity.Error));
         }
-        catch (e) {
-            if (e instanceof ParseException_1.ParseException) {
-                const line = e.line > 0 ? e.line - 1 : 0;
-                const range = new vscode.Range(line, 0, line, 100);
-                diagnostics.push(new vscode.Diagnostic(range, `Parse error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
+        // Si hay exactamente un nodo, intentar transformarlo
+        if (result.getNodes().length === 1 && !result.hasErrors()) {
+            try {
+                SchemaParser_1.SchemaParser.transformNodeToSchema(result.getNodes()[0]);
             }
-            else if (e instanceof Error) {
-                const range = new vscode.Range(0, 0, 0, 100);
-                diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
+            catch (e) {
+                if (e instanceof ParseException_1.ParseException) {
+                    const line = e.line > 0 ? e.line - 1 : 0;
+                    const range = new vscode.Range(line, 0, line, 100);
+                    diagnostics.push(new vscode.Diagnostic(range, `Schema error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
+                }
+                else if (e instanceof Error) {
+                    const range = new vscode.Range(0, 0, 0, 100);
+                    diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
+                }
+                else {
+                    const range = new vscode.Range(0, 0, 0, 100);
+                    diagnostics.push(new vscode.Diagnostic(range, `Error desconocido: ${String(e)}`, vscode.DiagnosticSeverity.Error));
+                }
             }
-            else {
-                const range = new vscode.Range(0, 0, 0, 100);
-                diagnostics.push(new vscode.Diagnostic(range, `Error desconocido: ${String(e)}`, vscode.DiagnosticSeverity.Error));
-            }
-        }
-    }
-}
-function closeToLevel(stack, targetLevel, diagnostics) {
-    while (stack.length > targetLevel) {
-        const completed = stack.pop();
-        completed.freeze();
-        if (stack.length > 0) {
-            stack[stack.length - 1].addChild(completed);
-        }
-        // Validate grammar of completed
-        try {
-            if (completed.getNamespace() !== "") {
-                SCHEMA_VALIDATOR.validate(completed);
-            }
-        }
-        catch (e) {
-            const range = new vscode.Range(completed.getLine() - 1, 0, completed.getLine() - 1, 100); // TODO Hacer longitud correctamente
-            diagnostics.push(new vscode.Diagnostic(range, "" + e, vscode.DiagnosticSeverity.Warning));
         }
     }
 }
