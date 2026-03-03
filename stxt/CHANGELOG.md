@@ -9,6 +9,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Added Observers and validators in the parsing
 - Unified parsing in process. Better performance and accuracy.
 - Read all schemas and templates from dir `.stxt`.
+- Display schema type in hover
+- Display ENUM values in hover
 
 ## [0.1.4]
 

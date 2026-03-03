@@ -27,6 +27,20 @@ export class StxtHoverProvider implements HoverProvider {
 			if (schema) {
 				const nodeDef = schema.getNodeDefinition(node.getName());
 				if (nodeDef) {
+					// Mostrar el tipo
+					const type = nodeDef.getType();
+					md.appendMarkdown(`- **Schema Type:** \`${type}\`\n`);
+
+					// Si es ENUM, mostrar los valores permitidos
+					if (type === 'ENUM') {
+						const values = nodeDef.getValues();
+						if (values.size > 0) {
+							const valueList = Array.from(values).map(v => `\`${escapeMd(v)}\``).join(', ');
+							md.appendMarkdown(`- **Allowed values:** ${valueList}\n`);
+						}
+					}
+
+					// Mostrar la descripción si existe
 					const description = nodeDef.getDescription();
 					if (description) {
 						md.appendMarkdown(`\n---\n`);
