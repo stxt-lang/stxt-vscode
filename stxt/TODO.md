@@ -8,6 +8,7 @@
 * Revisar cómo obtiene los ROOT en autocompletado
 * Parseo en proyecto node separado
 * Permitir un nodo ROOT?
+* Hover para texto. Quizá añadir a observer el añadido de una línea también
 
 # Sobre STXT
 * Revisar documentos
