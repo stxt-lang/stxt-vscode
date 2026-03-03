@@ -9,7 +9,9 @@
 * Hover para texto. Quizá añadir a observer el añadido de una línea también
 * Schema type en la definición del nodo
 * Goto para ir a la definición del schema
+* Unificar core/LineIndent y core/LineIndentParse
 * Parseo en proyecto node separado
+
 
 # Sobre STXT
 * Revisar documentos
