@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.2.0]
+
 - Read all schemas and templates from dir `.stxt` (and all subdirectorys).
 - Added Observers and validators in the parsing
 - Unified parsing in process. Better performance and accuracy.
