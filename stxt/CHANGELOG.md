@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Values in templates only allowed if type ENUM
+
 ## [0.2.0]
 
 - Read all schemas and templates from dir `.stxt` (and all subdirectorys).

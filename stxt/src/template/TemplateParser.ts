@@ -70,6 +70,9 @@ function addToSchema(schema: Schema, node: Node, offset: number): void {
 
 		const values = cl.getValues();
 		if (values) {
+			if (type !== "ENUM") {
+				throw new ValidationException(node.getLine() + offset, "VALUES_NOT_IN_ENUM", `Values only allowed with type ENUM`);
+			}
 			for (const v of values) {
 				schemaNode.addValue(v);
 			}
