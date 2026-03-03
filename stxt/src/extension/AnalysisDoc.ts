@@ -92,8 +92,12 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
     }
 
     // Validaciones adicionales de template y schema
-    validateSchema(document, diagnostics);
-    validateTemplate(document, diagnostics);
+    validateSpecialDocument(document, diagnostics, "stxt.template", "Template", (node) => {
+        TemplateParser.transformNodeToSchema(node);
+    });
+    validateSpecialDocument(document, diagnostics, "stxt.schema", "Schema", (node) => {
+        SchemaParser.transformNodeToSchema(node);
+    });
 
     // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
@@ -151,18 +155,6 @@ function generateTokensForNode(node: Node, lineIndex: number, document: vscode.T
             tokens.push({ line: lineIndex, startChar: valueStart, length: line.length - valueStart, type: 'string' });
         }
     }
-}
-
-function validateTemplate(document: vscode.TextDocument, diagnostics: vscode.Diagnostic[]): void {
-    validateSpecialDocument(document, diagnostics, "stxt.template", "Template", (node) => {
-        TemplateParser.transformNodeToSchema(node);
-    });
-}
-
-function validateSchema(document: vscode.TextDocument, diagnostics: vscode.Diagnostic[]): void {
-    validateSpecialDocument(document, diagnostics, "stxt.schema", "Schema", (node) => {
-        SchemaParser.transformNodeToSchema(node);
-    });
 }
 
 function validateSpecialDocument(document: vscode.TextDocument, diagnostics: vscode.Diagnostic[], fileIdentifier: string, typeName: string,

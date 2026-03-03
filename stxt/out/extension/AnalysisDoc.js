@@ -110,8 +110,12 @@ function analisysDoc(document, diagnosticCollection) {
         }
     }
     // Validaciones adicionales de template y schema
-    validateSchema(document, diagnostics);
-    validateTemplate(document, diagnostics);
+    validateSpecialDocument(document, diagnostics, "stxt.template", "Template", (node) => {
+        TemplateParser_1.TemplateParser.transformNodeToSchema(node);
+    });
+    validateSpecialDocument(document, diagnostics, "stxt.schema", "Schema", (node) => {
+        SchemaParser_1.SchemaParser.transformNodeToSchema(node);
+    });
     // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
     // Guardamos resultados
@@ -162,16 +166,6 @@ function generateTokensForNode(node, lineIndex, document, tokens) {
             tokens.push({ line: lineIndex, startChar: valueStart, length: line.length - valueStart, type: 'string' });
         }
     }
-}
-function validateTemplate(document, diagnostics) {
-    validateSpecialDocument(document, diagnostics, "stxt.template", "Template", (node) => {
-        TemplateParser_1.TemplateParser.transformNodeToSchema(node);
-    });
-}
-function validateSchema(document, diagnostics) {
-    validateSpecialDocument(document, diagnostics, "stxt.schema", "Schema", (node) => {
-        SchemaParser_1.SchemaParser.transformNodeToSchema(node);
-    });
 }
 function validateSpecialDocument(document, diagnostics, fileIdentifier, typeName, transformer) {
     // Final // TODO Hacer mejor!! Mirar listado de nodos con namespace, hacer todo del inicial
