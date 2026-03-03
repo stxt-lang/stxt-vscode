@@ -1,5 +1,4 @@
 # Plugin VSCode
-* Template no debería poder poner valores `[x,y,z]` sin ser ENUM
 * Parse description en templates
 * ENUM sin mayúsculas, minúsculas, etc. como los nombres de namespace
 * ENUM no repetidos si permitimos eso de mayúsculas, minúsculas,...
