@@ -1,5 +1,5 @@
 import { Node } from "../core/Node";
 
 export interface Validator {
-  validate(n: Node): void;
+	validate(n: Node): void;
 }
