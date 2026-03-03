@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { Schema } from '../schema/Schema';
 import { SchemaProvider } from '../schema/SchemaProvider';
-import { UnifiedSchemaProvider } from './UnifiedSchemaProvider';
+import { UnifiedSchemaProvider } from '../runtime/UnifiedSchemaProvider';
 
 const STXT_DIR_REL = ['.stxt'];
 const STXT_FILES_GLOB = '**/.stxt/**/*.stxt';
