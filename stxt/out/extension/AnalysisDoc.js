@@ -45,21 +45,9 @@ const ParseException_1 = require("../exceptions/ParseException");
 const TemplateParser_1 = require("../template/TemplateParser");
 const SchemaParser_1 = require("../schema/SchemaParser");
 const TokenGeneratorObserver_1 = require("./TokenGeneratorObserver");
+const ConditionalValidator_1 = require("../runtime/ConditionalValidator");
 const LAST_ANALYSIS_BY_URI = new Map();
 const SCHEMA_VALIDATOR = new SchemaValidator_1.SchemaValidator(new SchemaLoader_1.SchemaLoaderExtension());
-// Wrapper del validador que solo valida nodos con namespace
-class ConditionalValidator {
-    schemaValidator;
-    constructor(schemaValidator) {
-        this.schemaValidator = schemaValidator;
-    }
-    validate(node) {
-        // Solo validar si tiene namespace
-        if (node.getNamespace() !== "") {
-            this.schemaValidator.validate(node);
-        }
-    }
-}
 function getLastAnalysis(document) {
     return LAST_ANALYSIS_BY_URI.get(document.uri.toString());
 }
@@ -79,7 +67,7 @@ function analisysDoc(document, diagnosticCollection) {
     // Parsear documento con validación de schema
     const parser = new Parser_1.Parser();
     parser.registerObserver(tokenObserver);
-    parser.registerValidator(new ConditionalValidator(SCHEMA_VALIDATOR));
+    parser.registerValidator(new ConditionalValidator_1.ConditionalValidator(SCHEMA_VALIDATOR));
     const parseResult = parser.parseResult(document.getText());
     // Obtener tokens y nodeByLine generados por el observer
     const tokens = tokenObserver.getTokens();

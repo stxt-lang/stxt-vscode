@@ -7,30 +7,14 @@ import { diagnosticCollection } from '../extension';
 import { Parser } from '../core/Parser';
 import { ParseException } from '../exceptions/ParseException';
 import { ParseResult } from '../core/ParseResult';
-import { Validator } from '../processors/Validator';
 import { transformTemplateNodeToSchema } from '../template/TemplateParser';
 import { transformNodeToSchema } from '../schema/SchemaParser';
 import { Schema } from '../schema/Schema';
 import { TokenGeneratorObserver } from './TokenGeneratorObserver';
+import { ConditionalValidator } from '../runtime/ConditionalValidator';
 
 const LAST_ANALYSIS_BY_URI  = new Map<string, AnalysisResult>();
 const SCHEMA_VALIDATOR      = new SchemaValidator(new SchemaLoaderExtension());
-
-// Wrapper del validador que solo valida nodos con namespace
-class ConditionalValidator implements Validator {
-    private readonly schemaValidator: SchemaValidator;
-
-    constructor(schemaValidator: SchemaValidator) {
-        this.schemaValidator = schemaValidator;
-    }
-
-    validate(node: Node): void {
-        // Solo validar si tiene namespace
-        if (node.getNamespace() !== "") {
-            this.schemaValidator.validate(node);
-        }
-    }
-}
 
 export function getLastAnalysis(document: vscode.TextDocument): AnalysisResult | undefined {
     return LAST_ANALYSIS_BY_URI.get(document.uri.toString());
