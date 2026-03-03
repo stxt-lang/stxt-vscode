@@ -10,7 +10,7 @@
 * Goto para ir a la definición del schema
 * Unificar core/LineIndent y core/LineIndentParse
 * Parseo en proyecto node separado
-
+* Mostrar errores de validación de cardinalidad en todos los nodos si superan el máximo permitido por el parent
 
 # Sobre STXT
 * Revisar documentos
