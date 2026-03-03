@@ -8,6 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Added Observers and validators in the parsing
 - Unified parsing in process. Better performance and accuracy.
+- Read all schemas and templates of dir `.stxt`.
 
 ## [0.1.4]
 

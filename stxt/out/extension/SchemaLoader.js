@@ -38,14 +38,10 @@ exports.getSchema = getSchema;
 exports.getSchemas = getSchemas;
 exports.registerSchemaLoader = registerSchemaLoader;
 const vscode = __importStar(require("vscode"));
-const SchemaProviderMemory_1 = require("../schema/SchemaProviderMemory");
-const TemplateSchemaProviderMemory_1 = require("../template/TemplateSchemaProviderMemory");
-const SCHEMA_DIR_REL = ['.stxt', '@stxt.schema'];
-const TEMPLATE_DIR_REL = ['.stxt', '@stxt.template'];
-const SCHEMA_FILES_GLOB = '**/.stxt/@stxt.schema/*.stxt';
-const SCHEMA_PROVIDER = new SchemaProviderMemory_1.SchemaProviderMemory();
-const TEMPLATE_FILES_GLOB = '**/.stxt/@stxt.template/*.stxt';
-const TEMPLATE_PROVIDER = new TemplateSchemaProviderMemory_1.TemplateSchemaProviderMemory();
+const UnifiedSchemaProvider_1 = require("./UnifiedSchemaProvider");
+const STXT_DIR_REL = ['.stxt'];
+const STXT_FILES_GLOB = '**/.stxt/**/*.stxt';
+const PROVIDER = new UnifiedSchemaProvider_1.UnifiedSchemaProvider();
 class SchemaLoaderExtension {
     getSchema(namespace) {
         return getSchema(namespace);
@@ -53,40 +49,20 @@ class SchemaLoaderExtension {
 }
 exports.SchemaLoaderExtension = SchemaLoaderExtension;
 function getSchema(schema) {
-    try {
-        //console.log("Search schema..." + schema);
-        const result = SCHEMA_PROVIDER.getSchema(schema);
-        return result;
-    }
-    catch (e) {
-        // Continuamos
-        // console.log("Not found in schema\nContinue with template");
-    }
-    const result = TEMPLATE_PROVIDER.getSchema(schema);
-    return result;
+    return PROVIDER.getSchema(schema);
 }
 function getSchemas() {
-    const merged = new Map();
-    for (const templateSchema of TEMPLATE_PROVIDER.getAllSchemas()) {
-        merged.set(templateSchema.getNamespace(), templateSchema);
-    }
-    for (const schema of SCHEMA_PROVIDER.getAllSchemas()) {
-        merged.set(schema.getNamespace(), schema);
-    }
-    return Array.from(merged.values());
+    return PROVIDER.getAllSchemas();
 }
 // ****************
 // Register loaders
 // ****************
 async function registerSchemaLoader(context, onSchemasChanged) {
     const reloadScheduler = createReloadScheduler(onSchemasChanged);
-    // Watcher de cualquier fichero .stxt dentro del directorio
-    const watcherSchema = vscode.workspace.createFileSystemWatcher(SCHEMA_FILES_GLOB);
-    context.subscriptions.push(watcherSchema, watcherSchema.onDidCreate(() => reloadScheduler.schedule('schema created')), watcherSchema.onDidChange(() => reloadScheduler.schedule('schema changed')), watcherSchema.onDidDelete(() => reloadScheduler.schedule('schema deleted')));
-    // Watcher de cualquier fichero .stxt dentro del directorio
-    const watcherTemplate = vscode.workspace.createFileSystemWatcher(TEMPLATE_FILES_GLOB);
-    context.subscriptions.push(watcherTemplate, watcherTemplate.onDidCreate(() => reloadScheduler.schedule('template created')), watcherTemplate.onDidChange(() => reloadScheduler.schedule('template changed')), watcherTemplate.onDidDelete(() => reloadScheduler.schedule('template deleted')), { dispose: reloadScheduler.dispose });
-    // Carga inicial de schemas/templates y revalidación del workspace.
+    // Watcher de cualquier fichero .stxt dentro del directorio .stxt
+    const watcher = vscode.workspace.createFileSystemWatcher(STXT_FILES_GLOB);
+    context.subscriptions.push(watcher, watcher.onDidCreate(() => reloadScheduler.schedule('file created')), watcher.onDidChange(() => reloadScheduler.schedule('file changed')), watcher.onDidDelete(() => reloadScheduler.schedule('file deleted')), { dispose: reloadScheduler.dispose });
+    // Carga inicial de schemas y revalidación del workspace.
     await reloadAllSchemaData('initial load', onSchemasChanged);
 }
 function createReloadScheduler(onSchemasChanged) {
@@ -110,12 +86,8 @@ function createReloadScheduler(onSchemasChanged) {
 async function reloadAllSchemaData(reason, onSchemasChanged) {
     try {
         console.log(`[stxt] reloading schema data (${reason})...`);
-        SCHEMA_PROVIDER.clear();
-        TEMPLATE_PROVIDER.clear();
-        await Promise.all([
-            loadAllWorkspaceSchemas(),
-            loadAllWorkspaceTemplates()
-        ]);
+        PROVIDER.clear();
+        await loadAllWorkspaceFiles();
         await onSchemasChanged();
         console.log(`[stxt] schema data reloaded (${reason}).`);
     }
@@ -123,17 +95,17 @@ async function reloadAllSchemaData(reason, onSchemasChanged) {
         console.log(`[stxt] error reloading schema data (${reason})`, e);
     }
 }
-// ************
-// LOAD SCHEMAS
-// ************
-async function loadAllWorkspaceSchemas() {
+// **********
+// LOAD FILES
+// **********
+async function loadAllWorkspaceFiles() {
     try {
-        console.log("Init loading workspace...");
+        console.log("Init loading workspace files...");
         const folders = vscode.workspace.workspaceFolders ?? [];
         for (const f of folders) {
             console.log(`Folder: ${f.uri}`);
-            const dirUri = vscode.Uri.joinPath(f.uri, ...SCHEMA_DIR_REL);
-            await loadSchemasFromDir(dirUri);
+            const dirUri = vscode.Uri.joinPath(f.uri, ...STXT_DIR_REL);
+            await loadFilesFromDir(dirUri);
         }
         console.log("Ok loading workspace.");
     }
@@ -141,72 +113,33 @@ async function loadAllWorkspaceSchemas() {
         console.log("Error loading all workspace", e);
     }
 }
-async function loadSchemasFromDir(dirUri) {
+async function loadFilesFromDir(dirUri) {
     try {
         const entries = await vscode.workspace.fs.readDirectory(dirUri);
-        for (const [name] of entries) {
-            if (name.endsWith('.stxt')) {
-                const fileUri = vscode.Uri.joinPath(dirUri, name);
-                await addSchemaFile(fileUri, 'initial');
+        for (const [name, fileType] of entries) {
+            const itemUri = vscode.Uri.joinPath(dirUri, name);
+            if (fileType === vscode.FileType.Directory) {
+                // Recursivamente cargar archivos de subdirectorios
+                await loadFilesFromDir(itemUri);
+            }
+            else if (name.endsWith('.stxt')) {
+                await addSchemaFile(itemUri, 'initial');
             }
         }
     }
     catch (e) {
-        console.log(`[stxt] schema dir not found: ${dirUri.toString()} (${String(e)})`);
+        console.log(`[stxt] dir not found: ${dirUri.toString()} (${String(e)})`);
     }
 }
 async function addSchemaFile(uri, reason) {
     try {
         const bytes = await vscode.workspace.fs.readFile(uri);
         const text = new TextDecoder('utf-8').decode(bytes);
-        console.log(`\n[stxt] schema ${reason}: ${uri.toString()}\n${text.length} chars.`);
-        SCHEMA_PROVIDER.addSchema(text);
+        console.log(`\n[stxt] file ${reason}: ${uri.toString()}\n${text.length} chars.`);
+        PROVIDER.addFile(text);
     }
     catch (e) {
-        console.log(`[stxt] schema ${reason}: could not read ${uri.toString()} (${String(e)})`);
-    }
-}
-// **************
-// LOAD TEMPLATES
-// **************
-async function loadAllWorkspaceTemplates() {
-    try {
-        console.log("Init loading workspace...");
-        const folders = vscode.workspace.workspaceFolders ?? [];
-        for (const f of folders) {
-            console.log(`Folder: ${f.uri}`);
-            const dirUri = vscode.Uri.joinPath(f.uri, ...TEMPLATE_DIR_REL);
-            await loadTemplatesFromDir(dirUri);
-        }
-        console.log("Ok loading workspace.");
-    }
-    catch (e) {
-        console.log("Error loading all workspace", e);
-    }
-}
-async function loadTemplatesFromDir(dirUri) {
-    try {
-        const entries = await vscode.workspace.fs.readDirectory(dirUri);
-        for (const [name] of entries) {
-            if (name.endsWith('.stxt')) {
-                const fileUri = vscode.Uri.joinPath(dirUri, name);
-                await addTemplateFile(fileUri, 'initial');
-            }
-        }
-    }
-    catch (e) {
-        console.log(`[stxt] template dir not found: ${dirUri.toString()} (${String(e)})`);
-    }
-}
-async function addTemplateFile(uri, reason) {
-    try {
-        const bytes = await vscode.workspace.fs.readFile(uri);
-        const text = new TextDecoder('utf-8').decode(bytes);
-        console.log(`\n[stxt] template ${reason}: ${uri.toString()}\n${text.length} chars.`);
-        TEMPLATE_PROVIDER.addTemplate(text);
-    }
-    catch (e) {
-        console.log(`[stxt] template ${reason}: could not read ${uri.toString()}:\n(${String(e)})`);
+        console.log(`[stxt] file ${reason}: could not read ${uri.toString()} (${String(e)})`);
     }
 }
 //# sourceMappingURL=SchemaLoader.js.map
