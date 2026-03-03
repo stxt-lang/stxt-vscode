@@ -6,9 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Read all schemas and templates from dir `.stxt` (and all subdirectorys).
 - Added Observers and validators in the parsing
 - Unified parsing in process. Better performance and accuracy.
-- Read all schemas and templates from dir `.stxt`.
 - Display schema type in hover
 - Display ENUM values in hover
 
