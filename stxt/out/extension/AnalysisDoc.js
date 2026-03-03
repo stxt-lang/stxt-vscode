@@ -110,10 +110,10 @@ function analisysDoc(document, diagnosticCollection) {
         }
     }
     // Validaciones adicionales de template y schema
-    validateSpecialDocument(document, diagnostics, "stxt.template", "Template", (node) => {
+    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.template", "Template", (node) => {
         TemplateParser_1.TemplateParser.transformNodeToSchema(node);
     });
-    validateSpecialDocument(document, diagnostics, "stxt.schema", "Schema", (node) => {
+    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.schema", "Schema", (node) => {
         SchemaParser_1.SchemaParser.transformNodeToSchema(node);
     });
     // Fin de diagnosis
@@ -167,22 +167,11 @@ function generateTokensForNode(node, lineIndex, document, tokens) {
         }
     }
 }
-function validateSpecialDocument(document, diagnostics, fileIdentifier, typeName, transformer) {
-    // Final // TODO Hacer mejor!! Mirar listado de nodos con namespace, hacer todo del inicial
-    if (document.uri.toString().indexOf(fileIdentifier) !== -1) {
-        console.log(`Is ${typeName}`);
-        const p = new Parser_1.Parser();
-        const result = p.parseResult(document.getText());
-        // Agregar errores de parsing
-        for (const error of result.getErrors()) {
-            const line = error.line > 0 ? error.line - 1 : 0;
-            const range = new vscode.Range(line, 0, line, 100);
-            diagnostics.push(new vscode.Diagnostic(range, `Parse error [${error.code}]: ${error.message}`, vscode.DiagnosticSeverity.Error));
-        }
-        // Si hay exactamente un nodo, intentar transformarlo
-        if (result.getNodes().length === 1 && !result.hasErrors()) {
+function validateSpecialDocument(nodes, diagnostics, namespace, typeName, transformer) {
+    nodes.forEach((node) => {
+        if (node.getNamespace() === namespace) {
             try {
-                transformer(result.getNodes()[0]);
+                transformer(node);
             }
             catch (e) {
                 if (e instanceof ParseException_1.ParseException) {
@@ -200,6 +189,6 @@ function validateSpecialDocument(document, diagnostics, fileIdentifier, typeName
                 }
             }
         }
-    }
+    });
 }
 //# sourceMappingURL=AnalysisDoc.js.map

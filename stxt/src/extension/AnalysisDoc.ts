@@ -92,10 +92,10 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
     }
 
     // Validaciones adicionales de template y schema
-    validateSpecialDocument(document, diagnostics, "stxt.template", "Template", (node) => {
+    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.template", "Template", (node) => {
         TemplateParser.transformNodeToSchema(node);
     });
-    validateSpecialDocument(document, diagnostics, "stxt.schema", "Schema", (node) => {
+    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.schema", "Schema", (node) => {
         SchemaParser.transformNodeToSchema(node);
     });
 
@@ -157,26 +157,13 @@ function generateTokensForNode(node: Node, lineIndex: number, document: vscode.T
     }
 }
 
-function validateSpecialDocument(document: vscode.TextDocument, diagnostics: vscode.Diagnostic[], fileIdentifier: string, typeName: string,
+function validateSpecialDocument(nodes: Node[], diagnostics: vscode.Diagnostic[], namespace: string, typeName: string,
      transformer: (node: Node) => void): void {
         
-    // Final // TODO Hacer mejor!! Mirar listado de nodos con namespace, hacer todo del inicial
-    if (document.uri.toString().indexOf(fileIdentifier) !== -1) {
-        console.log(`Is ${typeName}`);
-        const p = new Parser();
-        const result = p.parseResult(document.getText());
-
-        // Agregar errores de parsing
-        for (const error of result.getErrors()) {
-            const line = error.line > 0 ? error.line - 1 : 0;
-            const range = new vscode.Range(line, 0, line, 100);
-            diagnostics.push(new vscode.Diagnostic(range, `Parse error [${error.code}]: ${error.message}`, vscode.DiagnosticSeverity.Error));
-        }
-
-        // Si hay exactamente un nodo, intentar transformarlo
-        if (result.getNodes().length === 1 && !result.hasErrors()) {
+    nodes.forEach((node) => {
+        if (node.getNamespace() === namespace) {
             try {
-                transformer(result.getNodes()[0]);
+                transformer(node);
             } catch (e: unknown) {
                 if (e instanceof ParseException) {
                     const line = e.line > 0 ? e.line - 1 : 0;
@@ -191,6 +178,5 @@ function validateSpecialDocument(document: vscode.TextDocument, diagnostics: vsc
                 }
             }
         }
-    }
+    });
 }
-
