@@ -10,7 +10,9 @@
 * Goto para ir a la definición del schema
 * Unificar core/LineIndent y core/LineIndentParse
 * Parseo en proyecto node separado
-* Mostrar errores de validación de cardinalidad en todos los nodos si superan el máximo permitido por el parent
+* Mostrar errores de validación de cardinalidad en todos los nodos si superan el máximo permitido por el parent.
+  Para esto quizá que los validadores no lancen excepciones, sinó que pasen listado de errores al parser.
+  Cambiar la firma por validate(Node): ParseException[] o Errors[]
 * Colores dentro de los template, para ver mejor el contenido
 
 # Sobre STXT
