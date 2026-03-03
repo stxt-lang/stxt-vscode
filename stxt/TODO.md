@@ -11,6 +11,7 @@
 * Unificar core/LineIndent y core/LineIndentParse
 * Parseo en proyecto node separado
 * Mostrar errores de validación de cardinalidad en todos los nodos si superan el máximo permitido por el parent
+* Colores dentro de los template, para ver mejor el contenido
 
 # Sobre STXT
 * Revisar documentos
