@@ -6,16 +6,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
-- Values in templates only allowed if type ENUM
+- Template values are only allowed when the type is `ENUM`.
 
 ## [0.2.0]
 
-- Read all schemas and templates from dir `.stxt` (and all subdirectorys).
-- Added Observers and validators in the parsing
-- Unified parsing in process. Better performance and accuracy.
-- Display schema type in hover
-- Display ENUM values in hover
-- Autocompletion with ENUM values
+- Read all schemas and templates from the `.stxt` directory (and all subdirectories).
+- Added observers and validators to parsing.
+- Unified the parsing process for better performance and accuracy.
+- Display schema type in hover.
+- Display `ENUM` values in hover.
+- Autocompletion with `ENUM` values.
 
 ## [0.1.4]
 
@@ -31,7 +31,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [0.1.2]
 
-- Fixed formating of `INLINE` node with value with chars `()`
+- Fixed formatting of `INLINE` nodes with values containing `()`.
 - Improved completion suggestions for nested levels when text is already typed on the current line (prefix filtering).
 - Added completion suggestions for top-level/root nodes, including prefix filtering.
 - Reduced non-STXT completion noise by disabling word-based suggestions in comments/strings for `stxt` defaults.
