@@ -28,30 +28,11 @@ function getSchemas() {
 // Register loaders
 // ****************
 async function registerSchemaLoader(context, onSchemasChanged) {
-    const reloadScheduler = createReloadScheduler(onSchemasChanged);
     // Watcher de cualquier fichero .stxt dentro del directorio .stxt
     const watcher = vscode_1.default.workspace.createFileSystemWatcher(STXT_FILES_GLOB);
-    context.subscriptions.push(watcher, watcher.onDidCreate(() => reloadScheduler.schedule('file created')), watcher.onDidChange(() => reloadScheduler.schedule('file changed')), watcher.onDidDelete(() => reloadScheduler.schedule('file deleted')), { dispose: reloadScheduler.dispose });
+    context.subscriptions.push(watcher, watcher.onDidCreate(() => reloadAllSchemaData('file created', onSchemasChanged)), watcher.onDidChange(() => reloadAllSchemaData('file changed', onSchemasChanged)), watcher.onDidDelete(() => reloadAllSchemaData('file deleted', onSchemasChanged)));
     // Carga inicial de schemas y revalidación del workspace.
     await reloadAllSchemaData('initial load', onSchemasChanged);
-}
-function createReloadScheduler(onSchemasChanged) {
-    let reloadTimer;
-    const schedule = (reason) => {
-        if (reloadTimer) {
-            clearTimeout(reloadTimer);
-        }
-        reloadTimer = setTimeout(() => {
-            void reloadAllSchemaData(reason, onSchemasChanged);
-        }, 120);
-    };
-    const dispose = () => {
-        if (reloadTimer) {
-            clearTimeout(reloadTimer);
-            reloadTimer = undefined;
-        }
-    };
-    return { schedule, dispose };
 }
 async function reloadAllSchemaData(reason, onSchemasChanged) {
     try {

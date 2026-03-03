@@ -26,52 +26,24 @@ export function getSchemas(): ReadonlyArray<Schema> {
 // ****************
 
 export async function registerSchemaLoader(context: vscode.ExtensionContext, onSchemasChanged: () => void | Promise<void>) {
-    const reloadScheduler = createReloadScheduler(onSchemasChanged);
-
     // Watcher de cualquier fichero .stxt dentro del directorio .stxt
     const watcher = vscode.workspace.createFileSystemWatcher(STXT_FILES_GLOB);
     context.subscriptions.push(
         watcher,
-        watcher.onDidCreate(() => reloadScheduler.schedule('file created')),
-        watcher.onDidChange(() => reloadScheduler.schedule('file changed')),
-        watcher.onDidDelete(() => reloadScheduler.schedule('file deleted')),
-        { dispose: reloadScheduler.dispose }
+        watcher.onDidCreate(() => reloadAllSchemaData('file created', onSchemasChanged)),
+        watcher.onDidChange(() => reloadAllSchemaData('file changed', onSchemasChanged)),
+        watcher.onDidDelete(() => reloadAllSchemaData('file deleted', onSchemasChanged)),
     );
 
     // Carga inicial de schemas y revalidación del workspace.
     await reloadAllSchemaData('initial load', onSchemasChanged);
 }
 
-function createReloadScheduler(onSchemasChanged: () => void | Promise<void>) {
-    let reloadTimer: ReturnType<typeof setTimeout> | undefined;
-
-    const schedule = (reason: string): void => {
-        if (reloadTimer) {
-            clearTimeout(reloadTimer);
-        }
-
-        reloadTimer = setTimeout(() => {
-            void reloadAllSchemaData(reason, onSchemasChanged);
-        }, 120);
-    };
-
-    const dispose = (): void => {
-        if (reloadTimer) {
-            clearTimeout(reloadTimer);
-            reloadTimer = undefined;
-        }
-    };
-
-    return { schedule, dispose };
-}
-
 async function reloadAllSchemaData(reason: string, onSchemasChanged: () => void | Promise<void>) {
     try {
         console.log(`[stxt] reloading schema data (${reason})...`);
         PROVIDER.clear();
-
         await loadAllWorkspaceFiles();
-
         await onSchemasChanged();
         console.log(`[stxt] schema data reloaded (${reason}).`);
     } catch (e) {
