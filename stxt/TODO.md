@@ -7,7 +7,7 @@
 * Permitir un nodo ROOT?
 * Dependiendo del schema no mostrar nodos que ya tienen superado el máximo permitido, por lo que irán desapareciendo a medida que esté completo
 * Hover para texto. Quizá añadir a observer el añadido de una línea también
-* Goto para ir a la definición del schema
+* Goto (click) para ir a la definición del schema
 * Unificar core/LineIndent y core/LineIndentParse
 * Parseo en proyecto node separado
 * Mostrar errores de validación de cardinalidad en todos los nodos si superan el máximo permitido por el parent.
