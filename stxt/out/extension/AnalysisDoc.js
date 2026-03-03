@@ -44,6 +44,7 @@ const Parser_1 = require("../core/Parser");
 const ParseException_1 = require("../exceptions/ParseException");
 const TemplateParser_1 = require("../template/TemplateParser");
 const SchemaParser_1 = require("../schema/SchemaParser");
+const TokenGeneratorObserver_1 = require("./TokenGeneratorObserver");
 const LAST_ANALYSIS_BY_URI = new Map();
 const SCHEMA_VALIDATOR = new SchemaValidator_1.SchemaValidator(new SchemaLoader_1.SchemaLoaderExtension());
 // Wrapper del validador que solo valida nodos con namespace
@@ -73,12 +74,16 @@ function analysisAllDocs() {
 function analisysDoc(document, diagnosticCollection) {
     //console.log("Parse init...");
     const diagnostics = [];
-    const tokens = [];
-    const nodeByLine = new Map();
+    // Crear observer para generar tokens y nodeByLine durante el parsing
+    const tokenObserver = new TokenGeneratorObserver_1.TokenGeneratorObserver(document);
     // Parsear documento con validación de schema
     const parser = new Parser_1.Parser();
+    parser.registerObserver(tokenObserver);
     parser.registerValidator(new ConditionalValidator(SCHEMA_VALIDATOR));
     const parseResult = parser.parseResult(document.getText());
+    // Obtener tokens y nodeByLine generados por el observer
+    const tokens = tokenObserver.getTokens();
+    const nodeByLine = tokenObserver.getNodeByLine();
     // Convertir errores a diagnostics
     for (const error of parseResult.getErrors()) {
         const line = error.line > 0 ? error.line - 1 : 0;
@@ -88,26 +93,6 @@ function analisysDoc(document, diagnosticCollection) {
             ? vscode.DiagnosticSeverity.Warning
             : vscode.DiagnosticSeverity.Error;
         diagnostics.push(new vscode.Diagnostic(range, `[${error.code}]: ${error.message}`, severity));
-    }
-    // Construir tokens y nodeByLine desde los nodos parseados
-    const nodesToProcess = [...parseResult.getNodes()];
-    while (nodesToProcess.length > 0) {
-        const node = nodesToProcess.shift();
-        const lineIndex = node.getLine() - 1;
-        nodeByLine.set(lineIndex, node);
-        // Generar tokens para este nodo
-        generateTokensForNode(node, lineIndex, document, tokens);
-        // Añadir hijos a la cola de procesamiento
-        nodesToProcess.push(...node.getChildren());
-    }
-    // Generar tokens para comentarios (líneas que empiezan con #)
-    const lines = document.getText().split(/\r?\n/);
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const trimmedLine = line.trim();
-        if (trimmedLine.startsWith('#')) {
-            tokens.push({ line: i, startChar: 0, length: line.length, type: 'comment' });
-        }
     }
     // Validaciones adicionales de template y schema
     validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.template", "Template", TemplateParser_1.transformTemplateNodeToSchema);
@@ -119,49 +104,6 @@ function analisysDoc(document, diagnosticCollection) {
     LAST_ANALYSIS_BY_URI.set(document.uri.toString(), result);
     //console.log("Parse end.");
     return result;
-}
-function generateTokensForNode(node, lineIndex, document, tokens) {
-    const line = document.lineAt(lineIndex).text;
-    if (node.isTextNode()) {
-        const sepIndx = line.indexOf(">>");
-        if (sepIndx === -1) {
-            return;
-        }
-        const head = line.substring(0, sepIndx);
-        const nsOpen = head.indexOf('(');
-        const nsClose = head.indexOf(')');
-        if (nsOpen !== -1 && nsClose !== -1) {
-            tokens.push({ line: lineIndex, startChar: 0, length: nsOpen, type: 'macro' });
-            tokens.push({ line: lineIndex, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
-            tokens.push({ line: lineIndex, startChar: nsClose + 1, length: line.length - nsClose - 1, type: 'macro' });
-        }
-        else {
-            tokens.push({ line: lineIndex, startChar: 0, length: sepIndx, type: 'macro' });
-            tokens.push({ line: lineIndex, startChar: sepIndx, length: 2, type: 'macro' });
-        }
-    }
-    else {
-        const colon = line.indexOf(':');
-        if (colon === -1) {
-            return;
-        }
-        const head = line.substring(0, colon);
-        const nsOpen = head.indexOf('(');
-        const nsClose = head.indexOf(')');
-        if (nsOpen !== -1 && nsClose !== -1) {
-            tokens.push({ line: lineIndex, startChar: 0, length: nsOpen, type: 'property' });
-            tokens.push({ line: lineIndex, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
-            tokens.push({ line: lineIndex, startChar: nsClose + 1, length: colon - (nsClose + 1) + 1, type: 'property' });
-        }
-        else {
-            tokens.push({ line: lineIndex, startChar: 0, length: colon, type: 'property' });
-            tokens.push({ line: lineIndex, startChar: colon, length: 1, type: 'property' });
-        }
-        const valueStart = colon + 1;
-        if (valueStart < line.length) {
-            tokens.push({ line: lineIndex, startChar: valueStart, length: line.length - valueStart, type: 'string' });
-        }
-    }
 }
 function validateSpecialDocument(nodes, diagnostics, namespace, typeName, transformer) {
     nodes.forEach((node) => {
