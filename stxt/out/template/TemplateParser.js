@@ -29,12 +29,12 @@ function transformTemplateNodeToSchema(node) {
 }
 function addToSchema(schema, node, offset) {
     // Obtenemos nombre qualificado
-    const namespace = node.getNamespace();
+    let namespace = node.getNamespace();
     const name = node.getName();
     // Miramos datos
     let cl = ChildLineParser_1.ChildLineParser.parse(node.getValue(), node.getLine() + offset);
-    if (namespace.length === 0) {
-        throw new ValidationException_1.ValidationException(node.getLine() + offset, "EMPTY_NAMESPACE", "Not allowed empty namespaces");
+    if (!namespace || namespace === "") {
+        namespace = schema.getNamespace();
     }
     if (namespace !== schema.getNamespace()) {
         // Validamos type vacío
@@ -77,7 +77,10 @@ function addToSchema(schema, node, offset) {
     for (const child of childrenNode) {
         cl = ChildLineParser_1.ChildLineParser.parse(child.getValue(), child.getLine() + offset);
         const childName = child.getName();
-        const childNamespace = child.getNamespace();
+        let childNamespace = child.getNamespace();
+        if (!childNamespace || childNamespace === "") {
+            childNamespace = schema.getNamespace();
+        }
         const schChild = new ChildDefinition_1.ChildDefinition(childName, childNamespace, cl.getMin(), cl.getMax(), child.getLine() + offset);
         schemaNode.addChildDefinition(schChild);
         addToSchema(schema, child, offset);

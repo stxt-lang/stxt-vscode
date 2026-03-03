@@ -9,6 +9,8 @@
 * Parseo en proyecto node separado
 * Permitir un nodo ROOT?
 * Hover para texto. Quizá añadir a observer el añadido de una línea también
+* Schema type en la definición del nodo
+* Goto para ir a la definición del schema
 
 # Sobre STXT
 * Revisar documentos

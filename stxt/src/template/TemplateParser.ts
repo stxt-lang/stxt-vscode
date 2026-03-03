@@ -18,11 +18,7 @@ export function transformTemplateNodeToSchema(node: Node): Schema {
 	// Buscamos nodo structure
 	const structure = node.getChild("structure");
 	if (!structure) {
-		throw new ValidationException(
-			node.getLine(),
-			"TEMPLATE_STRUCTURE_REQUIRED",
-			"Template must define 'Structure >>'"
-		);
+		throw new ValidationException(node.getLine(),"TEMPLATE_STRUCTURE_REQUIRED","Template must define 'Structure >>'");
 	}
 
 	const text = structure.getText();
@@ -42,14 +38,14 @@ export function transformTemplateNodeToSchema(node: Node): Schema {
 
 function addToSchema(schema: Schema, node: Node, offset: number): void {
 	// Obtenemos nombre qualificado
-	const namespace = node.getNamespace();
+	let namespace = node.getNamespace();
 	const name = node.getName();
 
 	// Miramos datos
 	let cl: ChildLine = ChildLineParser.parse(node.getValue(), node.getLine() + offset);
 
-	if (namespace.length === 0) {
-		throw new ValidationException(node.getLine() + offset, "EMPTY_NAMESPACE", "Not allowed empty namespaces");
+	if (!namespace || namespace === "") {
+		namespace = schema.getNamespace();
 	}
 
 	if (namespace !== schema.getNamespace()) {
@@ -102,7 +98,10 @@ function addToSchema(schema: Schema, node: Node, offset: number): void {
 		cl = ChildLineParser.parse(child.getValue(), child.getLine() + offset);
 
 		const childName = child.getName();
-		const childNamespace = child.getNamespace();
+		let childNamespace = child.getNamespace();
+		if (!childNamespace || childNamespace === "") {
+			childNamespace = schema.getNamespace();
+		}
 
 		const schChild = new ChildDefinition(childName, childNamespace, cl.getMin(), cl.getMax(), child.getLine() + offset);
 		schemaNode.addChildDefinition(schChild);
