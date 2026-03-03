@@ -7,6 +7,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 - Added Observers and validators in the parsing
+- Unified parsing in process. Better performance and accuracy.
 
 ## [0.1.4]
 
