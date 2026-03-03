@@ -48,11 +48,11 @@ class StxtHoverProvider {
             return;
         }
         const md = new vscode.MarkdownString();
-        md.appendMarkdown(node.isTextNode() ? "### Node - Block TEXT\n\n" : "### Node - Inline\n\n");
-        md.appendMarkdown(`- **Level:** ${node.getLevel()}\n`);
+        md.appendMarkdown(node.isTextNode() ? "### BLOCK " : "### INLINE");
+        md.appendMarkdown(` (Level ${node.getLevel()})\n`);
         md.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
-        md.appendMarkdown(`- **Normalized:** \`${escapeMd(node.getNormalizedName())}\`\n`);
-        md.appendMarkdown(`- **Qualified:** \`${escapeMd(node.getQualifiedName())}\`\n`);
+        md.appendMarkdown(`- **Normalized name:** \`${escapeMd(node.getNormalizedName())}\`\n`);
+        md.appendMarkdown(`- **Qualified name:** \`${escapeMd(node.getQualifiedName())}\`\n`);
         if (node.getNamespace()) {
             const schema = (0, SchemaLoader_1.getSchema)(node.getNamespace());
             if (schema) {
