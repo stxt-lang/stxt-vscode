@@ -86,10 +86,6 @@ function getRootNodeDefinitions(schema) {
     // Fallback si no podemos inferir raíces.
     return Array.from(schema.getNodes().values());
 }
-function isBlockTextNode(nodeDef) {
-    const type = nodeDef.getType();
-    return type === "TEXT" || type === "BLOCK";
-}
 function createCompletionItem(name, namespace, isText, hideNamespaceWhenEmpty) {
     const item = new vscode_1.CompletionItem(name, isText ? vscode_1.CompletionItemKind.Module : vscode_1.CompletionItemKind.EnumMember);
     const includeNamespace = namespace.length > 0 && !hideNamespaceWhenEmpty;
@@ -112,6 +108,10 @@ function createCompletionItem(name, namespace, isText, hideNamespaceWhenEmpty) {
     item.detail = includeNamespace ? `${namespace}:${StringUtils_1.StringUtils.normalize(name)}` : StringUtils_1.StringUtils.normalize(name);
     return item;
 }
+function isBlockTextNode(nodeDef) {
+    const type = nodeDef.getType();
+    return type === "TEXT" || type === "BLOCK";
+}
 function isBlockText(childDef) {
     try {
         const schema = schemaLoader.getSchema(childDef.getNamespace());
@@ -122,8 +122,7 @@ function isBlockText(childDef) {
         if (!nodeDef) {
             return false;
         }
-        const type = nodeDef.getType();
-        return type === "TEXT" || type === "BLOCK";
+        return isBlockTextNode(nodeDef);
     }
     catch (e) {
         return false;

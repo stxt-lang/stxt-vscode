@@ -101,11 +101,6 @@ function getRootNodeDefinitions(schema: Schema): NodeDefinition[] {
     return Array.from(schema.getNodes().values());
 }
 
-function isBlockTextNode(nodeDef: NodeDefinition): boolean {
-    const type = nodeDef.getType();
-    return type === "TEXT" || type === "BLOCK";
-}
-
 function createCompletionItem(name: string, namespace: string, isText: boolean, hideNamespaceWhenEmpty: boolean): CompletionItem {
     const item = new CompletionItem(name, isText ? CompletionItemKind.Module : CompletionItemKind.EnumMember);
     const includeNamespace = namespace.length > 0 && !hideNamespaceWhenEmpty;
@@ -128,6 +123,11 @@ function createCompletionItem(name: string, namespace: string, isText: boolean, 
     return item;
 }
 
+function isBlockTextNode(nodeDef: NodeDefinition): boolean {
+    const type = nodeDef.getType();
+    return type === "TEXT" || type === "BLOCK";
+}
+
 function isBlockText(childDef: ChildDefinition): boolean {
     try {
          const schema = schemaLoader.getSchema(childDef.getNamespace());
@@ -139,9 +139,8 @@ function isBlockText(childDef: ChildDefinition): boolean {
          if (!nodeDef) { 
             return false;
          }
-
-         const type = nodeDef.getType();
-         return type === "TEXT" || type === "BLOCK";
+         
+         return isBlockTextNode(nodeDef);
     } catch (e) {
         return false;
     }
