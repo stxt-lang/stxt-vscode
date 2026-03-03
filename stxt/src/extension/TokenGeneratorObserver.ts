@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import { Observer } from '../processors/Observer';
 import { Node } from '../core/Node';
 import { StxtToken } from './Tokens';
