@@ -1,6 +1,6 @@
 import { SemanticTokensLegend } from "vscode";
 
-export const STXT_TOKEN_TYPES = [
+const STXT_TOKEN_TYPES = [
 	'comment',
 	'namespace',
 	'property',
