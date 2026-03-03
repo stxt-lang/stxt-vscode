@@ -6,11 +6,6 @@ import { StxtToken } from './Tokens';
 export class TokenGeneratorObserver implements Observer {
     private tokens: StxtToken[] = [];
     private nodeByLine = new Map<number, Node>();
-    private document: vscode.TextDocument;
-
-    constructor(document: vscode.TextDocument) {
-        this.document = document;
-    }
 
     onCreate(node: Node, line: string): void {
         const lineIndex = node.getLine() - 1;

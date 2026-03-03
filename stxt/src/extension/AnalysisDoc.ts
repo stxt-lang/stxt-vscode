@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { Node } from '../core/Node';
 import { AnalysisResult } from './AnalysisResult';
-import { StxtToken } from './Tokens';
 import { SchemaValidator } from '../schema/SchemaValidator';
 import { SchemaLoaderExtension } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';
@@ -51,7 +50,7 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
     const diagnostics: vscode.Diagnostic[] = [];
 
     // Crear observer para generar tokens y nodeByLine durante el parsing
-    const tokenObserver = new TokenGeneratorObserver(document);
+    const tokenObserver = new TokenGeneratorObserver();
 
     // Parsear documento con validación de schema
     const parser = new Parser();

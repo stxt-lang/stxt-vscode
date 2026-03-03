@@ -4,10 +4,6 @@ exports.TokenGeneratorObserver = void 0;
 class TokenGeneratorObserver {
     tokens = [];
     nodeByLine = new Map();
-    document;
-    constructor(document) {
-        this.document = document;
-    }
     onCreate(node, line) {
         const lineIndex = node.getLine() - 1;
         // Guardar nodo en el mapa

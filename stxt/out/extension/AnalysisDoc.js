@@ -75,7 +75,7 @@ function analisysDoc(document, diagnosticCollection) {
     //console.log("Parse init...");
     const diagnostics = [];
     // Crear observer para generar tokens y nodeByLine durante el parsing
-    const tokenObserver = new TokenGeneratorObserver_1.TokenGeneratorObserver(document);
+    const tokenObserver = new TokenGeneratorObserver_1.TokenGeneratorObserver();
     // Parsear documento con validación de schema
     const parser = new Parser_1.Parser();
     parser.registerObserver(tokenObserver);
