@@ -1,43 +1,13 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SchemaLoaderExtension = void 0;
 exports.getSchema = getSchema;
 exports.getSchemas = getSchemas;
 exports.registerSchemaLoader = registerSchemaLoader;
-const vscode = __importStar(require("vscode"));
+const vscode_1 = __importDefault(require("vscode"));
 const UnifiedSchemaProvider_1 = require("../runtime/UnifiedSchemaProvider");
 const STXT_DIR_REL = ['.stxt'];
 const STXT_FILES_GLOB = '**/.stxt/**/*.stxt';
@@ -60,7 +30,7 @@ function getSchemas() {
 async function registerSchemaLoader(context, onSchemasChanged) {
     const reloadScheduler = createReloadScheduler(onSchemasChanged);
     // Watcher de cualquier fichero .stxt dentro del directorio .stxt
-    const watcher = vscode.workspace.createFileSystemWatcher(STXT_FILES_GLOB);
+    const watcher = vscode_1.default.workspace.createFileSystemWatcher(STXT_FILES_GLOB);
     context.subscriptions.push(watcher, watcher.onDidCreate(() => reloadScheduler.schedule('file created')), watcher.onDidChange(() => reloadScheduler.schedule('file changed')), watcher.onDidDelete(() => reloadScheduler.schedule('file deleted')), { dispose: reloadScheduler.dispose });
     // Carga inicial de schemas y revalidación del workspace.
     await reloadAllSchemaData('initial load', onSchemasChanged);
@@ -101,10 +71,10 @@ async function reloadAllSchemaData(reason, onSchemasChanged) {
 async function loadAllWorkspaceFiles() {
     try {
         console.log("Init loading workspace files...");
-        const folders = vscode.workspace.workspaceFolders ?? [];
+        const folders = vscode_1.default.workspace.workspaceFolders ?? [];
         for (const f of folders) {
             console.log(`Folder: ${f.uri}`);
-            const dirUri = vscode.Uri.joinPath(f.uri, ...STXT_DIR_REL);
+            const dirUri = vscode_1.default.Uri.joinPath(f.uri, ...STXT_DIR_REL);
             await loadFilesFromDir(dirUri);
         }
         console.log("Ok loading workspace.");
@@ -115,10 +85,10 @@ async function loadAllWorkspaceFiles() {
 }
 async function loadFilesFromDir(dirUri) {
     try {
-        const entries = await vscode.workspace.fs.readDirectory(dirUri);
+        const entries = await vscode_1.default.workspace.fs.readDirectory(dirUri);
         for (const [name, fileType] of entries) {
-            const itemUri = vscode.Uri.joinPath(dirUri, name);
-            if (fileType === vscode.FileType.Directory) {
+            const itemUri = vscode_1.default.Uri.joinPath(dirUri, name);
+            if (fileType === vscode_1.default.FileType.Directory) {
                 // Recursivamente cargar archivos de subdirectorios
                 await loadFilesFromDir(itemUri);
             }
@@ -133,7 +103,7 @@ async function loadFilesFromDir(dirUri) {
 }
 async function addSchemaFile(uri, reason) {
     try {
-        const bytes = await vscode.workspace.fs.readFile(uri);
+        const bytes = await vscode_1.default.workspace.fs.readFile(uri);
         const text = new TextDecoder('utf-8').decode(bytes);
         console.log(`\n[stxt] file ${reason}: ${uri.toString()}\n${text.length} chars.`);
         PROVIDER.addFile(text);

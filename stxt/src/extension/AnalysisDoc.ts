@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { Node } from '../core/Node';
 import { AnalysisResult } from './AnalysisResult';
 import { SchemaValidator } from '../schema/SchemaValidator';

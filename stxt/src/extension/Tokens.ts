@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import { SemanticTokensLegend } from "vscode";
 
 export const STXT_TOKEN_TYPES = [
 	'comment',
@@ -12,7 +12,7 @@ export const STXT_TOKEN_TYPES = [
 export type StxtTokenType = typeof STXT_TOKEN_TYPES[number];
 
 // Legend derivado del mismo sitio
-export const tokenLegend = new vscode.SemanticTokensLegend([...STXT_TOKEN_TYPES]);
+export const tokenLegend = new SemanticTokensLegend([...STXT_TOKEN_TYPES]);
 
 // Mapping type -> index derivado del mismo sitio
 export const tokenTypeIndex: Record<StxtTokenType, number> =

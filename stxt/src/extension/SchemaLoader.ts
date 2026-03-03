@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { Schema } from '../schema/Schema';
 import { SchemaProvider } from '../schema/SchemaProvider';
 import { UnifiedSchemaProvider } from '../runtime/UnifiedSchemaProvider';

@@ -1,5 +1,5 @@
 import { Node } from '../core/Node';
-import type { StxtToken, StxtTokenType } from './Tokens';
+import type { StxtToken } from './Tokens';
 
 export interface AnalysisResult {
 	tokens: StxtToken[];

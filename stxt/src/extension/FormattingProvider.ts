@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { getLastAnalysis } from './AnalysisDoc';
 import type { Node } from '../core/Node';
 import { StringUtils } from '../core/StringUtils';

@@ -1,42 +1,12 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLastAnalysis = getLastAnalysis;
 exports.analysisAllDocs = analysisAllDocs;
 exports.analisysDoc = analisysDoc;
-const vscode = __importStar(require("vscode"));
+const vscode_1 = __importDefault(require("vscode"));
 const SchemaValidator_1 = require("../schema/SchemaValidator");
 const SchemaLoader_1 = require("./SchemaLoader");
 const extension_1 = require("../extension");
@@ -52,7 +22,7 @@ function getLastAnalysis(document) {
     return LAST_ANALYSIS_BY_URI.get(document.uri.toString());
 }
 function analysisAllDocs() {
-    for (const doc of vscode.workspace.textDocuments) {
+    for (const doc of vscode_1.default.workspace.textDocuments) {
         if (doc.languageId === 'stxt') {
             //console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
             analisysDoc(doc, extension_1.diagnosticCollection);
@@ -76,11 +46,11 @@ function analisysDoc(document, diagnosticCollection) {
     for (const error of parseResult.getErrors()) {
         const line = error.line > 0 ? error.line - 1 : 0;
         const lineText = document.lineAt(line).text;
-        const range = new vscode.Range(line, 0, line, lineText.length);
+        const range = new vscode_1.default.Range(line, 0, line, lineText.length);
         const severity = error.name === 'ValidationException'
-            ? vscode.DiagnosticSeverity.Warning
-            : vscode.DiagnosticSeverity.Error;
-        diagnostics.push(new vscode.Diagnostic(range, `[${error.code}]: ${error.message}`, severity));
+            ? vscode_1.default.DiagnosticSeverity.Warning
+            : vscode_1.default.DiagnosticSeverity.Error;
+        diagnostics.push(new vscode_1.default.Diagnostic(range, `[${error.code}]: ${error.message}`, severity));
     }
     // Validaciones adicionales de template y schema
     validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.template", "Template", TemplateParser_1.transformTemplateNodeToSchema);
@@ -102,16 +72,16 @@ function validateSpecialDocument(nodes, diagnostics, namespace, typeName, transf
             catch (e) {
                 if (e instanceof ParseException_1.ParseException) {
                     const line = e.line > 0 ? e.line - 1 : 0;
-                    const range = new vscode.Range(line, 0, line, 100);
-                    diagnostics.push(new vscode.Diagnostic(range, `${typeName} error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
+                    const range = new vscode_1.default.Range(line, 0, line, 100);
+                    diagnostics.push(new vscode_1.default.Diagnostic(range, `${typeName} error [${e.code}]: ${e.message}`, vscode_1.default.DiagnosticSeverity.Error));
                 }
                 else if (e instanceof Error) {
-                    const range = new vscode.Range(0, 0, 0, 100);
-                    diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
+                    const range = new vscode_1.default.Range(0, 0, 0, 100);
+                    diagnostics.push(new vscode_1.default.Diagnostic(range, `Error: ${e.message}`, vscode_1.default.DiagnosticSeverity.Error));
                 }
                 else {
-                    const range = new vscode.Range(0, 0, 0, 100);
-                    diagnostics.push(new vscode.Diagnostic(range, `Error desconocido: ${String(e)}`, vscode.DiagnosticSeverity.Error));
+                    const range = new vscode_1.default.Range(0, 0, 0, 100);
+                    diagnostics.push(new vscode_1.default.Diagnostic(range, `Error desconocido: ${String(e)}`, vscode_1.default.DiagnosticSeverity.Error));
                 }
             }
         }

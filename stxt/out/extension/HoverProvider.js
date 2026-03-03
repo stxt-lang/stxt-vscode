@@ -1,40 +1,10 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StxtHoverProvider = void 0;
-const vscode = __importStar(require("vscode"));
+const vscode_1 = __importDefault(require("vscode"));
 const AnalysisDoc_1 = require("./AnalysisDoc");
 const SchemaLoader_1 = require("./SchemaLoader");
 class StxtHoverProvider {
@@ -47,7 +17,7 @@ class StxtHoverProvider {
         if (!node) {
             return;
         }
-        const md = new vscode.MarkdownString();
+        const md = new vscode_1.default.MarkdownString();
         md.appendMarkdown(node.isTextNode() ? "### BLOCK " : "### INLINE");
         md.appendMarkdown(` (Level ${node.getLevel()})\n`);
         md.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
@@ -73,7 +43,7 @@ class StxtHoverProvider {
             md.appendCodeblock(String(text), 'stxt');
         }
         md.isTrusted = false; // por seguridad, no permitir links/HTML
-        return new vscode.Hover(md);
+        return new vscode_1.default.Hover(md);
     }
 }
 exports.StxtHoverProvider = StxtHoverProvider;
