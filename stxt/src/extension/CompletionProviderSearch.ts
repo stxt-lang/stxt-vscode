@@ -145,3 +145,40 @@ function isBlockText(childDef: ChildDefinition): boolean {
         return false;
     }
 }
+
+export function buscarValoresEnum(node: Node, prefix: string): CompletionItem[] {
+    console.log(`Buscando valores ENUM para nodo: ${node.getQualifiedName()}`);
+    
+    const schema = schemaLoader.getSchema(node.getNamespace());
+    if (!schema) {
+        return [];
+    }
+
+    const nodeDef = schema.getNodeDefinition(node.getName());
+    if (!nodeDef) {
+        return [];
+    }
+
+    // Solo ofrecer valores si el tipo es ENUM
+    if (nodeDef.getType() !== 'ENUM') {
+        return [];
+    }
+
+    const values = nodeDef.getValues();
+    const result: CompletionItem[] = [];
+    const normalizedPrefix = StringUtils.normalize(prefix);
+
+    for (const value of values) {
+        // Filtrar los valores que comienzan con el prefijo
+        if (normalizedPrefix.length > 0 && !StringUtils.normalize(value).startsWith(normalizedPrefix)) {
+            continue;
+        }
+
+        const item = new CompletionItem(value, CompletionItemKind.EnumMember);
+        item.insertText = value;
+        item.detail = `ENUM value for ${node.getName()}`;
+        result.push(item);
+    }
+
+    return result;
+}

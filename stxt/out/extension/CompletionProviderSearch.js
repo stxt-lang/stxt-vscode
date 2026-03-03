@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buscarSugerencias = buscarSugerencias;
 exports.buscarSugerenciasPrimerNivel = buscarSugerenciasPrimerNivel;
+exports.buscarValoresEnum = buscarValoresEnum;
 const StringUtils_1 = require("../core/StringUtils");
 const SchemaLoader_1 = require("./SchemaLoader");
 const vscode_1 = require("vscode");
@@ -127,5 +128,34 @@ function isBlockText(childDef) {
     catch (e) {
         return false;
     }
+}
+function buscarValoresEnum(node, prefix) {
+    console.log(`Buscando valores ENUM para nodo: ${node.getQualifiedName()}`);
+    const schema = schemaLoader.getSchema(node.getNamespace());
+    if (!schema) {
+        return [];
+    }
+    const nodeDef = schema.getNodeDefinition(node.getName());
+    if (!nodeDef) {
+        return [];
+    }
+    // Solo ofrecer valores si el tipo es ENUM
+    if (nodeDef.getType() !== 'ENUM') {
+        return [];
+    }
+    const values = nodeDef.getValues();
+    const result = [];
+    const normalizedPrefix = StringUtils_1.StringUtils.normalize(prefix);
+    for (const value of values) {
+        // Filtrar los valores que comienzan con el prefijo
+        if (normalizedPrefix.length > 0 && !StringUtils_1.StringUtils.normalize(value).startsWith(normalizedPrefix)) {
+            continue;
+        }
+        const item = new vscode_1.CompletionItem(value, vscode_1.CompletionItemKind.EnumMember);
+        item.insertText = value;
+        item.detail = `ENUM value for ${node.getName()}`;
+        result.push(item);
+    }
+    return result;
 }
 //# sourceMappingURL=CompletionProviderSearch.js.map

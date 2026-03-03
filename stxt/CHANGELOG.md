@@ -11,6 +11,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Unified parsing in process. Better performance and accuracy.
 - Display schema type in hover
 - Display ENUM values in hover
+- Autocompletion with ENUM values
 
 ## [0.1.4]
 

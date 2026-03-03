@@ -2,7 +2,7 @@ import { getLastAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
 import { Constants } from '../core/Constants';
 import { calculateIndentLevel, getIndentationLength } from '../core/IndentUtils';
-import { buscarSugerencias, buscarSugerenciasPrimerNivel } from './CompletionProviderSearch';
+import { buscarSugerencias, buscarSugerenciasPrimerNivel, buscarValoresEnum } from './CompletionProviderSearch';
 import { CompletionItem, CompletionItemProvider, Position, ProviderResult, TextDocument } from 'vscode';
 
 export class StxtCompletionProvider implements CompletionItemProvider {
@@ -21,6 +21,15 @@ export class StxtCompletionProvider implements CompletionItemProvider {
 
         const completionContext = getCompletionContext(linePrefix);
         if (!completionContext) {
+            return [];
+        }
+
+        // Si estamos completando el valor de un nodo
+        if (completionContext.isValue) {
+            const nodeAtLine = lastAnalisis.nodeByLine.get(position.line);
+            if (nodeAtLine) {
+                return buscarValoresEnum(nodeAtLine, completionContext.prefix);
+            }
             return [];
         }
 
@@ -53,25 +62,35 @@ export class StxtCompletionProvider implements CompletionItemProvider {
     }
 }
 
-function getCompletionContext(linePrefix: string): { level: number, prefix: string } | null {
+function getCompletionContext(linePrefix: string): { level: number, prefix: string, isValue: boolean } | null {
     const trimmed = linePrefix.trimStart();
     if (trimmed.startsWith(Constants.COMMENT_CHAR)) {
         return null;
     }
 
-    // Si estamos ya en el valor/texto, no sugerimos nodos.
-    if (trimmed.includes(Constants.SEP_NODE) || trimmed.includes('>>')) {
+    const level = calculateIndentLevel(linePrefix);
+    const indentationLength = getIndentationLength(linePrefix);
+
+    // Detectar si estamos completando un valor (después de ':' o '>>')
+    const sepIndex = trimmed.indexOf(Constants.SEP_NODE);
+    const textSepIndex = trimmed.indexOf('>>');
+    
+    if (sepIndex !== -1) {
+        // Estamos después de ':', completando un valor inline
+        const valuePrefix = trimmed.substring(sepIndex + 1).trimStart();
+        return { level, prefix: valuePrefix, isValue: true };
+    }
+    
+    if (textSepIndex !== -1) {
+        // Estamos después de '>>', esto es para nodos de texto, no ofrecemos completado
         return null;
     }
 
-    const level = calculateIndentLevel(linePrefix);
-    const indentationLength = getIndentationLength(linePrefix);
+    // Estamos completando un nombre de nodo
     const rawNodePrefix = linePrefix.slice(indentationLength);
-
-    // Permitimos texto para filtrar por prefijo de nombre.
     const prefix = rawNodePrefix.replace(/\s*\(.*$/, '').trimEnd();
 
-    return { level, prefix };
+    return { level, prefix, isValue: false };
 }
 
 

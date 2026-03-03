@@ -18,6 +18,14 @@ class StxtCompletionProvider {
         if (!completionContext) {
             return [];
         }
+        // Si estamos completando el valor de un nodo
+        if (completionContext.isValue) {
+            const nodeAtLine = lastAnalisis.nodeByLine.get(position.line);
+            if (nodeAtLine) {
+                return (0, CompletionProviderSearch_1.buscarValoresEnum)(nodeAtLine, completionContext.prefix);
+            }
+            return [];
+        }
         // Buscamos nivel del cursor
         let level = completionContext.level;
         console.log("Level: " + level);
@@ -48,15 +56,23 @@ function getCompletionContext(linePrefix) {
     if (trimmed.startsWith(Constants_1.Constants.COMMENT_CHAR)) {
         return null;
     }
-    // Si estamos ya en el valor/texto, no sugerimos nodos.
-    if (trimmed.includes(Constants_1.Constants.SEP_NODE) || trimmed.includes('>>')) {
-        return null;
-    }
     const level = (0, IndentUtils_1.calculateIndentLevel)(linePrefix);
     const indentationLength = (0, IndentUtils_1.getIndentationLength)(linePrefix);
+    // Detectar si estamos completando un valor (después de ':' o '>>')
+    const sepIndex = trimmed.indexOf(Constants_1.Constants.SEP_NODE);
+    const textSepIndex = trimmed.indexOf('>>');
+    if (sepIndex !== -1) {
+        // Estamos después de ':', completando un valor inline
+        const valuePrefix = trimmed.substring(sepIndex + 1).trimStart();
+        return { level, prefix: valuePrefix, isValue: true };
+    }
+    if (textSepIndex !== -1) {
+        // Estamos después de '>>', esto es para nodos de texto, no ofrecemos completado
+        return null;
+    }
+    // Estamos completando un nombre de nodo
     const rawNodePrefix = linePrefix.slice(indentationLength);
-    // Permitimos texto para filtrar por prefijo de nombre.
     const prefix = rawNodePrefix.replace(/\s*\(.*$/, '').trimEnd();
-    return { level, prefix };
+    return { level, prefix, isValue: false };
 }
 //# sourceMappingURL=CompletionProvider.js.map
