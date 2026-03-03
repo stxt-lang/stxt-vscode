@@ -44,7 +44,7 @@ const Parser_1 = require("../core/Parser");
 const TemplateParser_1 = require("../template/TemplateParser");
 const ParseException_1 = require("../exceptions/ParseException");
 const SchemaParser_1 = require("../schema/SchemaParser");
-const lastAnalysisByUri = new Map();
+const LAST_ANALYSIS_BY_URI = new Map();
 const SCHEMA_VALIDATOR = new SchemaValidator_1.SchemaValidator(new SchemaLoader_1.SchemaLoaderExtension());
 // Wrapper del validador que solo valida nodos con namespace
 class ConditionalValidator {
@@ -60,7 +60,7 @@ class ConditionalValidator {
     }
 }
 function getLastAnalysis(document) {
-    return lastAnalysisByUri.get(document.uri.toString());
+    return LAST_ANALYSIS_BY_URI.get(document.uri.toString());
 }
 function analysisAllDocs() {
     for (const doc of vscode.workspace.textDocuments) {
@@ -120,7 +120,7 @@ function analisysDoc(document, diagnosticCollection) {
     diagnosticCollection.set(document.uri, diagnostics);
     // Guardamos resultados
     const result = { tokens, nodeByLine };
-    lastAnalysisByUri.set(document.uri.toString(), result);
+    LAST_ANALYSIS_BY_URI.set(document.uri.toString(), result);
     //console.log("Parse end.");
     return result;
 }

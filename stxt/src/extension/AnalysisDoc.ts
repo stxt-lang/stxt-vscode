@@ -12,9 +12,8 @@ import { SchemaParser } from '../schema/SchemaParser';
 import { ParseResult } from '../core/ParseResult';
 import { Validator } from '../processors/Validator';
 
-const lastAnalysisByUri = new Map<string, AnalysisResult>();
-
-const SCHEMA_VALIDATOR = new SchemaValidator(new SchemaLoaderExtension());
+const LAST_ANALYSIS_BY_URI  = new Map<string, AnalysisResult>();
+const SCHEMA_VALIDATOR      = new SchemaValidator(new SchemaLoaderExtension());
 
 // Wrapper del validador que solo valida nodos con namespace
 class ConditionalValidator implements Validator {
@@ -33,7 +32,7 @@ class ConditionalValidator implements Validator {
 }
 
 export function getLastAnalysis(document: vscode.TextDocument): AnalysisResult | undefined {
-    return lastAnalysisByUri.get(document.uri.toString());
+    return LAST_ANALYSIS_BY_URI.get(document.uri.toString());
 }
 
 export function analysisAllDocs(): void{
@@ -104,7 +103,7 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
 
     // Guardamos resultados
     const result: AnalysisResult = { tokens, nodeByLine };
-    lastAnalysisByUri.set(document.uri.toString(), result);
+    LAST_ANALYSIS_BY_URI.set(document.uri.toString(), result);
 
     //console.log("Parse end.");
     return result;
