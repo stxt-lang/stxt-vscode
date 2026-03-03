@@ -1,0 +1,148 @@
+import vscode from 'vscode';
+import { Node } from '../core/Node';
+import { StringUtils } from '../core/StringUtils';
+import { getSchemas, SchemaLoaderExtension } from './SchemaLoader';
+import { Schema } from '../schema/Schema';
+import { NodeDefinition } from '../schema/NodeDefinition';
+import { ChildDefinition } from '../schema/ChildDefinition';
+
+let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();
+
+export function buscarSugerencias(parent: Node, prefix: string): vscode.CompletionItem[] {
+    console.log("Buscando esquema de " + parent.getQualifiedName());
+    let schema = schemaLoader.getSchema(parent.getNamespace());
+
+    if (!schema) {
+        return [];
+    }
+
+    let nodeDef = schema.getNodeDefinition(parent.getName());
+    if (!nodeDef) {
+        return [];
+    }
+
+    const children = nodeDef.getChildren();
+    const result: vscode.CompletionItem[] = [];
+    const normalizedPrefix = StringUtils.normalize(prefix);
+
+    for (let [childName, childDef] of children.entries()) {
+        if (normalizedPrefix.length > 0 && !StringUtils.normalize(childDef.getName()).startsWith(normalizedPrefix)) {
+            continue;
+        }
+        const isText: boolean = isBlockText(childDef);
+        const item = new vscode.CompletionItem(childDef.getName(), isText ? vscode.CompletionItemKind.Module: vscode.CompletionItemKind.EnumMember);
+        if (childDef.getNamespace() === parent.getNamespace()) {
+            if (isText) {
+                item.insertText = `${childDef.getName()} >>\n\t`;
+            } else {
+                item.insertText = `${childDef.getName()}: `;
+            }
+        } else {
+            if (isText) {
+                item.insertText = `${childDef.getName()} (${childDef.getNamespace()})>>\n\t`;
+            } else {
+                item.insertText = `${childDef.getName()} (${childDef.getNamespace()}): `;
+            }
+        }
+        item.detail = childName;
+        result.push(item);
+    }
+
+    return result;
+}
+
+export function buscarSugerenciasPrimerNivel(prefix: string): vscode.CompletionItem[] {
+    const result: vscode.CompletionItem[] = [];
+    const seen = new Set<string>();
+    const normalizedPrefix = StringUtils.normalize(prefix);
+
+    for (const schema of getSchemas()) {
+        for (const nodeDef of getRootNodeDefinitions(schema)) {
+            if (normalizedPrefix.length > 0 && !nodeDef.getNormalizedName().startsWith(normalizedPrefix)) {
+                continue;
+            }
+
+            const key = `${schema.getNamespace()}:${nodeDef.getNormalizedName()}`;
+            if (seen.has(key)) {
+                continue;
+            }
+            seen.add(key);
+
+            result.push(createCompletionItem(nodeDef.getName(), schema.getNamespace(), isBlockTextNode(nodeDef), false));
+        }
+    }
+
+    return result;
+}
+
+function getRootNodeDefinitions(schema: Schema): NodeDefinition[] {
+    const referencedLocalChildren = new Set<string>();
+
+    for (const nodeDef of schema.getNodes().values()) {
+        for (const childDef of nodeDef.getChildren().values()) {
+            if (childDef.getNamespace() === schema.getNamespace()) {
+                referencedLocalChildren.add(childDef.getNormalizedName());
+            }
+        }
+    }
+
+    const roots: NodeDefinition[] = [];
+    for (const nodeDef of schema.getNodes().values()) {
+        if (!referencedLocalChildren.has(nodeDef.getNormalizedName())) {
+            roots.push(nodeDef);
+        }
+    }
+
+    if (roots.length > 0) {
+        return roots;
+    }
+
+    // Fallback si no podemos inferir raíces.
+    return Array.from(schema.getNodes().values());
+}
+
+function isBlockTextNode(nodeDef: NodeDefinition): boolean {
+    const type = nodeDef.getType();
+    return type === "TEXT" || type === "BLOCK";
+}
+
+function createCompletionItem(name: string, namespace: string, isText: boolean, hideNamespaceWhenEmpty: boolean): vscode.CompletionItem {
+    const item = new vscode.CompletionItem(name, isText ? vscode.CompletionItemKind.Module : vscode.CompletionItemKind.EnumMember);
+    const includeNamespace = namespace.length > 0 && !hideNamespaceWhenEmpty;
+
+    if (includeNamespace) {
+        if (isText) {
+            item.insertText = `${name} (${namespace})>>\n\t`;
+        } else {
+            item.insertText = `${name} (${namespace}): `;
+        }
+    } else {
+        if (isText) {
+            item.insertText = `${name} >>\n\t`;
+        } else {
+            item.insertText = `${name}: `;
+        }
+    }
+
+    item.detail = includeNamespace ? `${namespace}:${StringUtils.normalize(name)}` : StringUtils.normalize(name);
+    return item;
+}
+
+function isBlockText(childDef: ChildDefinition): boolean {
+    try {
+         const schema = schemaLoader.getSchema(childDef.getNamespace());
+         if (!schema) {
+            return false;
+         }
+
+         const nodeDef = schema.getNodeDefinition(childDef.getName());
+         if (!nodeDef) { 
+            return false;
+         }
+
+         const type = nodeDef.getType();
+         return type === "TEXT" || type === "BLOCK";
+    } catch (e) {
+        return false;
+    }
+}
