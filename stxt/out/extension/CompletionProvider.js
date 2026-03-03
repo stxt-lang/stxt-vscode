@@ -9,6 +9,7 @@ const AnalysisDoc_1 = require("./AnalysisDoc");
 const Constants_1 = require("../core/Constants");
 const SchemaLoader_1 = require("./SchemaLoader");
 const StringUtils_1 = require("../core/StringUtils");
+const IndentUtils_1 = require("../core/IndentUtils");
 let schemaLoader = new SchemaLoader_1.SchemaLoaderExtension();
 class StxtCompletionProvider {
     provideCompletionItems(document, position) {
@@ -48,34 +49,6 @@ class StxtCompletionProvider {
     }
 }
 exports.StxtCompletionProvider = StxtCompletionProvider;
-function getLevel(line) {
-    let level = 0;
-    let spaces = 0;
-    let pointer = 0;
-    while (pointer < line.length) {
-        const c = line.charAt(pointer);
-        if (c === Constants_1.Constants.SPACE) {
-            spaces++;
-            if (spaces === Constants_1.Constants.TAB_SPACES) {
-                level++;
-                spaces = 0;
-            }
-        }
-        else if (c === Constants_1.Constants.TAB) {
-            level++;
-            spaces = 0;
-        }
-        else if (c === Constants_1.Constants.COMMENT_CHAR) {
-            return 0;
-        }
-        else {
-            // Primer carácter no espacio/tab/comentario => fin de indentación
-            break;
-        }
-        pointer++;
-    }
-    return level;
-}
 function getCompletionContext(linePrefix) {
     const trimmed = linePrefix.trimStart();
     if (trimmed.startsWith(Constants_1.Constants.COMMENT_CHAR)) {
@@ -85,23 +58,12 @@ function getCompletionContext(linePrefix) {
     if (trimmed.includes(Constants_1.Constants.SEP_NODE) || trimmed.includes('>>')) {
         return null;
     }
-    const level = getLevel(linePrefix);
-    const indentationLength = getIndentationLength(linePrefix);
+    const level = (0, IndentUtils_1.calculateIndentLevel)(linePrefix);
+    const indentationLength = (0, IndentUtils_1.getIndentationLength)(linePrefix);
     const rawNodePrefix = linePrefix.slice(indentationLength);
     // Permitimos texto para filtrar por prefijo de nombre.
     const prefix = rawNodePrefix.replace(/\s*\(.*$/, '').trimEnd();
     return { level, prefix };
-}
-function getIndentationLength(line) {
-    let pointer = 0;
-    while (pointer < line.length) {
-        const c = line.charAt(pointer);
-        if (c !== Constants_1.Constants.SPACE && c !== Constants_1.Constants.TAB) {
-            break;
-        }
-        pointer++;
-    }
-    return pointer;
 }
 function buscarSugerencias(parent, prefix) {
     console.log("Buscando esquema de " + parent.getQualifiedName());

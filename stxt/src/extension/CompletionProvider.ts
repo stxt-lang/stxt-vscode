@@ -8,6 +8,7 @@ import { ChildDefinition } from '../schema/ChildDefinition';
 import { StringUtils } from '../core/StringUtils';
 import { NodeDefinition } from '../schema/NodeDefinition';
 import { Schema } from '../schema/Schema';
+import { calculateIndentLevel, getIndentationLength } from '../core/IndentUtils';
 
 let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();
 
@@ -60,35 +61,6 @@ export class StxtCompletionProvider implements vscode.CompletionItemProvider {
     }
 }
 
-function getLevel(line: string): number {
-    let level = 0;
-    let spaces = 0;
-    let pointer = 0;
-
-    while (pointer < line.length) {
-        const c = line.charAt(pointer);
-
-        if (c === Constants.SPACE) {
-            spaces++;
-            if (spaces === Constants.TAB_SPACES) {
-                level++;
-                spaces = 0;
-            }
-        } else if (c === Constants.TAB) {
-            level++;
-            spaces = 0;
-        } else if (c === Constants.COMMENT_CHAR) {
-            return 0;
-        } else {
-            // Primer carácter no espacio/tab/comentario => fin de indentación
-            break;
-        }
-
-        pointer++;
-    }
-    return level;
-}
-
 function getCompletionContext(linePrefix: string): { level: number, prefix: string } | null {
     const trimmed = linePrefix.trimStart();
     if (trimmed.startsWith(Constants.COMMENT_CHAR)) {
@@ -100,7 +72,7 @@ function getCompletionContext(linePrefix: string): { level: number, prefix: stri
         return null;
     }
 
-    const level = getLevel(linePrefix);
+    const level = calculateIndentLevel(linePrefix);
     const indentationLength = getIndentationLength(linePrefix);
     const rawNodePrefix = linePrefix.slice(indentationLength);
 
@@ -108,18 +80,6 @@ function getCompletionContext(linePrefix: string): { level: number, prefix: stri
     const prefix = rawNodePrefix.replace(/\s*\(.*$/, '').trimEnd();
 
     return { level, prefix };
-}
-
-function getIndentationLength(line: string): number {
-    let pointer = 0;
-    while (pointer < line.length) {
-        const c = line.charAt(pointer);
-        if (c !== Constants.SPACE && c !== Constants.TAB) {
-            break;
-        }
-        pointer++;
-    }
-    return pointer;
 }
 
 function buscarSugerencias(parent: Node, prefix: string): vscode.CompletionItem[] {
