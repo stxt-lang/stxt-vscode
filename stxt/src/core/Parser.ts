@@ -66,6 +66,10 @@ export class Parser {
 			const lineIndent: LineIndent | null = parseLineIndent(line, lastNodeText, lastLevel, lineNumber);
 
 			if (lineIndent === null) {
+				// Pasamos a observers
+				this.observers.forEach(observer => {
+					observer.onComment(lineNumber, line);
+				});
 				return;
 			}
 
@@ -87,7 +91,7 @@ export class Parser {
 
 			// Pasamos a observers
 			this.observers.forEach(observer => {
-				observer.onCreate(node);
+				observer.onCreate(node, line);
 			});
 
 			// Añadimos a stack

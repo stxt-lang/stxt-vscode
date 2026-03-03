@@ -50,6 +50,10 @@ class Parser {
             // Parseamos línea
             const lineIndent = (0, LineIndentParser_1.parseLineIndent)(line, lastNodeText, lastLevel, lineNumber);
             if (lineIndent === null) {
+                // Pasamos a observers
+                this.observers.forEach(observer => {
+                    observer.onComment(lineNumber, line);
+                });
                 return;
             }
             const currentLevel = lineIndent.indentLevel;
@@ -66,7 +70,7 @@ class Parser {
             const node = (0, NodeCreator_1.createNode)(lineIndent, lineNumber, currentLevel, parent);
             // Pasamos a observers
             this.observers.forEach(observer => {
-                observer.onCreate(node);
+                observer.onCreate(node, line);
             });
             // Añadimos a stack
             stack.push(node);
