@@ -1,13 +1,13 @@
-import vscode from 'vscode';
 import { getLastAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
 import { Constants } from '../core/Constants';
 import { calculateIndentLevel, getIndentationLength } from '../core/IndentUtils';
 import { buscarSugerencias, buscarSugerenciasPrimerNivel } from './CompletionProviderSearch';
+import { CompletionItem, CompletionItemProvider, Position, ProviderResult, TextDocument } from 'vscode';
 
-export class StxtCompletionProvider implements vscode.CompletionItemProvider {
+export class StxtCompletionProvider implements CompletionItemProvider {
 
-    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.CompletionItem[]> {
+    provideCompletionItems(document: TextDocument, position: Position): ProviderResult<CompletionItem[]> {
 
         const linePrefix = document.lineAt(position).text.slice(0, position.character);
 

@@ -1,13 +1,10 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buscarSugerencias = buscarSugerencias;
 exports.buscarSugerenciasPrimerNivel = buscarSugerenciasPrimerNivel;
-const vscode_1 = __importDefault(require("vscode"));
 const StringUtils_1 = require("../core/StringUtils");
 const SchemaLoader_1 = require("./SchemaLoader");
+const vscode_1 = require("vscode");
 let schemaLoader = new SchemaLoader_1.SchemaLoaderExtension();
 function buscarSugerencias(parent, prefix) {
     console.log("Buscando esquema de " + parent.getQualifiedName());
@@ -27,7 +24,7 @@ function buscarSugerencias(parent, prefix) {
             continue;
         }
         const isText = isBlockText(childDef);
-        const item = new vscode_1.default.CompletionItem(childDef.getName(), isText ? vscode_1.default.CompletionItemKind.Module : vscode_1.default.CompletionItemKind.EnumMember);
+        const item = new vscode_1.CompletionItem(childDef.getName(), isText ? vscode_1.CompletionItemKind.Module : vscode_1.CompletionItemKind.EnumMember);
         if (childDef.getNamespace() === parent.getNamespace()) {
             if (isText) {
                 item.insertText = `${childDef.getName()} >>\n\t`;
@@ -94,7 +91,7 @@ function isBlockTextNode(nodeDef) {
     return type === "TEXT" || type === "BLOCK";
 }
 function createCompletionItem(name, namespace, isText, hideNamespaceWhenEmpty) {
-    const item = new vscode_1.default.CompletionItem(name, isText ? vscode_1.default.CompletionItemKind.Module : vscode_1.default.CompletionItemKind.EnumMember);
+    const item = new vscode_1.CompletionItem(name, isText ? vscode_1.CompletionItemKind.Module : vscode_1.CompletionItemKind.EnumMember);
     const includeNamespace = namespace.length > 0 && !hideNamespaceWhenEmpty;
     if (includeNamespace) {
         if (isText) {

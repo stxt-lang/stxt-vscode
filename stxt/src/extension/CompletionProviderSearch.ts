@@ -1,14 +1,14 @@
-import vscode from 'vscode';
 import { Node } from '../core/Node';
 import { StringUtils } from '../core/StringUtils';
 import { getSchemas, SchemaLoaderExtension } from './SchemaLoader';
 import { Schema } from '../schema/Schema';
 import { NodeDefinition } from '../schema/NodeDefinition';
 import { ChildDefinition } from '../schema/ChildDefinition';
+import { CompletionItem, CompletionItemKind } from 'vscode';
 
 let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();
 
-export function buscarSugerencias(parent: Node, prefix: string): vscode.CompletionItem[] {
+export function buscarSugerencias(parent: Node, prefix: string): CompletionItem[] {
     console.log("Buscando esquema de " + parent.getQualifiedName());
     let schema = schemaLoader.getSchema(parent.getNamespace());
 
@@ -22,7 +22,7 @@ export function buscarSugerencias(parent: Node, prefix: string): vscode.Completi
     }
 
     const children = nodeDef.getChildren();
-    const result: vscode.CompletionItem[] = [];
+    const result: CompletionItem[] = [];
     const normalizedPrefix = StringUtils.normalize(prefix);
 
     for (let [childName, childDef] of children.entries()) {
@@ -30,7 +30,7 @@ export function buscarSugerencias(parent: Node, prefix: string): vscode.Completi
             continue;
         }
         const isText: boolean = isBlockText(childDef);
-        const item = new vscode.CompletionItem(childDef.getName(), isText ? vscode.CompletionItemKind.Module: vscode.CompletionItemKind.EnumMember);
+        const item = new CompletionItem(childDef.getName(), isText ? CompletionItemKind.Module: CompletionItemKind.EnumMember);
         if (childDef.getNamespace() === parent.getNamespace()) {
             if (isText) {
                 item.insertText = `${childDef.getName()} >>\n\t`;
@@ -51,8 +51,8 @@ export function buscarSugerencias(parent: Node, prefix: string): vscode.Completi
     return result;
 }
 
-export function buscarSugerenciasPrimerNivel(prefix: string): vscode.CompletionItem[] {
-    const result: vscode.CompletionItem[] = [];
+export function buscarSugerenciasPrimerNivel(prefix: string): CompletionItem[] {
+    const result: CompletionItem[] = [];
     const seen = new Set<string>();
     const normalizedPrefix = StringUtils.normalize(prefix);
 
@@ -106,8 +106,8 @@ function isBlockTextNode(nodeDef: NodeDefinition): boolean {
     return type === "TEXT" || type === "BLOCK";
 }
 
-function createCompletionItem(name: string, namespace: string, isText: boolean, hideNamespaceWhenEmpty: boolean): vscode.CompletionItem {
-    const item = new vscode.CompletionItem(name, isText ? vscode.CompletionItemKind.Module : vscode.CompletionItemKind.EnumMember);
+function createCompletionItem(name: string, namespace: string, isText: boolean, hideNamespaceWhenEmpty: boolean): CompletionItem {
+    const item = new CompletionItem(name, isText ? CompletionItemKind.Module : CompletionItemKind.EnumMember);
     const includeNamespace = namespace.length > 0 && !hideNamespaceWhenEmpty;
 
     if (includeNamespace) {

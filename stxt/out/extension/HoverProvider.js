@@ -1,10 +1,7 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StxtHoverProvider = void 0;
-const vscode_1 = __importDefault(require("vscode"));
+const vscode_1 = require("vscode");
 const AnalysisDoc_1 = require("./AnalysisDoc");
 const SchemaLoader_1 = require("./SchemaLoader");
 class StxtHoverProvider {
@@ -17,7 +14,7 @@ class StxtHoverProvider {
         if (!node) {
             return;
         }
-        const md = new vscode_1.default.MarkdownString();
+        const md = new vscode_1.MarkdownString();
         md.appendMarkdown(node.isTextNode() ? "### BLOCK " : "### INLINE");
         md.appendMarkdown(` (Level ${node.getLevel()})\n`);
         md.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
@@ -43,7 +40,7 @@ class StxtHoverProvider {
             md.appendCodeblock(String(text), 'stxt');
         }
         md.isTrusted = false; // por seguridad, no permitir links/HTML
-        return new vscode_1.default.Hover(md);
+        return new vscode_1.Hover(md);
     }
 }
 exports.StxtHoverProvider = StxtHoverProvider;

@@ -1,10 +1,10 @@
-import vscode from 'vscode';
+import { DocumentSemanticTokensProvider, ProviderResult, SemanticTokens, SemanticTokensBuilder, TextDocument } from 'vscode';
 import { getLastAnalysis } from './AnalysisDoc';
 import { tokenLegend, tokenTypeIndex } from './Tokens';
 
-export class StxtSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
-	provideDocumentSemanticTokens(document: vscode.TextDocument): vscode.ProviderResult<vscode.SemanticTokens> {
-		const builder = new vscode.SemanticTokensBuilder(tokenLegend);
+export class StxtSemanticTokensProvider implements DocumentSemanticTokensProvider {
+	provideDocumentSemanticTokens(document: TextDocument): ProviderResult<SemanticTokens> {
+		const builder = new SemanticTokensBuilder(tokenLegend);
 
 		const analysis = getLastAnalysis(document);
 		if (!analysis) {

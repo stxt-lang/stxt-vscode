@@ -1,12 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StxtFormattingProvider = void 0;
-const vscode_1 = __importDefault(require("vscode"));
 const AnalysisDoc_1 = require("./AnalysisDoc");
 const StringUtils_1 = require("../core/StringUtils");
+const vscode_1 = require("vscode");
 class StxtFormattingProvider {
     provideDocumentFormattingEdits(document) {
         const analysis = (0, AnalysisDoc_1.getLastAnalysis)(document);
@@ -16,7 +13,7 @@ class StxtFormattingProvider {
             const node = analysis?.nodeByLine.get(index);
             const newLine = createLine(line, node);
             if (newLine !== line) {
-                edits.push(vscode_1.default.TextEdit.replace(new vscode_1.default.Range(index, 0, index, line.length), newLine));
+                edits.push(vscode_1.TextEdit.replace(new vscode_1.Range(index, 0, index, line.length), newLine));
             }
         });
         return edits;

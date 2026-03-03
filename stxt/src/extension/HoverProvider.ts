@@ -1,9 +1,9 @@
-import vscode from 'vscode';
+import { Hover, HoverProvider, MarkdownString, Position, ProviderResult, TextDocument } from 'vscode';
 import { getLastAnalysis } from './AnalysisDoc';
 import { getSchema } from './SchemaLoader';
 
-export class StxtHoverProvider implements vscode.HoverProvider {
-	provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.ProviderResult<vscode.Hover> {
+export class StxtHoverProvider implements HoverProvider {
+	provideHover(document: TextDocument, position: Position): ProviderResult<Hover> {
 
 		const analysis = getLastAnalysis(document);
 		if (!analysis) {
@@ -15,7 +15,7 @@ export class StxtHoverProvider implements vscode.HoverProvider {
 			return;
 		}
 
-		const md = new vscode.MarkdownString();
+		const md = new MarkdownString();
 		md.appendMarkdown(node.isTextNode() ? "### BLOCK ": "### INLINE");
 		md.appendMarkdown(` (Level ${node.getLevel()})\n`);
 		md.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
@@ -45,7 +45,7 @@ export class StxtHoverProvider implements vscode.HoverProvider {
 		}
 
 		md.isTrusted = false; // por seguridad, no permitir links/HTML
-		return new vscode.Hover(md);
+		return new Hover(md);
 	}
 }
 
