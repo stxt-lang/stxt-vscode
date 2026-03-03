@@ -41,8 +41,8 @@ const SchemaValidator_1 = require("../schema/SchemaValidator");
 const SchemaLoader_1 = require("./SchemaLoader");
 const extension_1 = require("../extension");
 const Parser_1 = require("../core/Parser");
-const TemplateParser_1 = require("../template/TemplateParser");
 const ParseException_1 = require("../exceptions/ParseException");
+const TemplateParser_1 = require("../template/TemplateParser");
 const SchemaParser_1 = require("../schema/SchemaParser");
 const LAST_ANALYSIS_BY_URI = new Map();
 const SCHEMA_VALIDATOR = new SchemaValidator_1.SchemaValidator(new SchemaLoader_1.SchemaLoaderExtension());
@@ -110,12 +110,8 @@ function analisysDoc(document, diagnosticCollection) {
         }
     }
     // Validaciones adicionales de template y schema
-    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.template", "Template", (node) => {
-        TemplateParser_1.TemplateParser.transformNodeToSchema(node);
-    });
-    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.schema", "Schema", (node) => {
-        SchemaParser_1.SchemaParser.transformNodeToSchema(node);
-    });
+    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.template", "Template", TemplateParser_1.transformTemplateNodeToSchema);
+    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.schema", "Schema", SchemaParser_1.transformNodeToSchema);
     // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
     // Guardamos resultados

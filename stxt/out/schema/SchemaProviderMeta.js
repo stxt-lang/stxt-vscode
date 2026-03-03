@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SchemaProviderMeta = void 0;
 const Schema_1 = require("./Schema");
-const SchemaParser_1 = require("./SchemaParser");
 const Parser_1 = require("../core/Parser");
 const ValidationException_1 = require("../exceptions/ValidationException");
 const RuntimeException_1 = require("../exceptions/RuntimeException");
+const SchemaParser_1 = require("./SchemaParser");
 class SchemaProviderMeta {
     static META_TEXT = `Schema (@stxt.schema): @stxt.schema
     Node: Schema
@@ -55,7 +55,7 @@ class SchemaProviderMeta {
         if (nodes.length !== 1) {
             throw new ValidationException_1.ValidationException(0, "META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);
         }
-        this.meta = SchemaParser_1.SchemaParser.transformNodeToSchema(nodes[0]);
+        this.meta = (0, SchemaParser_1.transformNodeToSchema)(nodes[0]);
     }
     getSchema(namespace) {
         if (namespace !== Schema_1.Schema.SCHEMA_NAMESPACE) {

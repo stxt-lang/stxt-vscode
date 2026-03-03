@@ -6,8 +6,8 @@ const Parser_1 = require("../core/Parser");
 const SchemaValidator_1 = require("../schema/SchemaValidator");
 const ValidationException_1 = require("../exceptions/ValidationException");
 const MetaTemplateSchemaProvider_1 = require("./MetaTemplateSchemaProvider");
-const TemplateParser_1 = require("./TemplateParser");
 const SchemaProviderMemory_1 = require("../schema/SchemaProviderMemory");
+const TemplateParser_1 = require("./TemplateParser");
 class TemplateSchemaProviderMemory extends SchemaProviderMemory_1.SchemaProviderMemory {
     constructor(parent) {
         if (!parent) {
@@ -25,7 +25,7 @@ class TemplateSchemaProviderMemory extends SchemaProviderMemory_1.SchemaProvider
         const schemaValidator = new SchemaValidator_1.SchemaValidator(new MetaTemplateSchemaProvider_1.MetaTemplateSchemaProvider(), true);
         schemaValidator.validate(nodes[0]);
         // Generamos schema desde el template
-        const sch = TemplateParser_1.TemplateParser.transformNodeToSchema(nodes[0]);
+        const sch = (0, TemplateParser_1.transformTemplateNodeToSchema)(nodes[0]);
         // Check mínimo de seguridad (en Java también se controlaba el namespace esperado)
         if (!sch.getNamespace() || sch.getNamespace().trim().length === 0) {
             throw new ValidationException_1.ValidationException(0, "INVALID_SCHEMA", "Schema namespace is empty");

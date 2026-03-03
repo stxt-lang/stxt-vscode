@@ -1,10 +1,10 @@
 import { Schema } from "./Schema";
 import { SchemaProvider } from "./SchemaProvider";
-import { SchemaParser } from "./SchemaParser";
 import { Parser } from "../core/Parser";
 import { Node } from "../core/Node";
 import { ValidationException } from "../exceptions/ValidationException";
 import { RuntimeException } from "../exceptions/RuntimeException";
+import { transformNodeToSchema } from "./SchemaParser";
 
 export class SchemaProviderMeta implements SchemaProvider {
     private static readonly META_TEXT = `Schema (@stxt.schema): @stxt.schema
@@ -59,7 +59,7 @@ export class SchemaProviderMeta implements SchemaProvider {
             throw new ValidationException(0, "META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);
         }
 
-        this.meta = SchemaParser.transformNodeToSchema(nodes[0]);
+        this.meta = transformNodeToSchema(nodes[0]);
     }
 
     getSchema(namespace: string): Schema {

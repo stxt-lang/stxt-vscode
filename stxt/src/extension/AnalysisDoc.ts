@@ -6,11 +6,12 @@ import { SchemaValidator } from '../schema/SchemaValidator';
 import { SchemaLoaderExtension } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';
 import { Parser } from '../core/Parser';
-import { TemplateParser } from '../template/TemplateParser';
 import { ParseException } from '../exceptions/ParseException';
-import { SchemaParser } from '../schema/SchemaParser';
 import { ParseResult } from '../core/ParseResult';
 import { Validator } from '../processors/Validator';
+import { transformTemplateNodeToSchema } from '../template/TemplateParser';
+import { transformNodeToSchema } from '../schema/SchemaParser';
+import { Schema } from '../schema/Schema';
 
 const LAST_ANALYSIS_BY_URI  = new Map<string, AnalysisResult>();
 const SCHEMA_VALIDATOR      = new SchemaValidator(new SchemaLoaderExtension());
@@ -91,12 +92,8 @@ export function analisysDoc(document: vscode.TextDocument, diagnosticCollection:
     }
 
     // Validaciones adicionales de template y schema
-    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.template", "Template", (node) => {
-        TemplateParser.transformNodeToSchema(node);
-    });
-    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.schema", "Schema", (node) => {
-        SchemaParser.transformNodeToSchema(node);
-    });
+    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.template", "Template", transformTemplateNodeToSchema);
+    validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.schema", "Schema", transformNodeToSchema);
 
     // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
@@ -157,7 +154,7 @@ function generateTokensForNode(node: Node, lineIndex: number, document: vscode.T
 }
 
 function validateSpecialDocument(nodes: Node[], diagnostics: vscode.Diagnostic[], namespace: string, typeName: string,
-     transformer: (node: Node) => void): void {
+     transformer: (node: Node) => Schema): void {
         
     nodes.forEach((node) => {
         if (node.getNamespace() === namespace) {

@@ -19,7 +19,7 @@ class MetaTemplateSchemaProvider {
         if (nodes.length !== 1) {
             throw new ValidationException_1.ValidationException(0, "META_SCHEMA_INVALID", `Meta schema must produce exactly 1 document, got ${nodes.length}`);
         }
-        this.meta = TemplateParser_1.TemplateParser.transformNodeToSchema(nodes[0]);
+        this.meta = (0, TemplateParser_1.transformTemplateNodeToSchema)(nodes[0]);
     }
     getSchema(namespace) {
         if (namespace !== "@stxt.template") {

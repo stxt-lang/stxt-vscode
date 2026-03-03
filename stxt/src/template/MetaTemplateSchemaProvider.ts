@@ -6,8 +6,7 @@ import { SchemaProvider } from "../schema/SchemaProvider";
 
 import { ValidationException } from "../exceptions/ValidationException";
 import { RuntimeException } from "../exceptions/RuntimeException";
-
-import { TemplateParser } from "./TemplateParser";
+import { transformTemplateNodeToSchema } from "./TemplateParser";
 
 export class MetaTemplateSchemaProvider implements SchemaProvider {
 	private static readonly META_TEXT = `Template (@stxt.template): @stxt.template
@@ -31,7 +30,7 @@ export class MetaTemplateSchemaProvider implements SchemaProvider {
 			);
 		}
 
-		this.meta = TemplateParser.transformNodeToSchema(nodes[0]);
+		this.meta = transformTemplateNodeToSchema(nodes[0]);
 	}
 
 	getSchema(namespace: string): Schema {

@@ -7,9 +7,9 @@ import { SchemaValidator } from "../schema/SchemaValidator";
 import { ValidationException } from "../exceptions/ValidationException";
 
 import { MetaTemplateSchemaProvider } from "./MetaTemplateSchemaProvider";
-import { TemplateParser } from "./TemplateParser";
 import { SchemaProviderMemory } from "../schema/SchemaProviderMemory";
 import { SchemaProvider } from "../schema/SchemaProvider";
+import { transformTemplateNodeToSchema } from "./TemplateParser";
 
 export class TemplateSchemaProviderMemory extends SchemaProviderMemory {
     
@@ -33,7 +33,7 @@ export class TemplateSchemaProviderMemory extends SchemaProviderMemory {
         schemaValidator.validate(nodes[0]);
 
         // Generamos schema desde el template
-        const sch = TemplateParser.transformNodeToSchema(nodes[0]);
+        const sch = transformTemplateNodeToSchema(nodes[0]);
 
         // Check mínimo de seguridad (en Java también se controlaba el namespace esperado)
         if (!sch.getNamespace() || sch.getNamespace().trim().length === 0) {

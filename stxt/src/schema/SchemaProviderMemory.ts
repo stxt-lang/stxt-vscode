@@ -2,7 +2,7 @@ import { Node } from "../core/Node";
 import { Parser } from "../core/Parser";
 import { StringUtils } from "../core/StringUtils";
 import { Schema } from "./Schema";
-import { SchemaParser } from "./SchemaParser";
+import { transformNodeToSchema } from "./SchemaParser";
 import { SchemaProvider } from "./SchemaProvider";
 import { SchemaProviderMeta } from "./SchemaProviderMeta";
 import { SchemaValidator } from "./SchemaValidator";
@@ -33,7 +33,7 @@ export class SchemaProviderMemory implements SchemaProvider {
     addSchema(txt: string): void {
         const parser: Parser = new Parser();
         const node: Node = parser.parse(txt)[0];
-        const schema: Schema = SchemaParser.transformNodeToSchema(node);
+        const schema: Schema = transformNodeToSchema(node);
 
         const schemaValidator = new SchemaValidator(new SchemaProviderMeta(), true);
         schemaValidator.validate(node);
