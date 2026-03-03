@@ -15,7 +15,7 @@ Ready-to-use examples: [https://github.com/stxt-lang/stxt-web](https://github.co
 * 🎨 Semantic syntax highlighting
 * 🧠 Context-aware hover information
 * ✍️ Document formatting
-* 🔧 Custom schema and template support (`.stxt/@stxt.schema`, `.stxt/@stxt.template`)
+* 🔧 Custom schema (`@stxt.template`) and template (`@stxt.schema`) support from directory `.stxt`.
 * 📐 Indentation configured for STXT (1 tab = 4 spaces)
 
 ---
