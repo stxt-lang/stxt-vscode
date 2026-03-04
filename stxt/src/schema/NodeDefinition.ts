@@ -6,7 +6,7 @@ export class NodeDefinition {
     private readonly name: string;
     private readonly normalizedName: string;
     private readonly type: string;
-    private readonly description: string | undefined;
+    private description: string | undefined;
 
     private readonly children: Map<string, ChildDefinition> = new Map();
     private readonly values: Set<string> = new Set();
@@ -40,6 +40,10 @@ export class NodeDefinition {
 
     getDescription(): string | undefined {
         return this.description;
+    }
+
+    setDescription(descrip: string): void {
+        this.description = descrip;
     }
 
     addChildDefinition(childDefinition: ChildDefinition): void {

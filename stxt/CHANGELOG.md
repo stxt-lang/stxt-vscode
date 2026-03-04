@@ -7,6 +7,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 - Template values are only allowed when the type is `ENUM`.
+- Parse node `description` of templates
 
 ## [0.2.0]
 

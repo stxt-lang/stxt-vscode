@@ -18,14 +18,52 @@ function transformTemplateNodeToSchema(node) {
     }
     const text = structure.getText();
     const offset = structure.getLine();
+    // Creamos un parser simple
+    const parser = new Parser_1.Parser();
     // Parseamos para los nodos
-    const nodes = new Parser_1.Parser().parse(text);
-    // Vamos iterando todos los nodos insertando
-    for (const n of nodes) {
-        addToSchema(result, n, offset);
+    try {
+        const nodes = parser.parse(text);
+        // Vamos iterando todos los nodos insertando
+        for (const n of nodes) {
+            addToSchema(result, n, offset);
+        }
+    }
+    catch (e) {
+        // TODO Cambiar línea para añadir offset.getLine();
+        throw e;
+    }
+    // Buscamos descripciones
+    const description = node.getChild("description");
+    if (description) {
+        const text = description.getText();
+        const nodes = parser.parse(text);
+        addDescriptions(result, nodes, description.getLine());
     }
     // Retornamos resultado
     return result;
+}
+function addDescriptions(schema, nodes, offset) {
+    nodes.forEach((node) => {
+        // Obtenemos namespace
+        let namespace = node.getNamespace();
+        if (!namespace || namespace === "") {
+            namespace = schema.getNamespace();
+        }
+        // Validamos no external description
+        if (namespace !== schema.getNamespace()) {
+            throw new ValidationException_1.ValidationException(node.getLine() + offset, "EXTERNAL_DESCRIPTION_NOT_ALLOWED", "Not allowed description in external namespaces");
+        }
+        // Validamos sin hijos
+        if (node.getChildren().length > 0) {
+            throw new ValidationException_1.ValidationException(node.getLine() + offset, "CHILDREN_DESCRIPTION_NOT_ALLOWED", "Not allowed children in description");
+        }
+        // Buscamos nodo de esquema
+        const nodeDef = schema.getNodeDefinition(node.getName());
+        if (!nodeDef) {
+            throw new ValidationException_1.ValidationException(node.getLine() + offset, "NODE_NOT_FOUND", `Not found node with name: ${node.getName()}`);
+        }
+        nodeDef.setDescription(node.getText());
+    });
 }
 function addToSchema(schema, node, offset) {
     // Obtenemos nombre qualificado

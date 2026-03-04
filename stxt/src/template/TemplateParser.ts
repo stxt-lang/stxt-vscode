@@ -10,6 +10,7 @@ import { StringUtils } from "../core/StringUtils";
 
 import { ChildLineParser } from "./ChildLineParser";
 import { ChildLine } from "./ChildLine";
+import { ParseException } from "../exceptions/ParseException";
 
 export function transformTemplateNodeToSchema(node: Node): Schema {
 	// Insertamos namespace
@@ -24,16 +25,60 @@ export function transformTemplateNodeToSchema(node: Node): Schema {
 	const text = structure.getText();
 	const offset = structure.getLine();
 
-	// Parseamos para los nodos
-	const nodes: Node[] = new Parser().parse(text);
+	// Creamos un parser simple
+	const parser = new Parser();
 
-	// Vamos iterando todos los nodos insertando
-	for (const n of nodes) {
-		addToSchema(result, n, offset);
+	// Parseamos para los nodos
+	try {
+		const nodes: Node[] = parser.parse(text);
+
+		// Vamos iterando todos los nodos insertando
+		for (const n of nodes) {
+			addToSchema(result, n, offset);
+		}
+	} catch (e) {
+		// TODO Cambiar línea para añadir offset.getLine();
+		throw e;
+	}
+
+	// Buscamos descripciones
+	const description = node.getChild("description");
+	if (description) {
+		const text = description.getText();
+		const nodes: Node[] = parser.parse(text);
+
+		addDescriptions(result, nodes, description.getLine());
 	}
 
 	// Retornamos resultado
 	return result;
+}
+
+function addDescriptions(schema: Schema, nodes: Node[], offset: number) {
+	nodes.forEach((node) => {
+		// Obtenemos namespace
+		let namespace = node.getNamespace();
+		if (!namespace || namespace === "") {
+			namespace = schema.getNamespace();
+		}
+
+		// Validamos no external description
+		if (namespace !== schema.getNamespace()) {		
+			throw new ValidationException(node.getLine() + offset, "EXTERNAL_DESCRIPTION_NOT_ALLOWED", "Not allowed description in external namespaces");
+		}
+
+		// Validamos sin hijos
+		if (node.getChildren().length > 0) {
+			throw new ValidationException(node.getLine() + offset, "CHILDREN_DESCRIPTION_NOT_ALLOWED", "Not allowed children in description");
+		}
+
+		// Buscamos nodo de esquema
+		const nodeDef =  schema.getNodeDefinition(node.getName());
+		if (!nodeDef) {
+			throw new ValidationException(node.getLine() + offset, "NODE_NOT_FOUND", `Not found node with name: ${node.getName()}`);
+		}
+		nodeDef.setDescription(node.getText());
+	});
 }
 
 function addToSchema(schema: Schema, node: Node, offset: number): void {
@@ -112,3 +157,4 @@ function addToSchema(schema: Schema, node: Node, offset: number): void {
 		addToSchema(schema, child, offset);
 	}
 }
+
