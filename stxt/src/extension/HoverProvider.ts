@@ -22,6 +22,13 @@ export class StxtHoverProvider implements HoverProvider {
 		md.appendMarkdown(`- **Normalized name:** \`${escapeMd(node.getNormalizedName())}\`\n`);
 		md.appendMarkdown(`- **Qualified name:** \`${escapeMd(node.getQualifiedName())}\`\n`);
 
+		const text = node.getText();
+		md.appendMarkdown(`\n---\n`);
+		md.appendMarkdown(node.isTextNode() ? `**Text**\n\n`: `- **Value:** \`${escapeMd(node.getValue())}\`\n`);
+		if(node.isTextNode()) {
+			md.appendCodeblock(String(text), 'stxt');
+		}
+
 		if (node.getNamespace()) {
 			const schema = getSchema(node.getNamespace());
 			if (schema) {
@@ -29,7 +36,8 @@ export class StxtHoverProvider implements HoverProvider {
 				if (nodeDef) {
 					// Mostrar el tipo
 					const type = nodeDef.getType();
-					md.appendMarkdown(`- **Schema Type:** \`${type}\`\n`);
+					md.appendMarkdown(`\n---\n`);
+					md.appendMarkdown(`### Schema\nType: \`${type}\`\n`);
 
 					// Si es ENUM, mostrar los valores permitidos
 					if (type === 'ENUM') {
@@ -44,19 +52,13 @@ export class StxtHoverProvider implements HoverProvider {
 					const description = nodeDef.getDescription();
 					if (description) {
 						md.appendMarkdown(`\n---\n`);
-						md.appendMarkdown(description);			
+						md.appendMarkdown(description + "\n");			
 					}
 				}
 			}
 		}
 		
 
-		const text = node.getText();
-		md.appendMarkdown(`\n---\n`);
-		md.appendMarkdown(node.isTextNode() ? `**Text**\n\n`: `- **Value:** \`${escapeMd(node.getValue())}\``);
-		if(node.isTextNode()) {
-			md.appendCodeblock(String(text), 'stxt');
-		}
 
 		md.isTrusted = false; // por seguridad, no permitir links/HTML
 		return new Hover(md);

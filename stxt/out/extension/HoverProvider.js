@@ -20,6 +20,12 @@ class StxtHoverProvider {
         md.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
         md.appendMarkdown(`- **Normalized name:** \`${escapeMd(node.getNormalizedName())}\`\n`);
         md.appendMarkdown(`- **Qualified name:** \`${escapeMd(node.getQualifiedName())}\`\n`);
+        const text = node.getText();
+        md.appendMarkdown(`\n---\n`);
+        md.appendMarkdown(node.isTextNode() ? `**Text**\n\n` : `- **Value:** \`${escapeMd(node.getValue())}\`\n`);
+        if (node.isTextNode()) {
+            md.appendCodeblock(String(text), 'stxt');
+        }
         if (node.getNamespace()) {
             const schema = (0, SchemaLoader_1.getSchema)(node.getNamespace());
             if (schema) {
@@ -27,7 +33,8 @@ class StxtHoverProvider {
                 if (nodeDef) {
                     // Mostrar el tipo
                     const type = nodeDef.getType();
-                    md.appendMarkdown(`- **Schema Type:** \`${type}\`\n`);
+                    md.appendMarkdown(`\n---\n`);
+                    md.appendMarkdown(`### Schema\nType: \`${type}\`\n`);
                     // Si es ENUM, mostrar los valores permitidos
                     if (type === 'ENUM') {
                         const values = nodeDef.getValues();
@@ -40,16 +47,10 @@ class StxtHoverProvider {
                     const description = nodeDef.getDescription();
                     if (description) {
                         md.appendMarkdown(`\n---\n`);
-                        md.appendMarkdown(description);
+                        md.appendMarkdown(description + "\n");
                     }
                 }
             }
-        }
-        const text = node.getText();
-        md.appendMarkdown(`\n---\n`);
-        md.appendMarkdown(node.isTextNode() ? `**Text**\n\n` : `- **Value:** \`${escapeMd(node.getValue())}\``);
-        if (node.isTextNode()) {
-            md.appendCodeblock(String(text), 'stxt');
         }
         md.isTrusted = false; // por seguridad, no permitir links/HTML
         return new vscode_1.Hover(md);
