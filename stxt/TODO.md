@@ -1,6 +1,4 @@
 # Plugin VSCode
-* ENUM sin mayúsculas, minúsculas, etc. como los nombres de namespace
-* ENUM no repetidos si permitimos eso de mayúsculas, minúsculas,...
 * Metaschema: enum de valores de tipo disponibles
 
 * Dependiendo del schema no mostrar nodos que ya tienen superado el máximo permitido, por lo que irán desapareciendo a medida que esté completo
