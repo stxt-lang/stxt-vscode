@@ -1,6 +1,5 @@
 # Plugin VSCode
 
-* Revisar getChildrenByName! No tiene en cuenta namespaces!!
 * Unificar core/LineIndent y core/LineIndentParse
 
 * Hover para texto. Quizá añadir a observer el añadido de una línea también

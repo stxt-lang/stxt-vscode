@@ -87,8 +87,8 @@ class Node {
         Object.freeze(this.textLines);
         this.isFrozen = true;
     }
-    getChild(cname) {
-        const result = this.getChildrenByName(cname);
+    getChild(cname, namespace) {
+        const result = this.getChildrenByName(cname, namespace);
         if (result.length > 1) {
             throw new RuntimeException_1.RuntimeException("AMBIGUOUS_CHILD", "More than 1 child. Use getChildren");
         }
@@ -98,11 +98,12 @@ class Node {
         return result[0];
     }
     // Fast access methods to children
-    getChildrenByName(cname) {
+    getChildrenByName(cname, namespace) {
         const key = StringUtils_1.StringUtils.normalize(cname);
+        const targetNamespace = namespace !== undefined ? namespace : this.namespace;
         const result = [];
         for (const child of this.children) {
-            if (child.getNormalizedName() === key) {
+            if (child.getNormalizedName() === key && child.getNamespace() === targetNamespace) {
                 result.push(child);
             }
         }

@@ -109,8 +109,8 @@ export class Node {
 		this.isFrozen = true;
 	}
 
-	getChild(cname: string): Node | null {
-		const result = this.getChildrenByName(cname);
+	getChild(cname: string, namespace?: string): Node | null {
+		const result = this.getChildrenByName(cname, namespace);
 		if (result.length > 1) {
 			throw new RuntimeException("AMBIGUOUS_CHILD", "More than 1 child. Use getChildren");
 		}
@@ -121,12 +121,13 @@ export class Node {
 	}
 
 	// Fast access methods to children
-	getChildrenByName(cname: string): Node[] {
+	getChildrenByName(cname: string, namespace?: string): Node[] {
 		const key = StringUtils.normalize(cname);
+		const targetNamespace = namespace !== undefined ? namespace : this.namespace;
 		const result: Node[] = [];
 
 		for (const child of this.children) {
-			if (child.getNormalizedName() === key) {
+			if (child.getNormalizedName() === key && child.getNamespace() === targetNamespace) {
 				result.push(child);
 			}
 		}

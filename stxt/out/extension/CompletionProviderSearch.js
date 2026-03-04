@@ -43,7 +43,7 @@ function buscarSugerenciasPorParent(parent, prefix) {
             }
         }
         item.detail = childName;
-        const actualChildren = parent.getChildrenByName(childDef.getName());
+        const actualChildren = parent.getChildrenByName(childDef.getName(), childDef.getNamespace());
         const maxChilds = childDef.getMax() ?? -1;
         if (maxChilds < 0 || actualChildren.length < maxChilds) {
             result.push(item);
