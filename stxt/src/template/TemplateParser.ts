@@ -29,18 +29,18 @@ export function transformTemplateNodeToSchema(node: Node): Schema {
 	const parser = new Parser();
 
 	// Parseamos para los nodos
+	let nodes: Node[] = [];
 	try {
-		const nodes: Node[] = parser.parse(text);
-
-		// Vamos iterando todos los nodos insertando
-		for (const n of nodes) {
-			addToSchema(result, n, offset);
-		}
+		nodes = parser.parse(text);
 	} catch (e) {
 		if (e instanceof ParseException) {
 			throw new ParseException(e.line + offset, e.code, e.message);
 		}
 		throw e;
+	}
+	// Vamos iterando todos los nodos insertando
+	for (const n of nodes) {
+		addToSchema(result, n, offset);
 	}
 
 	// Buscamos descripciones
@@ -63,32 +63,6 @@ export function transformTemplateNodeToSchema(node: Node): Schema {
 	return result;
 }
 
-function addDescriptions(schema: Schema, nodes: Node[], offset: number) {
-	nodes.forEach((node) => {
-		// Obtenemos namespace
-		let namespace = node.getNamespace();
-		if (!namespace || namespace === "") {
-			namespace = schema.getNamespace();
-		}
-
-		// Validamos no external description
-		if (namespace !== schema.getNamespace()) {
-			throw new ValidationException(node.getLine() + offset, "EXTERNAL_DESCRIPTION_NOT_ALLOWED", "Not allowed description in external namespaces");
-		}
-
-		// Validamos sin hijos
-		if (node.getChildren().length > 0) {
-			throw new ValidationException(node.getLine() + offset, "CHILDREN_DESCRIPTION_NOT_ALLOWED", "Not allowed children in description");
-		}
-
-		// Buscamos nodo de esquema
-		const nodeDef = schema.getNodeDefinition(node.getName());
-		if (!nodeDef) {
-			throw new ValidationException(node.getLine() + offset, "NODE_NOT_FOUND", `Not found node with name: ${node.getName()}`);
-		}
-		nodeDef.setDescription(node.getText());
-	});
-}
 
 function addToSchema(schema: Schema, node: Node, offset: number): void {
 	// Obtenemos nombre qualificado
@@ -167,3 +141,29 @@ function addToSchema(schema: Schema, node: Node, offset: number): void {
 	}
 }
 
+function addDescriptions(schema: Schema, nodes: Node[], offset: number) {
+	nodes.forEach((node) => {
+		// Obtenemos namespace
+		let namespace = node.getNamespace();
+		if (!namespace || namespace === "") {
+			namespace = schema.getNamespace();
+		}
+
+		// Validamos no external description
+		if (namespace !== schema.getNamespace()) {
+			throw new ValidationException(node.getLine() + offset, "EXTERNAL_DESCRIPTION_NOT_ALLOWED", "Not allowed description in external namespaces");
+		}
+
+		// Validamos sin hijos
+		if (node.getChildren().length > 0) {
+			throw new ValidationException(node.getLine() + offset, "CHILDREN_DESCRIPTION_NOT_ALLOWED", "Not allowed children in description");
+		}
+
+		// Buscamos nodo de esquema
+		const nodeDef = schema.getNodeDefinition(node.getName());
+		if (!nodeDef) {
+			throw new ValidationException(node.getLine() + offset, "NODE_NOT_FOUND", `Not found node with name: ${node.getName()}`);
+		}
+		nodeDef.setDescription(node.getText());
+	});
+}
