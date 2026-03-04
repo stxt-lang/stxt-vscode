@@ -2,7 +2,7 @@ import { getLastAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
 import { Constants } from '../core/Constants';
 import { calculateIndentLevel, getIndentationLength } from '../core/IndentUtils';
-import { buscarSugerencias, buscarSugerenciasPrimerNivel, buscarValoresEnum } from './CompletionProviderSearch';
+import { buscarSugerenciasPorParent, buscarSugerenciasPrimerNivel, buscarValoresEnum } from './CompletionProviderSearch';
 import { CompletionItem, CompletionItemProvider, Position, ProviderResult, TextDocument } from 'vscode';
 
 export class StxtCompletionProvider implements CompletionItemProvider {
@@ -55,7 +55,7 @@ export class StxtCompletionProvider implements CompletionItemProvider {
 
         if (parent) {
             console.log(`Parent *****: ${parent.getQualifiedName()} (${parent.getLine()})`);
-            return buscarSugerencias(parent, completionContext.prefix);
+            return buscarSugerenciasPorParent(parent, completionContext.prefix);
         }
 
         return [];

@@ -8,7 +8,7 @@ import { CompletionItem, CompletionItemKind } from 'vscode';
 
 let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();
 
-export function buscarSugerencias(parent: Node, prefix: string): CompletionItem[] {
+export function buscarSugerenciasPorParent(parent: Node, prefix: string): CompletionItem[] {
     console.log("Buscando esquema de " + parent.getQualifiedName());
     let schema = schemaLoader.getSchema(parent.getNamespace());
 
@@ -45,7 +45,12 @@ export function buscarSugerencias(parent: Node, prefix: string): CompletionItem[
             }
         }
         item.detail = childName;
-        result.push(item);
+
+        const actualChildren: Node[] = parent.getChildrenByName(childDef.getName());
+        const maxChilds = childDef.getMax() ?? -1;
+        if (maxChilds < 0 || actualChildren.length < maxChilds) {
+            result.push(item);
+        }        
     }
 
     return result;

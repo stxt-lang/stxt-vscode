@@ -45,7 +45,7 @@ class StxtCompletionProvider {
         }
         if (parent) {
             console.log(`Parent *****: ${parent.getQualifiedName()} (${parent.getLine()})`);
-            return (0, CompletionProviderSearch_1.buscarSugerencias)(parent, completionContext.prefix);
+            return (0, CompletionProviderSearch_1.buscarSugerenciasPorParent)(parent, completionContext.prefix);
         }
         return [];
     }

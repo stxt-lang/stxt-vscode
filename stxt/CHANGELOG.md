@@ -13,6 +13,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - ENUM with no repeted values
 - ENUM types in metaschema
 - Validate types in templates
+- Filter completions when the max limit is reached
 
 ## [0.2.0]
 

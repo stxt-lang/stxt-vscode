@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buscarSugerencias = buscarSugerencias;
+exports.buscarSugerenciasPorParent = buscarSugerenciasPorParent;
 exports.buscarSugerenciasPrimerNivel = buscarSugerenciasPrimerNivel;
 exports.buscarValoresEnum = buscarValoresEnum;
 const StringUtils_1 = require("../core/StringUtils");
 const SchemaLoader_1 = require("./SchemaLoader");
 const vscode_1 = require("vscode");
 let schemaLoader = new SchemaLoader_1.SchemaLoaderExtension();
-function buscarSugerencias(parent, prefix) {
+function buscarSugerenciasPorParent(parent, prefix) {
     console.log("Buscando esquema de " + parent.getQualifiedName());
     let schema = schemaLoader.getSchema(parent.getNamespace());
     if (!schema) {
@@ -43,7 +43,11 @@ function buscarSugerencias(parent, prefix) {
             }
         }
         item.detail = childName;
-        result.push(item);
+        const actualChildren = parent.getChildrenByName(childDef.getName());
+        const maxChilds = childDef.getMax() ?? -1;
+        if (maxChilds < 0 || actualChildren.length < maxChilds) {
+            result.push(item);
+        }
     }
     return result;
 }
