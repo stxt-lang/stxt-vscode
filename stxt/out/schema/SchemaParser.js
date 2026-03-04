@@ -72,7 +72,7 @@ function createFrom(n, namespace) {
         const valuesNode = valuesNodes[0];
         const values = valuesNode.getChildrenByName("value");
         for (const v of values) {
-            result.addValue(v.getValue());
+            result.addValue(v.getValue(), v.getLine());
         }
         // Para la comprobación final de ENUM
         valuesNodes = values;

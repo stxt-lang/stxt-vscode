@@ -12,7 +12,7 @@ exports.ENUM = {
         }
         const value = n.getValue();
         const allowed = ndef.getValues(); // ReadonlySet<string>
-        if (!allowed.has(value)) {
+        if (!ndef.isAllowedValue(value)) {
             throw new ValidationException_1.ValidationException(n.getLine(), "INVALID_VALUE", `The value '${value}' not allowed. Only: ${Array.from(allowed).join(", ")}`);
         }
     },

@@ -128,7 +128,7 @@ function addToSchema(schema: Schema, node: Node, offset: number): void {
 				throw new ValidationException(node.getLine() + offset, "VALUES_NOT_IN_ENUM", `Values only allowed with type ENUM`);
 			}
 			for (const v of values) {
-				schemaNode.addValue(v);
+				schemaNode.addValue(v, node.getLine() + offset);
 			}
 		}
 	} else {

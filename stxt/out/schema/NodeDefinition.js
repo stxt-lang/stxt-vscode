@@ -10,6 +10,7 @@ class NodeDefinition {
     description;
     children = new Map();
     values = new Set();
+    normalizedValues = new Map();
     constructor(name, type, line, description) {
         this.name = StringUtils_1.StringUtils.compactSpaces(name);
         this.normalizedName = StringUtils_1.StringUtils.normalize(name);
@@ -44,14 +45,21 @@ class NodeDefinition {
         }
         this.children.set(qname, childDefinition);
     }
-    addValue(value) {
+    addValue(value, line) {
+        const normalized = StringUtils_1.StringUtils.normalize(value);
+        if (this.normalizedValues.has(normalized)) {
+            const existing = this.normalizedValues.get(normalized);
+            throw new ValidationException_1.ValidationException(line ?? 0, "DUPLICATE_ENUM_VALUE", `Duplicate enum value: '${value}' normalizes to '${normalized}', which is already defined by '${existing}'`);
+        }
         this.values.add(value);
+        this.normalizedValues.set(normalized, value);
     }
     isAllowedValue(value) {
         if (this.values.size === 0) {
             return true;
         }
-        return this.values.has(value);
+        const normalized = StringUtils_1.StringUtils.normalize(value);
+        return this.normalizedValues.has(normalized);
     }
     getValues() {
         return this.values;

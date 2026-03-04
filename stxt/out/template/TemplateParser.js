@@ -108,7 +108,7 @@ function addToSchema(schema, node, offset) {
                 throw new ValidationException_1.ValidationException(node.getLine() + offset, "VALUES_NOT_IN_ENUM", `Values only allowed with type ENUM`);
             }
             for (const v of values) {
-                schemaNode.addValue(v);
+                schemaNode.addValue(v, node.getLine() + offset);
             }
         }
     }
