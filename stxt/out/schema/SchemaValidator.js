@@ -68,24 +68,33 @@ class SchemaValidator {
     static validateCount(nsNode, node) {
         const errors = [];
         const count = new Map();
+        const childrenByType = new Map();
         for (const child of node.getChildren()) {
             const childName = child.getQualifiedName();
             count.set(childName, (count.get(childName) ?? 0) + 1);
+            if (!childrenByType.has(childName)) {
+                childrenByType.set(childName, []);
+            }
+            childrenByType.get(childName).push(child);
         }
         for (const chNode of nsNode.getChildren().values()) {
-            errors.push(...SchemaValidator.validateCountChild(chNode, count.get(chNode.getQualifiedName()) ?? 0, node));
+            const qname = chNode.getQualifiedName();
+            errors.push(...SchemaValidator.validateCountChild(chNode, count.get(qname) ?? 0, node, childrenByType.get(qname) ?? []));
         }
         return errors;
     }
-    static validateCountChild(chNode, num, node) {
+    static validateCountChild(chNode, num, node, children) {
         const errors = [];
         const min = chNode.getMin(); // number | null
         const max = chNode.getMax(); // number | null
-        if (min != null && num < min) {
+        if (min !== null && num < min) {
             errors.push(new ValidationException_1.ValidationException(node.getLine(), "INVALID_NUMBER", `${num} nodes of '${chNode.getQualifiedName()}' and min is ${min}`));
         }
-        if (max != null && num > max) {
-            errors.push(new ValidationException_1.ValidationException(node.getLine(), "INVALID_NUMBER", `${num} nodes of '${chNode.getQualifiedName()}' and max is ${max}`));
+        if (max !== null && num > max) {
+            // Mostrar error en cada nodo hijo que excede el máximo permitido
+            for (const child of children) {
+                errors.push(new ValidationException_1.ValidationException(child.getLine(), "INVALID_NUMBER", `Too many '${chNode.getQualifiedName()}' nodes: found ${num}, max is ${max}`));
+            }
         }
         return errors;
     }

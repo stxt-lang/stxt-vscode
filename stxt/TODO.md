@@ -1,7 +1,7 @@
 # Plugin VSCode
 
 * Mostrar errores de validación de cardinalidad en todos los nodos si superan el máximo permitido por el 
-  parent. Para esto quizá que los validadores no lancen excepciones, sinó que pasen listado de errores al parser. Cambiar la firma por validate(Node): ParseException[] o Errors[]
+  parent.
 
 * Revisar cómo obtiene los ROOT en autocompletado
 * Permitir un nodo ROOT?
