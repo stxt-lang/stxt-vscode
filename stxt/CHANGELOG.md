@@ -8,6 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Template values are only allowed when the type is `ENUM`.
 - Parse node `description` of templates
+- Display correct line number when parsing templates
 
 ## [0.2.0]
 

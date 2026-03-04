@@ -8,6 +8,7 @@ const NodeDefinition_1 = require("../schema/NodeDefinition");
 const Schema_1 = require("../schema/Schema");
 const StringUtils_1 = require("../core/StringUtils");
 const ChildLineParser_1 = require("./ChildLineParser");
+const ParseException_1 = require("../exceptions/ParseException");
 function transformTemplateNodeToSchema(node) {
     // Insertamos namespace
     const result = new Schema_1.Schema(node.getValue(), node.getLine(), undefined);
@@ -29,14 +30,25 @@ function transformTemplateNodeToSchema(node) {
         }
     }
     catch (e) {
-        // TODO Cambiar línea para añadir offset.getLine();
+        if (e instanceof ParseException_1.ParseException) {
+            throw new ParseException_1.ParseException(e.line + offset, e.code, e.message);
+        }
         throw e;
     }
     // Buscamos descripciones
     const description = node.getChild("description");
     if (description) {
         const text = description.getText();
-        const nodes = parser.parse(text);
+        let nodes = [];
+        try {
+            nodes = parser.parse(text);
+        }
+        catch (e) {
+            if (e instanceof ParseException_1.ParseException) {
+                throw new ParseException_1.ParseException(e.line + description.getLine(), e.code, e.message);
+            }
+            throw e;
+        }
         addDescriptions(result, nodes, description.getLine());
     }
     // Retornamos resultado

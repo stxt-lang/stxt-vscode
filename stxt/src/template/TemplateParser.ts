@@ -19,7 +19,7 @@ export function transformTemplateNodeToSchema(node: Node): Schema {
 	// Buscamos nodo structure
 	const structure = node.getChild("structure");
 	if (!structure) {
-		throw new ValidationException(node.getLine(),"TEMPLATE_STRUCTURE_REQUIRED","Template must define 'Structure >>'");
+		throw new ValidationException(node.getLine(), "TEMPLATE_STRUCTURE_REQUIRED", "Template must define 'Structure >>'");
 	}
 
 	const text = structure.getText();
@@ -37,7 +37,9 @@ export function transformTemplateNodeToSchema(node: Node): Schema {
 			addToSchema(result, n, offset);
 		}
 	} catch (e) {
-		// TODO Cambiar línea para añadir offset.getLine();
+		if (e instanceof ParseException) {
+			throw new ParseException(e.line + offset, e.code, e.message);
+		}
 		throw e;
 	}
 
@@ -45,8 +47,15 @@ export function transformTemplateNodeToSchema(node: Node): Schema {
 	const description = node.getChild("description");
 	if (description) {
 		const text = description.getText();
-		const nodes: Node[] = parser.parse(text);
-
+		let nodes: Node[] = [];
+		try {
+			nodes = parser.parse(text);
+		} catch (e) {
+			if (e instanceof ParseException) {
+				throw new ParseException(e.line + description.getLine(), e.code, e.message);
+			}
+			throw e;
+		}
 		addDescriptions(result, nodes, description.getLine());
 	}
 
@@ -63,7 +72,7 @@ function addDescriptions(schema: Schema, nodes: Node[], offset: number) {
 		}
 
 		// Validamos no external description
-		if (namespace !== schema.getNamespace()) {		
+		if (namespace !== schema.getNamespace()) {
 			throw new ValidationException(node.getLine() + offset, "EXTERNAL_DESCRIPTION_NOT_ALLOWED", "Not allowed description in external namespaces");
 		}
 
@@ -73,7 +82,7 @@ function addDescriptions(schema: Schema, nodes: Node[], offset: number) {
 		}
 
 		// Buscamos nodo de esquema
-		const nodeDef =  schema.getNodeDefinition(node.getName());
+		const nodeDef = schema.getNodeDefinition(node.getName());
 		if (!nodeDef) {
 			throw new ValidationException(node.getLine() + offset, "NODE_NOT_FOUND", `Not found node with name: ${node.getName()}`);
 		}

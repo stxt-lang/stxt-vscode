@@ -1,5 +1,4 @@
 # Plugin VSCode
-* Mostrar línea correcta en errores de parseo de templates
 * ENUM sin mayúsculas, minúsculas, etc. como los nombres de namespace
 * ENUM no repetidos si permitimos eso de mayúsculas, minúsculas,...
 * Metaschema: enum de valores de tipo disponibles
