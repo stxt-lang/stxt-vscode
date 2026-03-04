@@ -1,16 +1,16 @@
 # Plugin VSCode
 
-* Unificar core/LineIndent y core/LineIndentParse
-* Hover para texto. Quizá añadir a observer el añadido de una línea también
-* Goto (click) para ir a la definición del schema
-
 * Revisar getChildrenByName! No tiene en cuenta namespaces!!
+* Unificar core/LineIndent y core/LineIndentParse
+
+* Hover para texto. Quizá añadir a observer el añadido de una línea también
 
 * Colores distintos para documentos con namespace y sin namespace
 * Colores distintos para namespace normal y namespace `@`
 * Colores dentro de los template, para ver mejor el contenido
 
 * Parseo en proyecto node separado
+* Goto (click) para ir a la definición del schema
 
 # Sobre STXT
 * Revisar documentos
