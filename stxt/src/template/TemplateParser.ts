@@ -11,6 +11,7 @@ import { StringUtils } from "../core/StringUtils";
 import { ChildLineParser } from "./ChildLineParser";
 import { ChildLine } from "./ChildLine";
 import { ParseException } from "../exceptions/ParseException";
+import { TypeRegistry } from "../schema/TypeRegistry";
 
 export function transformTemplateNodeToSchema(node: Node): Schema {
 	// Insertamos namespace
@@ -96,6 +97,10 @@ function addToSchema(schema: Schema, node: Node): void {
 		const type = cl.getType() == null ? "INLINE" : cl.getType()!;
 		schemaNode = new NodeDefinition(node.getName(), type, node.getLine(), undefined);
 		schema.addNodeDefinition(schemaNode);
+
+		if (!TypeRegistry.get(type)) {
+			throw new ValidationException(node.getLine(), "TYPE_NOT_VALID", `Type not valid: ${type}`);
+		}
 
 		const values = cl.getValues();
 		if (values) {

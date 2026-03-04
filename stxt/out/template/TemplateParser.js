@@ -9,6 +9,7 @@ const Schema_1 = require("../schema/Schema");
 const StringUtils_1 = require("../core/StringUtils");
 const ChildLineParser_1 = require("./ChildLineParser");
 const ParseException_1 = require("../exceptions/ParseException");
+const TypeRegistry_1 = require("../schema/TypeRegistry");
 function transformTemplateNodeToSchema(node) {
     // Insertamos namespace
     const result = new Schema_1.Schema(node.getValue(), node.getLine(), undefined);
@@ -81,6 +82,9 @@ function addToSchema(schema, node) {
         const type = cl.getType() == null ? "INLINE" : cl.getType();
         schemaNode = new NodeDefinition_1.NodeDefinition(node.getName(), type, node.getLine(), undefined);
         schema.addNodeDefinition(schemaNode);
+        if (!TypeRegistry_1.TypeRegistry.get(type)) {
+            throw new ValidationException_1.ValidationException(node.getLine(), "TYPE_NOT_VALID", `Type not valid: ${type}`);
+        }
         const values = cl.getValues();
         if (values) {
             if (type !== "ENUM") {

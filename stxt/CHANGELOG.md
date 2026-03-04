@@ -12,6 +12,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - ENUM with normalized values
 - ENUM with no repeted values
 - ENUM types in metaschema
+- Validate types in templates
 
 ## [0.2.0]
 
