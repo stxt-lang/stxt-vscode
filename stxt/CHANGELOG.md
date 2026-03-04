@@ -9,14 +9,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.3.0]
 
 - Template values are only allowed when the type is `ENUM`.
-- Parse node `description` of templates
-- Display correct line number when parsing templates
-- ENUM with normalized values
-- ENUM with no repeted values
-- ENUM types in metaschema
-- Validate types in templates
-- Filter completions when the max limit is reached
-- Change of Validator, now returns a array of ValidationException
+- Parse template node `description`.
+- Display the correct line number when parsing templates.
+- ENUM with normalized values.
+- ENUM with no repeated values.
+- ENUM types in metaschema.
+- Validate types in templates.
+- Filter completions when the max limit is reached.
+- Validator change: now returns an array of `ValidationException`.
 
 ## [0.2.0]
 
@@ -36,7 +36,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.1.3]
 
 - Fix: node `Description` of `@stxt.template`.
-- Code refactors
+- Code refactoring.
 - Automatic reloading after schema/template change
 
 ## [0.1.2]
