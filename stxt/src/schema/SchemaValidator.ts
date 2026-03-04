@@ -123,7 +123,10 @@ export class SchemaValidator implements Validator {
         }
 
         if (max !== null && num > max) {
-            // Mostrar error en cada nodo hijo que excede el máximo permitido
+            // Error en el parent
+            errors.push(new ValidationException(node.getLine(),"INVALID_NUMBER",`${num} nodes of '${chNode.getQualifiedName()}' and max is ${max}`));
+            
+            // Error en cada nodo hijo que excede el máximo permitido
             for (const child of children) {
                 errors.push(new ValidationException(
                     child.getLine(),

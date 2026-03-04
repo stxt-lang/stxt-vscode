@@ -91,7 +91,9 @@ class SchemaValidator {
             errors.push(new ValidationException_1.ValidationException(node.getLine(), "INVALID_NUMBER", `${num} nodes of '${chNode.getQualifiedName()}' and min is ${min}`));
         }
         if (max !== null && num > max) {
-            // Mostrar error en cada nodo hijo que excede el máximo permitido
+            // Error en el parent
+            errors.push(new ValidationException_1.ValidationException(node.getLine(), "INVALID_NUMBER", `${num} nodes of '${chNode.getQualifiedName()}' and max is ${max}`));
+            // Error en cada nodo hijo que excede el máximo permitido
             for (const child of children) {
                 errors.push(new ValidationException_1.ValidationException(child.getLine(), "INVALID_NUMBER", `Too many '${chNode.getQualifiedName()}' nodes: found ${num}, max is ${max}`));
             }
