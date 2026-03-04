@@ -11,6 +11,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Display correct line number when parsing templates
 - ENUM with normalized values
 - ENUM with no repeted values
+- ENUM types in metaschema
 
 ## [0.2.0]
 

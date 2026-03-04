@@ -1,5 +1,5 @@
 # Plugin VSCode
-* Metaschema: enum de valores de tipo disponibles
+* Validación de tipo en templates
 
 * Dependiendo del schema no mostrar nodos que ya tienen superado el máximo permitido, por lo que irán desapareciendo a medida que esté completo
 * Mostrar errores de validación de cardinalidad en todos los nodos si superan el máximo permitido por el parent.
