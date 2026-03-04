@@ -42,6 +42,23 @@ class SchemaProviderMeta {
     Node: Max
         Type: NATURAL
     Node: Type
+        Type: ENUM
+        Values:
+            Value: INLINE
+            Value: BLOCK
+            Value: TEXT
+            Value: BOOLEAN
+            Value: URL
+            Value: INTEGER
+            Value: NATURAL
+            Value: NUMBER
+            Value: DATE
+            Value: TIMESTAMP
+            Value: EMAIL
+            Value: HEXADECIMAL
+            Value: BASE64
+            Value: GROUP
+            Value: ENUM
     Node: Values
         Children:
             Child: Value
