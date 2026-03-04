@@ -1,7 +1,5 @@
 # Plugin VSCode
 
-* Revisar cómo obtiene los ROOT en autocompletado
-* Permitir un nodo ROOT?
 * Unificar core/LineIndent y core/LineIndentParse
 * Hover para texto. Quizá añadir a observer el añadido de una línea también
 * Goto (click) para ir a la definición del schema
