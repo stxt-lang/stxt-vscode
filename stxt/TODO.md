@@ -1,8 +1,5 @@
 # Plugin VSCode
 
-* Mostrar errores de validación de cardinalidad en todos los nodos si superan el máximo permitido por el 
-  parent.
-
 * Revisar cómo obtiene los ROOT en autocompletado
 * Permitir un nodo ROOT?
 * Unificar core/LineIndent y core/LineIndentParse

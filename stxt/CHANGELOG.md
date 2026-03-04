@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Cardinality max errors now show on both parent and each child node that exceeds the limit.
+
 ## [0.3.0]
 
 - Template values are only allowed when the type is `ENUM`.
