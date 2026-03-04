@@ -2,7 +2,7 @@
   "name": "stxt",
   "displayName": "STXT - Semantic Text",
   "description": "Semantic Text syntax (.stxt)",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "publisher": "stxt-lang",
   "repository": {
     "type": "git",

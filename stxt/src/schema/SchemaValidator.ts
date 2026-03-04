@@ -19,50 +19,74 @@ export class SchemaValidator implements Validator {
         this.recursiveValidation = recursive;
     }
 
-    validate(node: Node): void {
+    validate(node: Node): ValidationException[] {
+        const errors: ValidationException[] = [];
+
         // Obtenemos namespace
         const namespace = node.getNamespace();
         const sch = this.schemaProvider.getSchema(namespace);
 
         if (!sch) {
-            throw new ValidationException(node.getLine(),"SCHEMA_NOT_FOUND",`Not found schema: ${namespace}`);
+            errors.push(new ValidationException(node.getLine(),"SCHEMA_NOT_FOUND",`Not found schema: ${namespace}`));
+            return errors;
         }
 
         // Validamos nodo
-        this.validateAgainstSchema(node, sch);
+        errors.push(...this.validateAgainstSchema(node, sch));
 
         // Validamos children
         if (this.recursiveValidation) {
             for (const n of node.getChildren()){
-                this.validate(n);
+                errors.push(...this.validate(n));
             }
         }
+
+        return errors;
     }
 
-    validateAgainstSchema(node: Node, sch: Schema): void {
+    validateAgainstSchema(node: Node, sch: Schema): ValidationException[] {
+        const errors: ValidationException[] = [];
         const schemaNode = sch.getNodeDefinition(node.getNormalizedName());
 
         if (!schemaNode) {
             const error = `NOT EXIST NODE ${node.getNormalizedName()} for namespace ${sch.getNamespace()}`;
-            throw new ValidationException(node.getLine(), "NODE_NOT_EXIST_IN_SCHEMA", error);
+            errors.push(new ValidationException(node.getLine(), "NODE_NOT_EXIST_IN_SCHEMA", error));
+            return errors;
         }
 
-        SchemaValidator.validateValue(schemaNode, node);
-        SchemaValidator.validateCount(schemaNode, node);
+        errors.push(...SchemaValidator.validateValue(schemaNode, node));
+        errors.push(...SchemaValidator.validateCount(schemaNode, node));
+
+        return errors;
     }
 
-    private static validateValue(nsNode: NodeDefinition, n: Node): void {
+    private static validateValue(nsNode: NodeDefinition, n: Node): ValidationException[] {
+        const errors: ValidationException[] = [];
         const nodeType = nsNode.getType();
 
         const validator: Type | undefined = TypeRegistry.get(nodeType);
         if (!validator) {
-            throw new ValidationException(n.getLine(),"TYPE_NOT_SUPPORTED",`Node type not supported: ${nodeType}`);
+            errors.push(new ValidationException(n.getLine(),"TYPE_NOT_SUPPORTED",`Node type not supported: ${nodeType}`));
+            return errors;
         }
 
-        validator.validate(nsNode, n);
+        try {
+            validator.validate(nsNode, n);
+        } catch (e: unknown) {
+            if (e instanceof ValidationException) {
+                errors.push(e);
+            } else if (e instanceof Error) {
+                errors.push(new ValidationException(n.getLine(),"VALIDATION_ERROR", e.message));
+            } else {
+                errors.push(new ValidationException(n.getLine(),"UNKNOWN_VALIDATION_ERROR", String(e)));
+            }
+        }
+
+        return errors;
     }
 
-    private static validateCount(nsNode: NodeDefinition, node: Node): void {
+    private static validateCount(nsNode: NodeDefinition, node: Node): ValidationException[] {
+        const errors: ValidationException[] = [];
         const count = new Map<string, number>();
 
         for (const child of node.getChildren()) {
@@ -71,20 +95,25 @@ export class SchemaValidator implements Validator {
         }
 
         for (const chNode of nsNode.getChildren().values()) {
-            SchemaValidator.validateCountChild(chNode, count.get(chNode.getQualifiedName()) ?? 0, node);
+            errors.push(...SchemaValidator.validateCountChild(chNode, count.get(chNode.getQualifiedName()) ?? 0, node));
         }
+
+        return errors;
     }
 
-    private static validateCountChild(chNode: ChildDefinition, num: number, node: Node): void {
+    private static validateCountChild(chNode: ChildDefinition, num: number, node: Node): ValidationException[] {
+        const errors: ValidationException[] = [];
         const min = chNode.getMin(); // number | null
         const max = chNode.getMax(); // number | null
 
         if (min != null && num < min) {
-            throw new ValidationException(node.getLine(),"INVALID_NUMBER",`${num} nodes of '${chNode.getQualifiedName()}' and min is ${min}`);
+            errors.push(new ValidationException(node.getLine(),"INVALID_NUMBER",`${num} nodes of '${chNode.getQualifiedName()}' and min is ${min}`));
         }
 
         if (max != null && num > max) {
-            throw new ValidationException(node.getLine(),"INVALID_NUMBER",`${num} nodes of '${chNode.getQualifiedName()}' and max is ${max}`);
+            errors.push(new ValidationException(node.getLine(),"INVALID_NUMBER",`${num} nodes of '${chNode.getQualifiedName()}' and max is ${max}`));
         }
+
+        return errors;
     }
 }

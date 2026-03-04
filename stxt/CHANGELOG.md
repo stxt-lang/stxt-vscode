@@ -14,6 +14,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - ENUM types in metaschema
 - Validate types in templates
 - Filter completions when the max limit is reached
+- Change of Validator, now returns a array of ValidationException
 
 ## [0.2.0]
 

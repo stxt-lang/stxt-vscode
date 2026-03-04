@@ -10,8 +10,9 @@ class ConditionalValidator {
     validate(node) {
         // Solo validar si tiene namespace
         if (node.getNamespace() !== "") {
-            this.schemaValidator.validate(node);
+            return this.schemaValidator.validate(node);
         }
+        return [];
     }
 }
 exports.ConditionalValidator = ConditionalValidator;

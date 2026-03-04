@@ -121,7 +121,10 @@ export class Parser {
 			// Pasamos validators
 			this.validators.forEach(validator => {
 				try {
-					validator.validate(completed);
+					const errors = validator.validate(completed);
+					errors.forEach(error => {
+						result.addError(error);
+					});
 				} catch (e: unknown) {
 					this.handleError(e, completed.getLine(), result, "VALIDATION_ERROR", "UNKNOWN_VALIDATION_ERROR");
 				}

@@ -1,6 +1,7 @@
 import { Node } from "../core/Node";
 import { Validator } from "../processors/Validator";
 import { SchemaValidator } from "../schema/SchemaValidator";
+import { ValidationException } from "../exceptions/ValidationException";
 
 // Wrapper del validador que solo valida nodos con namespace
 export class ConditionalValidator implements Validator {
@@ -10,11 +11,12 @@ export class ConditionalValidator implements Validator {
         this.schemaValidator = schemaValidator;
     }
 
-    validate(node: Node): void {
+    validate(node: Node): ValidationException[] {
         // Solo validar si tiene namespace
         if (node.getNamespace() !== "") {
-            this.schemaValidator.validate(node);
+            return this.schemaValidator.validate(node);
         }
+        return [];
     }
 }
 
