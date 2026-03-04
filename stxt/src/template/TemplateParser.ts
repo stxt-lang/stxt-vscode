@@ -50,6 +50,9 @@ export function transformTemplateNodeToSchema(node: Node): Schema {
 			const nodes = parser.parse(text);
 			addDescriptions(result, nodes);
 		} catch (e) {
+			if (e instanceof ValidationException) {
+				throw new ValidationException(e.line + description.getLine(), e.code, e.message);
+			}
 			if (e instanceof ParseException) {
 				throw new ParseException(e.line + description.getLine(), e.code, e.message);
 			}

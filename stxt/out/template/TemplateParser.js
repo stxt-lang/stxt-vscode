@@ -44,6 +44,9 @@ function transformTemplateNodeToSchema(node) {
             addDescriptions(result, nodes);
         }
         catch (e) {
+            if (e instanceof ValidationException_1.ValidationException) {
+                throw new ValidationException_1.ValidationException(e.line + description.getLine(), e.code, e.message);
+            }
             if (e instanceof ParseException_1.ParseException) {
                 throw new ParseException_1.ParseException(e.line + description.getLine(), e.code, e.message);
             }
