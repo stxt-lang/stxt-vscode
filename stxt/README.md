@@ -46,20 +46,13 @@ STXT formatting preserves indentation and block semantics.
 
 ## Schemas and Templates
 
-STXT supports project-level schemas located at:
+STXT supports project-level schemas and templates located at:
 
 ```
-<workspace>/.stxt/@stxt.schema/
-```
-
-STXT also supports project-level templates located at:
-
-```
-<workspace>/.stxt/@stxt.template/
+<workspace>/.stxt/
 ```
 
 Schemas and templates are loaded automatically and refreshed when changes are detected.
-Schemas have higher priority than templates.
 
 ---
 
