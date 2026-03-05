@@ -5,7 +5,7 @@ const NameNamespaceParser_1 = require("./NameNamespaceParser");
 const Node_1 = require("./Node");
 const ParseException_1 = require("../exceptions/ParseException");
 function createNode(lineIndent, lineNumber, level, parent) {
-    const line = lineIndent.lineWithoutIndent;
+    const line = lineIndent.content;
     let name;
     let value;
     let textNode = false;

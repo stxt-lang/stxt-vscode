@@ -3,11 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Line = void 0;
 class Line {
     // Igual que en Java: campos públicos e inmutables
-    indentLevel;
-    lineWithoutIndent;
+    level;
+    content;
     constructor(level, line) {
-        this.indentLevel = level;
-        this.lineWithoutIndent = line;
+        this.level = level;
+        this.content = line;
     }
 }
 exports.Line = Line;

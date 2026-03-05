@@ -56,11 +56,11 @@ class Parser {
                 });
                 return;
             }
-            const currentLevel = line.indentLevel;
+            const currentLevel = line.level;
             // Si estamos dentro de un nodo texto, y el nivel indica que sigue siendo texto,
             // añadimos línea de texto y no creamos nodo.
             if (lastNodeText && currentLevel > lastLevel) {
-                lastNode.addTextLine(line.lineWithoutIndent);
+                lastNode.addTextLine(line.content);
                 return;
             }
             // Cerramos nodos hasta el nivel actual (esto "finaliza" y adjunta al padre/documentos)

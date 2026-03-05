@@ -1,11 +1,11 @@
 export class Line {
 	// Igual que en Java: campos públicos e inmutables
-	public readonly indentLevel: number;
-	public readonly lineWithoutIndent: string;
+	public readonly level: number;
+	public readonly content: string;
 
 	constructor(level: number, line: string) {
-		this.indentLevel = level;
-		this.lineWithoutIndent = line;
+		this.level = level;
+		this.content = line;
 	}
 }
 

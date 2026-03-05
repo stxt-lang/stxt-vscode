@@ -4,7 +4,7 @@ import { Node } from "./Node";
 import { ParseException } from "../exceptions/ParseException";
 
 export function createNode(lineIndent: Line, lineNumber: number, level: number, parent: Node | null): Node {
-    const line = lineIndent.lineWithoutIndent;
+    const line = lineIndent.content;
 
     let name: string;
     let value: string;
