@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.3.1]
+
 - Improved hover for comments: now displays the actual comment content with visual icon.
 - Improved hover for text lines: now shows information when hovering over lines inside TEXT BLOCK nodes.
 - Enhanced hover with visual icons for better readability (name, value, schema, etc.).
