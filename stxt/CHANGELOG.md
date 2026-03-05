@@ -6,6 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Improved hover information layout: better organization of node properties, schema information, and text content.
 - Internal refactor: improved code clarity and maintainability with consistent naming conventions (renamed Spanish function names to English, improved variable names, added constants for separators).
 - Internal refactor: unified line parsing logic with `Line` class improvements and removed `LineUtils.ts`.
 - Cardinality max errors now show on both parent and each child node that exceeds the limit.

@@ -20,11 +20,8 @@ class StxtHoverProvider {
         markdown.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
         markdown.appendMarkdown(`- **Normalized name:** \`${escapeMd(node.getNormalizedName())}\`\n`);
         markdown.appendMarkdown(`- **Qualified name:** \`${escapeMd(node.getQualifiedName())}\`\n`);
-        const text = node.getText();
-        markdown.appendMarkdown(`\n---\n`);
-        markdown.appendMarkdown(node.isTextNode() ? `**Text**\n\n` : `- **Value:** \`${escapeMd(node.getValue())}\`\n`);
-        if (node.isTextNode()) {
-            markdown.appendCodeblock(String(text), 'stxt');
+        if (!node.isTextNode()) {
+            markdown.appendMarkdown(`- **Value:** \`${escapeMd(node.getValue())}\`\n`);
         }
         if (node.getNamespace()) {
             const schema = (0, SchemaLoader_1.getSchema)(node.getNamespace());
@@ -34,13 +31,13 @@ class StxtHoverProvider {
                     // Mostrar el tipo
                     const type = nodeDef.getType();
                     markdown.appendMarkdown(`\n---\n`);
-                    markdown.appendMarkdown(`### Schema\nType: \`${type}\`\n`);
+                    markdown.appendMarkdown(`### Schema\n- **Type**: \`${type}\`\n`);
                     // Si es ENUM, mostrar los valores permitidos
                     if (type === 'ENUM') {
                         const values = nodeDef.getValues();
                         if (values.size > 0) {
                             const valueList = Array.from(values).map(v => `\`${escapeMd(v)}\``).join(', ');
-                            markdown.appendMarkdown(`- **Allowed values:** ${valueList}\n`);
+                            markdown.appendMarkdown(`- **Allowed values**: ${valueList}\n`);
                         }
                     }
                     // Mostrar la descripción si existe
@@ -51,6 +48,12 @@ class StxtHoverProvider {
                     }
                 }
             }
+        }
+        if (node.isTextNode()) {
+            const text = node.getText();
+            markdown.appendMarkdown(`\n---\n`);
+            markdown.appendMarkdown(`### Text\n\n`);
+            markdown.appendCodeblock(text, 'stxt');
         }
         markdown.isTrusted = false; // por seguridad, no permitir links/HTML
         return new vscode_1.Hover(markdown);
