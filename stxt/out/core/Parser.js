@@ -61,6 +61,10 @@ class Parser {
             // añadimos línea de texto y no creamos nodo.
             if (line.isBlock) {
                 lastNode.addTextLine(line.content);
+                // Notificar a observers sobre la línea de texto
+                this.observers.forEach(observer => {
+                    observer.onTextLine(lastNode, lineNumber, lineString);
+                });
                 return;
             }
             // Si es línea vacía no hacemos nada

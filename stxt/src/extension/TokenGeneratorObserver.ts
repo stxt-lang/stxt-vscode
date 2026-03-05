@@ -6,6 +6,10 @@ export class TokenGeneratorObserver implements Observer {
     private tokens: StxtToken[] = [];
     private nodeByLine = new Map<number, Node>();
 
+    onTextLine(node: Node, lineNumber: number, line: string): void {
+        // No operation
+    }
+
     onCreate(node: Node, line: string): void {
         const lineIndex = node.getLine() - 1;
         
