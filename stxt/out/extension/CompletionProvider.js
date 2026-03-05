@@ -14,7 +14,20 @@ class StxtCompletionProvider {
         if (!lastAnalisis) {
             return [];
         }
-        const completionContext = getCompletionContext(linePrefix);
+        // Buscar el nodo anterior para obtener lastLevel y lastNodeBlock
+        let lastNode = null;
+        let searchLine = position.line;
+        while (searchLine > 0) {
+            searchLine = searchLine - 1;
+            const nodeAtLine = lastAnalisis.nodeByLine.get(searchLine);
+            if (nodeAtLine) {
+                lastNode = nodeAtLine;
+                break;
+            }
+        }
+        const lastLevel = lastNode ? lastNode.getLevel() : 0;
+        const lastNodeBlock = lastNode ? lastNode.isTextNode() : false;
+        const completionContext = getCompletionContext(linePrefix, lastNodeBlock, lastLevel);
         if (!completionContext) {
             return [];
         }
@@ -34,10 +47,10 @@ class StxtCompletionProvider {
         }
         // Buscamos parent
         let parent = null;
-        let line = position.line;
-        while (line > 0) {
-            line = line - 1;
-            const nodeAtLine = lastAnalisis.nodeByLine.get(line);
+        let parentLine = position.line;
+        while (parentLine > 0) {
+            parentLine = parentLine - 1;
+            const nodeAtLine = lastAnalisis.nodeByLine.get(parentLine);
             if (nodeAtLine?.getLevel() === level - 1) {
                 parent = nodeAtLine;
                 break;
@@ -51,12 +64,14 @@ class StxtCompletionProvider {
     }
 }
 exports.StxtCompletionProvider = StxtCompletionProvider;
-function getCompletionContext(linePrefix) {
+function getCompletionContext(linePrefix, lastNodeBlock, lastLevel) {
     const trimmed = linePrefix.trimStart();
     if (trimmed.startsWith(Constants_1.Constants.COMMENT_CHAR)) {
         return null;
     }
-    const { level, length: indentationLength } = (0, LineParser_1.parseIndentation)(linePrefix);
+    const line = (0, LineParser_1.parseLine)(linePrefix, lastNodeBlock, lastLevel, 0, false);
+    const level = line.level;
+    const indentationLength = line.indentLength;
     // Detectar si estamos completando un valor (después de ':' o '>>')
     const sepIndex = trimmed.indexOf(Constants_1.Constants.SEP_NODE);
     const textSepIndex = trimmed.indexOf('>>');

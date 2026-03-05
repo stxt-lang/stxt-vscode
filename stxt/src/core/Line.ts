@@ -4,12 +4,14 @@ export class Line {
 	public readonly content: string;
 	public readonly isComment: boolean;
 	public readonly isBlock: boolean;
+	public readonly indentLength: number;
 
-	constructor(level: number, content: string, isComment: boolean, isBlock: boolean) {
+	constructor(level: number, content: string, isComment: boolean, isBlock: boolean, indentLength: number) {
 		this.level = level;
 		this.content = content;
 		this.isComment = isComment;
 		this.isBlock = isBlock;
+		this.indentLength = indentLength;
 
 	}
 	isEmpty(): boolean {

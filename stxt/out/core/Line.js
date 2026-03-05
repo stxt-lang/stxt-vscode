@@ -7,11 +7,13 @@ class Line {
     content;
     isComment;
     isBlock;
-    constructor(level, content, isComment, isBlock) {
+    indentLength;
+    constructor(level, content, isComment, isBlock, indentLength) {
         this.level = level;
         this.content = content;
         this.isComment = isComment;
         this.isBlock = isBlock;
+        this.indentLength = indentLength;
     }
     isEmpty() {
         return this.content.trim() === "";
