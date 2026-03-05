@@ -6,8 +6,12 @@ class TokenGeneratorObserver {
     tokens = [];
     nodeByLine = new Map();
     commentLines = new Set();
+    textLineByLineNumber = new Map();
     templateNodeByLine = new Map();
     onTextLine(node, lineNumber, lineString, line) {
+        // Guardar el nodo padre para las líneas de texto
+        const lineIndex = lineNumber - 1; // lineNumber es 1-indexed
+        this.textLineByLineNumber.set(lineIndex, node);
         // Guardar información de líneas dentro de nodos template
         if (this.isTemplateContentNode(node)) {
             // lineNumber es 1-indexed y absoluto en el documento
@@ -98,6 +102,9 @@ class TokenGeneratorObserver {
     }
     getCommentLines() {
         return this.commentLines;
+    }
+    getTextLineByLineNumber() {
+        return this.textLineByLineNumber;
     }
     generateTokensForNode(node, lineIndex, line) {
         if (node.isTextNode()) {

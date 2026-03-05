@@ -8,9 +8,14 @@ export class TokenGeneratorObserver implements Observer {
     private tokens: StxtToken[] = [];
     private nodeByLine = new Map<number, Node>();
     private commentLines = new Set<number>();
+    private textLineByLineNumber = new Map<number, Node>();
     private templateNodeByLine = new Map<number, Line>();
 
     onTextLine(node: Node, lineNumber: number, lineString: string, line: Line): void {
+        // Guardar el nodo padre para las líneas de texto
+        const lineIndex = lineNumber - 1; // lineNumber es 1-indexed
+        this.textLineByLineNumber.set(lineIndex, node);
+        
         // Guardar información de líneas dentro de nodos template
         if (this.isTemplateContentNode(node)) {
             // lineNumber es 1-indexed y absoluto en el documento
@@ -118,6 +123,10 @@ export class TokenGeneratorObserver implements Observer {
 
     getCommentLines(): Set<number> {
         return this.commentLines;
+    }
+
+    getTextLineByLineNumber(): Map<number, Node> {
+        return this.textLineByLineNumber;
     }
 
     private generateTokensForNode(node: Node, lineIndex: number, line: string): void {
