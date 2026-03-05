@@ -42,35 +42,35 @@ class Parser {
         // Retorno resultado
         return result;
     }
-    processLine(line, lineNumber, stack, documents, result) {
+    processLine(lineString, lineNumber, stack, documents, result) {
         try {
             const lastNode = stack.length === 0 ? null : stack[stack.length - 1];
             const lastLevel = lastNode ? lastNode.getLevel() : 0;
             const lastNodeText = lastNode ? lastNode.isTextNode() : false;
             // Parseamos línea
-            const lineIndent = (0, LineParser_1.parseLine)(line, lastNodeText, lastLevel, lineNumber);
-            if (lineIndent === null) {
+            const line = (0, LineParser_1.parseLine)(lineString, lastNodeText, lastLevel, lineNumber);
+            if (line === null) {
                 // Pasamos a observers
                 this.observers.forEach(observer => {
-                    observer.onComment(lineNumber, line);
+                    observer.onComment(lineNumber, lineString);
                 });
                 return;
             }
-            const currentLevel = lineIndent.indentLevel;
+            const currentLevel = line.indentLevel;
             // Si estamos dentro de un nodo texto, y el nivel indica que sigue siendo texto,
             // añadimos línea de texto y no creamos nodo.
             if (lastNodeText && currentLevel > lastLevel) {
-                lastNode.addTextLine(lineIndent.lineWithoutIndent);
+                lastNode.addTextLine(line.lineWithoutIndent);
                 return;
             }
             // Cerramos nodos hasta el nivel actual (esto "finaliza" y adjunta al padre/documentos)
             this.closeToLevel(stack, documents, currentLevel, result);
             // Creamos el nuevo nodo y lo dejamos "abierto" en la pila (NO lo adjuntamos aún)
             const parent = stack.length === 0 ? null : stack[stack.length - 1];
-            const node = (0, NodeCreator_1.createNode)(lineIndent, lineNumber, currentLevel, parent);
+            const node = (0, NodeCreator_1.createNode)(line, lineNumber, currentLevel, parent);
             // Pasamos a observers
             this.observers.forEach(observer => {
-                observer.onCreate(node, line);
+                observer.onCreate(node, lineString);
             });
             // Añadimos a stack
             stack.push(node);

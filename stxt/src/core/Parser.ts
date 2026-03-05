@@ -56,29 +56,29 @@ export class Parser {
 		return result;
 	}
 
-	private processLine(line: string, lineNumber: number, stack: Node[], documents: Node[], result: ParseResult): void {
+	private processLine(lineString: string, lineNumber: number, stack: Node[], documents: Node[], result: ParseResult): void {
 		try {
 			const lastNode: Node | null = stack.length === 0 ? null : stack[stack.length - 1];
 			const lastLevel = lastNode ? lastNode.getLevel() : 0;
 			const lastNodeText = lastNode ? lastNode.isTextNode() : false;
 
 			// Parseamos línea
-			const lineIndent: Line | null = parseLine(line, lastNodeText, lastLevel, lineNumber);
+			const line: Line | null = parseLine(lineString, lastNodeText, lastLevel, lineNumber);
 
-			if (lineIndent === null) {
+			if (line === null) {
 				// Pasamos a observers
 				this.observers.forEach(observer => {
-					observer.onComment(lineNumber, line);
+					observer.onComment(lineNumber, lineString);
 				});
 				return;
 			}
 
-			const currentLevel = lineIndent.indentLevel;
+			const currentLevel = line.indentLevel;
 
 			// Si estamos dentro de un nodo texto, y el nivel indica que sigue siendo texto,
 			// añadimos línea de texto y no creamos nodo.
 			if (lastNodeText && currentLevel > lastLevel) {
-				lastNode!.addTextLine(lineIndent.lineWithoutIndent);
+				lastNode!.addTextLine(line.lineWithoutIndent);
 				return;
 			}
 
@@ -87,11 +87,11 @@ export class Parser {
 
 			// Creamos el nuevo nodo y lo dejamos "abierto" en la pila (NO lo adjuntamos aún)
 			const parent: Node | null = stack.length === 0 ? null : stack[stack.length - 1];
-			const node = createNode(lineIndent, lineNumber, currentLevel, parent);
+			const node = createNode(line, lineNumber, currentLevel, parent);
 
 			// Pasamos a observers
 			this.observers.forEach(observer => {
-				observer.onCreate(node, line);
+				observer.onCreate(node, lineString);
 			});
 
 			// Añadimos a stack
