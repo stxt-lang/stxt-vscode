@@ -1,8 +1,5 @@
 # Plugin VSCode
 
-* Colores distintos para documentos con namespace y sin namespace
-* Colores distintos para namespace normal y namespace `@`
-
 * Error o warning con mezcla de identación?
 
 * Hover para texto. Quizá añadir a observer el añadido de una línea también
