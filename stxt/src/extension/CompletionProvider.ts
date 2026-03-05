@@ -1,7 +1,7 @@
 import { getLastAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
 import { Constants } from '../core/Constants';
-import { calculateIndentLevel, getIndentationLength } from '../core/LineUtils';
+import { parseIndentation } from '../core/LineParser';
 import { buscarSugerenciasPorParent, buscarSugerenciasPrimerNivel, buscarValoresEnum } from './CompletionProviderSearch';
 import { CompletionItem, CompletionItemProvider, Position, ProviderResult, TextDocument } from 'vscode';
 
@@ -68,8 +68,7 @@ function getCompletionContext(linePrefix: string): { level: number, prefix: stri
         return null;
     }
 
-    const level = calculateIndentLevel(linePrefix);
-    const indentationLength = getIndentationLength(linePrefix);
+    const { level, length: indentationLength } = parseIndentation(linePrefix);
 
     // Detectar si estamos completando un valor (después de ':' o '>>')
     const sepIndex = trimmed.indexOf(Constants.SEP_NODE);

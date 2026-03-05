@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseLine = parseLine;
+exports.parseIndentation = parseIndentation;
 const Constants_1 = require("./Constants");
 const StringUtils_1 = require("./StringUtils");
 const ParseException_1 = require("../exceptions/ParseException");
@@ -54,5 +55,37 @@ function parseLine(line, lastNodeBlock, lastLevel, numLine) {
     }
     // Caso general: devolver la línea sin la indentación consumida
     return new Line_1.Line(level, line.substring(pointer).trim(), false, false);
+}
+/**
+ * Calcula la indentación de una línea sin validaciones.
+ * Útil para el autocomplete y operaciones del editor.
+ *
+ * @param line La línea de texto a analizar
+ * @returns Objeto con level (nivel de indentación) y length (longitud en caracteres)
+ */
+function parseIndentation(line) {
+    let level = 0;
+    let spaces = 0;
+    let pointer = 0;
+    while (pointer < line.length) {
+        const c = line.charAt(pointer);
+        if (c === Constants_1.Constants.SPACE) {
+            spaces++;
+            if (spaces === Constants_1.Constants.TAB_SPACES) {
+                level++;
+                spaces = 0;
+            }
+        }
+        else if (c === Constants_1.Constants.TAB) {
+            level++;
+            spaces = 0;
+        }
+        else {
+            // Primer carácter no espacio/tab => fin de indentación
+            break;
+        }
+        pointer++;
+    }
+    return { level, length: pointer };
 }
 //# sourceMappingURL=LineParser.js.map
