@@ -1,0 +1,35 @@
+# Ejemplo de Template con coloreado
+
+Document (@stxt.template):
+	Structure >>
+		Title: Simple text
+		Author (dc): Person name
+		Section >>
+			Heading: Section title
+			Paragraph: Content text
+			Code (@example): Source code
+	
+	Description >>
+		Document (@stxt.template): Template definition
+			Title: The document title
+			Author (dc): Author of the document
+			Section: Main content section
+				Heading: Section heading text
+				Paragraph: Section paragraph content
+				Code (@example): Example code block
+
+# Otro ejemplo de template
+
+Person (@stxt.template):
+	Structure >>
+		Name: Full name
+		Age: Integer value
+		Email (contact): Email address
+		Phone (contact): Phone number
+	
+	Description >>
+		Person (@stxt.template): Person information
+			Name: Person's full name
+			Age: Person's age in years
+			Email (contact): Contact email address
+			Phone (contact): Contact phone number
