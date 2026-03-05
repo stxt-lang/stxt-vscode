@@ -6,9 +6,9 @@ exports.TEXT = {
     getName() {
         return "TEXT";
     },
-    validate(ndef, n) {
-        if (n.getChildren().length > 0) {
-            throw new ValidationException_1.ValidationException(n.getLine(), "NOT_ALLOWED_CHILDREN_TEXT", `Not allowed children nodes in node ${n.getQualifiedName()}`);
+    validate(nodeDef, node) {
+        if (node.getChildren().length > 0) {
+            throw new ValidationException_1.ValidationException(node.getLine(), "NOT_ALLOWED_CHILDREN_TEXT", `Not allowed children nodes in node ${node.getQualifiedName()}`);
         }
     },
 };

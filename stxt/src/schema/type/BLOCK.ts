@@ -8,9 +8,9 @@ export const BLOCK: Type = {
 		return "BLOCK";
 	},
 
-	validate(ndef: NodeDefinition, n: Node): void {
-		if (n.getValue().length > 0) {
-			throw new ValidationException(n.getLine(),"NOT_ALLOWED_VALUE",`Not allowed inline text in node ${n.getQualifiedName()}`);
+	validate(nodeDef: NodeDefinition, node: Node): void {
+		if (node.getValue().length > 0) {
+			throw new ValidationException(node.getLine(),"NOT_ALLOWED_VALUE",`Not allowed inline text in node ${node.getQualifiedName()}`);
 		}
 	},
 };

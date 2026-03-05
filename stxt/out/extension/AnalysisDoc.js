@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getLastAnalysis = getLastAnalysis;
 exports.analysisAllDocs = analysisAllDocs;
-exports.analisysDoc = analisysDoc;
+exports.analysisDoc = analysisDoc;
 const vscode_1 = __importDefault(require("vscode"));
 const SchemaValidator_1 = require("../schema/SchemaValidator");
 const SchemaLoader_1 = require("./SchemaLoader");
@@ -25,11 +25,11 @@ function analysisAllDocs() {
     for (const doc of vscode_1.default.workspace.textDocuments) {
         if (doc.languageId === 'stxt') {
             //console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
-            analisysDoc(doc, extension_1.diagnosticCollection);
+            analysisDoc(doc, extension_1.diagnosticCollection);
         }
     }
 }
-function analisysDoc(document, diagnosticCollection) {
+function analysisDoc(document, diagnosticCollection) {
     //console.log("Parse init...");
     const diagnostics = [];
     // Crear observer para generar tokens y nodeByLine durante el parsing
@@ -81,7 +81,7 @@ function validateSpecialDocument(nodes, diagnostics, namespace, typeName, transf
                 }
                 else {
                     const range = new vscode_1.default.Range(0, 0, 0, 100);
-                    diagnostics.push(new vscode_1.default.Diagnostic(range, `Error desconocido: ${String(e)}`, vscode_1.default.DiagnosticSeverity.Error));
+                    diagnostics.push(new vscode_1.default.Diagnostic(range, `Unknown error: ${String(e)}`, vscode_1.default.DiagnosticSeverity.Error));
                 }
             }
         }

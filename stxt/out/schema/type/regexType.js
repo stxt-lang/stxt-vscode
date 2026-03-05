@@ -5,10 +5,10 @@ const ValidationException_1 = require("../../exceptions/ValidationException");
 function regexType(name, pattern, error) {
     return {
         getName: () => name,
-        validate(ndef, n) {
-            const value = n.getText();
+        validate(nodeDef, node) {
+            const value = node.getText();
             if (!pattern.test(value)) {
-                throw new ValidationException_1.ValidationException(n.getLine(), "INVALID_VALUE", `${n.getName()}: ${error} (${value})`);
+                throw new ValidationException_1.ValidationException(node.getLine(), "INVALID_VALUE", `${node.getName()}: ${error} (${value})`);
             }
         },
     };

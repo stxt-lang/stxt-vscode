@@ -8,9 +8,9 @@ export const INLINE: Type = {
         return "INLINE";
     },
 
-    validate(ndef: NodeDefinition, n: Node): void {
-        if (n.getTextLines().length > 0) {
-            throw new ValidationException(n.getLine(), "NOT_ALLOWED_TEXT", `Not allowed text in node ${n.getQualifiedName()}`);
+    validate(nodeDef: NodeDefinition, node: Node): void {
+        if (node.getTextLines().length > 0) {
+            throw new ValidationException(node.getLine(), "NOT_ALLOWED_TEXT", `Not allowed text in node ${node.getQualifiedName()}`);
         }
     },
 };

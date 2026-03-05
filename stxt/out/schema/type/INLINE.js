@@ -6,9 +6,9 @@ exports.INLINE = {
     getName() {
         return "INLINE";
     },
-    validate(ndef, n) {
-        if (n.getTextLines().length > 0) {
-            throw new ValidationException_1.ValidationException(n.getLine(), "NOT_ALLOWED_TEXT", `Not allowed text in node ${n.getQualifiedName()}`);
+    validate(nodeDef, node) {
+        if (node.getTextLines().length > 0) {
+            throw new ValidationException_1.ValidationException(node.getLine(), "NOT_ALLOWED_TEXT", `Not allowed text in node ${node.getQualifiedName()}`);
         }
     },
 };

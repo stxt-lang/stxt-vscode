@@ -2,7 +2,7 @@ import { getLastAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
 import { Constants } from '../core/Constants';
 import { parseLine } from '../core/LineParser';
-import { buscarSugerenciasPorParent, buscarSugerenciasPrimerNivel, buscarValoresEnum } from './CompletionProviderSearch';
+import { findSuggestionsByParent, findRootLevelSuggestions, findEnumValues } from './CompletionProviderSearch';
 import { CompletionItem, CompletionItemProvider, Position, ProviderResult, TextDocument } from 'vscode';
 
 export class StxtCompletionProvider implements CompletionItemProvider {
@@ -14,13 +14,13 @@ export class StxtCompletionProvider implements CompletionItemProvider {
         console.log(`Position: ${position.line}`);
 
         // Si no hay análisis no mostramos nada
-        let lastAnalisis: AnalysisResult | undefined = getLastAnalysis(document);
-        if (!lastAnalisis) {
+        let lastAnalysis: AnalysisResult | undefined = getLastAnalysis(document);
+        if (!lastAnalysis) {
             return [];
         }
 
         // Buscar el nodo anterior para obtener lastLevel y lastNodeBlock
-        const lastNode = getLastNode(lastAnalisis, position.line);
+        const lastNode = getLastNode(lastAnalysis, position.line);
         const lastLevel = lastNode ? lastNode.getLevel() : 0;
         const lastNodeBlock = lastNode ? lastNode.isTextNode() : false;
 
@@ -29,11 +29,10 @@ export class StxtCompletionProvider implements CompletionItemProvider {
             return [];
         }
 
-        // Si estamos completando el valor de un nodo
         if (completionContext.isValue) {
-            const nodeAtLine = lastAnalisis.nodeByLine.get(position.line);
+            const nodeAtLine = lastAnalysis.nodeByLine.get(position.line);
             if (nodeAtLine) {
-                return buscarValoresEnum(nodeAtLine, completionContext.prefix);
+                return findEnumValues(nodeAtLine, completionContext.prefix);
             }
             return [];
         }
@@ -43,14 +42,14 @@ export class StxtCompletionProvider implements CompletionItemProvider {
         console.log("Level: " + level);
 
         if (level === 0) {
-            return buscarSugerenciasPrimerNivel(completionContext.prefix);
+            return findRootLevelSuggestions(completionContext.prefix);
         }
 
         // Buscamos parent
-        const parent = getParentNode(lastAnalisis, position.line, level);
+        const parent = getParentNode(lastAnalysis, position.line, level);
         if (parent) {
             console.log(`Parent *****: ${parent.getQualifiedName()} (${parent.getLine()})`);
-            return buscarSugerenciasPorParent(parent, completionContext.prefix);
+            return findSuggestionsByParent(parent, completionContext.prefix);
         }
 
         return [];
@@ -99,7 +98,7 @@ function getCompletionContext(linePrefix: string, lastNodeBlock: boolean, lastLe
 
     // Detectar si estamos completando un valor (después de ':' o '>>')
     const sepIndex = trimmed.indexOf(Constants.SEP_NODE);
-    const textSepIndex = trimmed.indexOf('>>');
+    const textSepIndex = trimmed.indexOf(Constants.SEP_TEXT_NODE);
     
     if (sepIndex !== -1) {
         // Estamos después de ':', completando un valor inline

@@ -7,6 +7,7 @@ class Constants {
     static TAB = "\t";
     static SPACE = " ";
     static SEP_NODE = ":";
+    static SEP_TEXT_NODE = ">>";
     static EMPTY_NAMESPACE = "";
 }
 exports.Constants = Constants;

@@ -43,8 +43,8 @@ export class NodeDefinition {
         return this.description;
     }
 
-    setDescription(descrip: string): void {
-        this.description = descrip;
+setDescription(description: string): void {
+		this.description = description;
     }
 
     addChildDefinition(childDefinition: ChildDefinition): void {

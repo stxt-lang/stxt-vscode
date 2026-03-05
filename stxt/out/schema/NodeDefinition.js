@@ -35,8 +35,8 @@ class NodeDefinition {
     getDescription() {
         return this.description;
     }
-    setDescription(descrip) {
-        this.description = descrip;
+    setDescription(description) {
+        this.description = description;
     }
     addChildDefinition(childDefinition) {
         const qname = childDefinition.getQualifiedName();

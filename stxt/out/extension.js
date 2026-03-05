@@ -51,13 +51,13 @@ async function activate(context) {
     context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(doc => {
         if (doc.languageId === 'stxt') {
             //console.log("onDidOpenTextDocument");
-            (0, AnalysisDoc_1.analisysDoc)(doc, exports.diagnosticCollection);
+            (0, AnalysisDoc_1.analysisDoc)(doc, exports.diagnosticCollection);
         }
     }), vscode.workspace.onDidChangeTextDocument(e => {
         const doc = e.document;
         if (doc.languageId === 'stxt') {
             //console.log("onDidChangeTextDocument");
-            (0, AnalysisDoc_1.analisysDoc)(doc, exports.diagnosticCollection);
+            (0, AnalysisDoc_1.analysisDoc)(doc, exports.diagnosticCollection);
         }
     }), vscode.workspace.onDidCloseTextDocument(doc => {
         //console.log("onDidCloseTextDocument");

@@ -6,9 +6,9 @@ exports.GROUP = {
     getName() {
         return "GROUP";
     },
-    validate(ndef, n) {
-        if (n.getValue().length > 0 || n.getTextLines().length > 0) {
-            throw new ValidationException_1.ValidationException(n.getLine(), "INVALID_VALUE", `Node '${n.getName()}' has to be empty`);
+    validate(nodeDef, node) {
+        if (node.getValue().length > 0 || node.getTextLines().length > 0) {
+            throw new ValidationException_1.ValidationException(node.getLine(), "INVALID_VALUE", `Node '${node.getName()}' has to be empty`);
         }
     },
 };

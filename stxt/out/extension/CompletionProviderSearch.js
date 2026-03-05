@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buscarSugerenciasPorParent = buscarSugerenciasPorParent;
-exports.buscarSugerenciasPrimerNivel = buscarSugerenciasPrimerNivel;
-exports.buscarValoresEnum = buscarValoresEnum;
+exports.findSuggestionsByParent = findSuggestionsByParent;
+exports.findRootLevelSuggestions = findRootLevelSuggestions;
+exports.findEnumValues = findEnumValues;
 const StringUtils_1 = require("../core/StringUtils");
 const SchemaLoader_1 = require("./SchemaLoader");
 const vscode_1 = require("vscode");
 let schemaLoader = new SchemaLoader_1.SchemaLoaderExtension();
-function buscarSugerenciasPorParent(parent, prefix) {
-    console.log("Buscando esquema de " + parent.getQualifiedName());
+function findSuggestionsByParent(parent, prefix) {
+    console.log("Searching schema for " + parent.getQualifiedName());
     let schema = schemaLoader.getSchema(parent.getNamespace());
     if (!schema) {
         return [];
@@ -51,7 +51,7 @@ function buscarSugerenciasPorParent(parent, prefix) {
     }
     return result;
 }
-function buscarSugerenciasPrimerNivel(prefix) {
+function findRootLevelSuggestions(prefix) {
     const result = [];
     const seen = new Set();
     const normalizedPrefix = StringUtils_1.StringUtils.normalize(prefix);
@@ -133,8 +133,8 @@ function isBlockText(childDef) {
         return false;
     }
 }
-function buscarValoresEnum(node, prefix) {
-    console.log(`Buscando valores ENUM para nodo: ${node.getQualifiedName()}`);
+function findEnumValues(node, prefix) {
+    console.log(`Searching ENUM values for node: ${node.getQualifiedName()}`);
     const schema = schemaLoader.getSchema(node.getNamespace());
     if (!schema) {
         return [];

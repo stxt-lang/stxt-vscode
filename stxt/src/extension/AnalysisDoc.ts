@@ -24,12 +24,12 @@ export function analysisAllDocs(): void{
 	for (const doc of vscode.workspace.textDocuments) {
 		if (doc.languageId === 'stxt') {
 			//console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
-			analisysDoc(doc, diagnosticCollection);
+			analysisDoc(doc, diagnosticCollection);
 		}
 	}
 }
 
-export function analisysDoc(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection): AnalysisResult {
+export function analysisDoc(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection): AnalysisResult {
     //console.log("Parse init...");
     const diagnostics: vscode.Diagnostic[] = [];
 
@@ -89,7 +89,7 @@ function validateSpecialDocument(nodes: Node[], diagnostics: vscode.Diagnostic[]
                     diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
                 } else {
                     const range = new vscode.Range(0, 0, 0, 100);
-                    diagnostics.push(new vscode.Diagnostic(range, `Error desconocido: ${String(e)}`, vscode.DiagnosticSeverity.Error));
+                    diagnostics.push(new vscode.Diagnostic(range, `Unknown error: ${String(e)}`, vscode.DiagnosticSeverity.Error));
                 }
             }
         }

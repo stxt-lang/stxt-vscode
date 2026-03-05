@@ -32,19 +32,19 @@ function createLine(line: string, node: Node | undefined): string {
     let result = "\t".repeat(node.getLevel());
 
     if (node.isTextNode()) {
-        const indexNs = line.indexOf("(");
-        if (indexNs !== -1) {
+        const namespaceIndex = line.indexOf("(");
+        if (namespaceIndex !== -1) {
             result += node.getName() + " (" + node.getNamespace() + ") >>";
         }
         else {
             result += node.getName() + " >>";
         }
     } else {
-        const indexPuntos = line.indexOf(":");
-        const lineKey = line.substring(0, indexPuntos);
-        const indexNs = lineKey.indexOf("(");
+        const colonIndex = line.indexOf(":");
+        const lineKey = line.substring(0, colonIndex);
+        const namespaceIndex = lineKey.indexOf("(");
 
-        if (indexNs !== -1) {
+        if (namespaceIndex !== -1) {
             result += node.getName() + " (" + node.getNamespace() + "): " + node.getValue();
         }
         else {

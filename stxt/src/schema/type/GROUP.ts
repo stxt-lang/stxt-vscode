@@ -8,9 +8,9 @@ export const GROUP: Type = {
 		return "GROUP";
 	},
 
-	validate(ndef: NodeDefinition, n: Node): void {
-		if (n.getValue().length > 0 || n.getTextLines().length > 0) {
-			throw new ValidationException(n.getLine(),"INVALID_VALUE",`Node '${n.getName()}' has to be empty`);
+	validate(nodeDef: NodeDefinition, node: Node): void {
+		if (node.getValue().length > 0 || node.getTextLines().length > 0) {
+			throw new ValidationException(node.getLine(),"INVALID_VALUE",`Node '${node.getName()}' has to be empty`);
 		}
 	},
 };

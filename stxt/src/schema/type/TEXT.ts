@@ -8,9 +8,9 @@ export const TEXT: Type = {
 		return "TEXT";
 	},
 
-	validate(ndef: NodeDefinition, n: Node): void {
-		if (n.getChildren().length > 0) {
-			throw new ValidationException(n.getLine(), "NOT_ALLOWED_CHILDREN_TEXT", `Not allowed children nodes in node ${n.getQualifiedName()}`);
+	validate(nodeDef: NodeDefinition, node: Node): void {
+		if (node.getChildren().length > 0) {
+			throw new ValidationException(node.getLine(), "NOT_ALLOWED_CHILDREN_TEXT", `Not allowed children nodes in node ${node.getQualifiedName()}`);
 		}
 	},
 };

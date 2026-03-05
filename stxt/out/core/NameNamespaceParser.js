@@ -11,23 +11,23 @@ class NameNamespaceParser {
             throw new ParseException_1.ParseException(lineNumber, "INVALID_LINE", `Line not valid: ${fullLine}`);
         }
         rawName = rawName.trim();
-        const indexInicio = rawName.indexOf("(");
-        const indexFin = rawName.indexOf(")");
+        const startIndex = rawName.indexOf("(");
+        const endIndex = rawName.indexOf(")");
         let name;
         let namespace = inheritedNs ?? "";
         // Encontrados los dos
-        if (indexInicio !== -1 && indexFin !== -1) {
-            if (indexInicio > indexFin || indexFin !== rawName.length - 1) {
+        if (startIndex !== -1 && endIndex !== -1) {
+            if (startIndex > endIndex || endIndex !== rawName.length - 1) {
                 throw new ParseException_1.ParseException(lineNumber, "INVALID_NAMESPACE", `Line not valid: ${fullLine}`);
             }
-            name = rawName.substring(0, indexInicio).trim();
-            namespace = rawName.substring(indexInicio + 1, indexFin).trim();
+            name = rawName.substring(0, startIndex).trim();
+            namespace = rawName.substring(startIndex + 1, endIndex).trim();
             if (namespace.length === 0) {
                 throw new ParseException_1.ParseException(lineNumber, "INVALID_NAMESPACE", `Line not valid: ${fullLine}`);
             }
         }
         // Ninguno de los dos
-        else if (indexInicio === -1 && indexFin === -1) {
+        else if (startIndex === -1 && endIndex === -1) {
             name = rawName;
         }
         // Solo uno de los dos

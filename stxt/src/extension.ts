@@ -3,7 +3,7 @@ import { StxtSemanticTokensProvider } from './extension/SemanticTokensProvider';
 import { StxtFormattingProvider } from './extension/FormattingProvider';
 import { StxtCompletionProvider } from './extension/CompletionProvider';
 import { StxtHoverProvider } from './extension/HoverProvider';
-import { analisysDoc, analysisAllDocs } from './extension/AnalysisDoc';
+import { analysisDoc, analysisAllDocs } from './extension/AnalysisDoc';
 import { tokenLegend } from './extension/Tokens';
 import { registerSchemaLoader } from './extension/SchemaLoader';
 
@@ -19,14 +19,14 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.workspace.onDidOpenTextDocument(doc => {
 			if (doc.languageId === 'stxt') {
 				//console.log("onDidOpenTextDocument");
-				analisysDoc(doc, diagnosticCollection);
+				analysisDoc(doc, diagnosticCollection);
 			}
 		}),
 		vscode.workspace.onDidChangeTextDocument(e => {
 			const doc = e.document;
 			if (doc.languageId === 'stxt') {
 				//console.log("onDidChangeTextDocument");
-				analisysDoc(doc, diagnosticCollection);
+				analysisDoc(doc, diagnosticCollection);
 			}
 		}),
 		vscode.workspace.onDidCloseTextDocument(doc => {

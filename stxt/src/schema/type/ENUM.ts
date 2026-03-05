@@ -8,16 +8,16 @@ export const ENUM: Type = {
         return "ENUM";
     },
 
-    validate(ndef: NodeDefinition, n: Node): void {
-        if (n.getTextLines().length > 0) {
-            throw new ValidationException(n.getLine(),"NOT_ALLOWED_TEXT",`Not allowed text in node ${n.getQualifiedName()}`);
+    validate(nodeDef: NodeDefinition, node: Node): void {
+        if (node.getTextLines().length > 0) {
+            throw new ValidationException(node.getLine(),"NOT_ALLOWED_TEXT",`Not allowed text in node ${node.getQualifiedName()}`);
         }
 
-        const value = n.getValue();
-        const allowed = ndef.getValues(); // ReadonlySet<string>
+        const value = node.getValue();
+        const allowed = nodeDef.getValues(); // ReadonlySet<string>
 
-        if (!ndef.isAllowedValue(value)) {
-            throw new ValidationException(n.getLine(),"INVALID_VALUE",`The value '${value}' not allowed. Only: ${Array.from(allowed).join(", ")}`);
+        if (!nodeDef.isAllowedValue(value)) {
+            throw new ValidationException(node.getLine(),"INVALID_VALUE",`The value '${value}' not allowed. Only: ${Array.from(allowed).join(", ")}`);
         }
     },
 };

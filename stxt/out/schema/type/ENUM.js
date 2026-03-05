@@ -6,14 +6,14 @@ exports.ENUM = {
     getName() {
         return "ENUM";
     },
-    validate(ndef, n) {
-        if (n.getTextLines().length > 0) {
-            throw new ValidationException_1.ValidationException(n.getLine(), "NOT_ALLOWED_TEXT", `Not allowed text in node ${n.getQualifiedName()}`);
+    validate(nodeDef, node) {
+        if (node.getTextLines().length > 0) {
+            throw new ValidationException_1.ValidationException(node.getLine(), "NOT_ALLOWED_TEXT", `Not allowed text in node ${node.getQualifiedName()}`);
         }
-        const value = n.getValue();
-        const allowed = ndef.getValues(); // ReadonlySet<string>
-        if (!ndef.isAllowedValue(value)) {
-            throw new ValidationException_1.ValidationException(n.getLine(), "INVALID_VALUE", `The value '${value}' not allowed. Only: ${Array.from(allowed).join(", ")}`);
+        const value = node.getValue();
+        const allowed = nodeDef.getValues(); // ReadonlySet<string>
+        if (!nodeDef.isAllowedValue(value)) {
+            throw new ValidationException_1.ValidationException(node.getLine(), "INVALID_VALUE", `The value '${value}' not allowed. Only: ${Array.from(allowed).join(", ")}`);
         }
     },
 };

@@ -2,6 +2,7 @@ import { Line } from "./Line";
 import { NameNamespaceParser } from "./NameNamespaceParser";
 import { Node } from "./Node";
 import { ParseException } from "../exceptions/ParseException";
+import { Constants } from "./Constants";
 
 export function createNode(lineIndent: Line, lineNumber: number, level: number, parent: Node | null): Node {
     const line = lineIndent.content;
@@ -10,8 +11,8 @@ export function createNode(lineIndent: Line, lineNumber: number, level: number, 
     let value: string;
     let textNode = false;
 
-    const nodeIndex = line.indexOf(":");
-    const textIndex = line.indexOf(">>");
+    const nodeIndex = line.indexOf(Constants.SEP_NODE);
+    const textIndex = line.indexOf(Constants.SEP_TEXT_NODE);
 
     if (nodeIndex === -1 && textIndex === -1) {
         throw new ParseException(lineNumber, "INVALID_LINE", `Line not valid: ${line}`);
@@ -27,10 +28,10 @@ export function createNode(lineIndent: Line, lineNumber: number, level: number, 
 
     if (textNode) {
         name = line.substring(0, textIndex);
-        value = line.substring(textIndex + 2);
+        value = line.substring(textIndex + Constants.SEP_TEXT_NODE.length);
     } else {
         name = line.substring(0, nodeIndex);
-        value = line.substring(nodeIndex + 1);
+        value = line.substring(nodeIndex + Constants.SEP_NODE.length);
     }
 
     if (textNode && value.trim().length > 0) {
@@ -38,14 +39,14 @@ export function createNode(lineIndent: Line, lineNumber: number, level: number, 
     }
 
     // Namespace por defecto: heredado del padre
-    const nn = NameNamespaceParser.parse(
+    const nameNamespace = NameNamespaceParser.parse(
         name,
         parent ? parent.getNamespace() : null,
         lineNumber,
         line
     );
-    name = nn.getName();
-    const namespace = nn.getNamespace();
+    name = nameNamespace.getName();
+    const namespace = nameNamespace.getNamespace();
 
     // Validamos nombre
     if (name.length === 0) {

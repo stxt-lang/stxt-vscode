@@ -8,8 +8,8 @@ import { CompletionItem, CompletionItemKind } from 'vscode';
 
 let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();
 
-export function buscarSugerenciasPorParent(parent: Node, prefix: string): CompletionItem[] {
-    console.log("Buscando esquema de " + parent.getQualifiedName());
+export function findSuggestionsByParent(parent: Node, prefix: string): CompletionItem[] {
+    console.log("Searching schema for " + parent.getQualifiedName());
     let schema = schemaLoader.getSchema(parent.getNamespace());
 
     if (!schema) {
@@ -56,7 +56,7 @@ export function buscarSugerenciasPorParent(parent: Node, prefix: string): Comple
     return result;
 }
 
-export function buscarSugerenciasPrimerNivel(prefix: string): CompletionItem[] {
+export function findRootLevelSuggestions(prefix: string): CompletionItem[] {
     const result: CompletionItem[] = [];
     const seen = new Set<string>();
     const normalizedPrefix = StringUtils.normalize(prefix);
@@ -151,8 +151,8 @@ function isBlockText(childDef: ChildDefinition): boolean {
     }
 }
 
-export function buscarValoresEnum(node: Node, prefix: string): CompletionItem[] {
-    console.log(`Buscando valores ENUM para nodo: ${node.getQualifiedName()}`);
+export function findEnumValues(node: Node, prefix: string): CompletionItem[] {
+    console.log(`Searching ENUM values for node: ${node.getQualifiedName()}`);
     
     const schema = schemaLoader.getSchema(node.getNamespace());
     if (!schema) {

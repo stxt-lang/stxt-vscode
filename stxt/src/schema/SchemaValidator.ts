@@ -24,32 +24,32 @@ export class SchemaValidator implements Validator {
 
         // Obtenemos namespace
         const namespace = node.getNamespace();
-        const sch = this.schemaProvider.getSchema(namespace);
+        const schema = this.schemaProvider.getSchema(namespace);
 
-        if (!sch) {
+        if (!schema) {
             errors.push(new ValidationException(node.getLine(),"SCHEMA_NOT_FOUND",`Not found schema: ${namespace}`));
             return errors;
         }
 
         // Validamos nodo
-        errors.push(...this.validateAgainstSchema(node, sch));
+        errors.push(...this.validateAgainstSchema(node, schema));
 
         // Validamos children
         if (this.recursiveValidation) {
-            for (const n of node.getChildren()){
-                errors.push(...this.validate(n));
+            for (const childNode of node.getChildren()){
+                errors.push(...this.validate(childNode));
             }
         }
 
         return errors;
     }
 
-    validateAgainstSchema(node: Node, sch: Schema): ValidationException[] {
+    validateAgainstSchema(node: Node, schema: Schema): ValidationException[] {
         const errors: ValidationException[] = [];
-        const schemaNode = sch.getNodeDefinition(node.getNormalizedName());
+        const schemaNode = schema.getNodeDefinition(node.getNormalizedName());
 
         if (!schemaNode) {
-            const error = `NOT EXIST NODE ${node.getNormalizedName()} for namespace ${sch.getNamespace()}`;
+            const error = `NOT EXIST NODE ${node.getNormalizedName()} for namespace ${schema.getNamespace()}`;
             errors.push(new ValidationException(node.getLine(), "NODE_NOT_EXIST_IN_SCHEMA", error));
             return errors;
         }
@@ -60,32 +60,32 @@ export class SchemaValidator implements Validator {
         return errors;
     }
 
-    private static validateValue(nsNode: NodeDefinition, n: Node): ValidationException[] {
+    private static validateValue(nodeDef: NodeDefinition, node: Node): ValidationException[] {
         const errors: ValidationException[] = [];
-        const nodeType = nsNode.getType();
+        const nodeType = nodeDef.getType();
 
         const validator: Type | undefined = TypeRegistry.get(nodeType);
         if (!validator) {
-            errors.push(new ValidationException(n.getLine(),"TYPE_NOT_SUPPORTED",`Node type not supported: ${nodeType}`));
+            errors.push(new ValidationException(node.getLine(),"TYPE_NOT_SUPPORTED",`Node type not supported: ${nodeType}`));
             return errors;
         }
 
         try {
-            validator.validate(nsNode, n);
+            validator.validate(nodeDef, node);
         } catch (e: unknown) {
             if (e instanceof ValidationException) {
                 errors.push(e);
             } else if (e instanceof Error) {
-                errors.push(new ValidationException(n.getLine(),"VALIDATION_ERROR", e.message));
+                errors.push(new ValidationException(node.getLine(),"VALIDATION_ERROR", e.message));
             } else {
-                errors.push(new ValidationException(n.getLine(),"UNKNOWN_VALIDATION_ERROR", String(e)));
+                errors.push(new ValidationException(node.getLine(),"UNKNOWN_VALIDATION_ERROR", String(e)));
             }
         }
 
         return errors;
     }
 
-    private static validateCount(nsNode: NodeDefinition, node: Node): ValidationException[] {
+    private static validateCount(nodeDef: NodeDefinition, node: Node): ValidationException[] {
         const errors: ValidationException[] = [];
         const count = new Map<string, number>();
         const childrenByType = new Map<string, Node[]>();
@@ -100,10 +100,10 @@ export class SchemaValidator implements Validator {
             childrenByType.get(childName)!.push(child);
         }
 
-        for (const chNode of nsNode.getChildren().values()) {
-            const qname = chNode.getQualifiedName();
+        for (const childDef of nodeDef.getChildren().values()) {
+            const qname = childDef.getQualifiedName();
             errors.push(...SchemaValidator.validateCountChild(
-                chNode, 
+                childDef, 
                 count.get(qname) ?? 0, 
                 node,
                 childrenByType.get(qname) ?? []
@@ -113,25 +113,25 @@ export class SchemaValidator implements Validator {
         return errors;
     }
 
-    private static validateCountChild(chNode: ChildDefinition, num: number, node: Node, children: Node[]): ValidationException[] {
+    private static validateCountChild(childDef: ChildDefinition, childCount: number, node: Node, children: Node[]): ValidationException[] {
         const errors: ValidationException[] = [];
-        const min = chNode.getMin(); // number | null
-        const max = chNode.getMax(); // number | null
+        const min = childDef.getMin(); // number | null
+        const max = childDef.getMax(); // number | null
 
-        if (min !== null && num < min) {
-            errors.push(new ValidationException(node.getLine(),"INVALID_NUMBER",`${num} nodes of '${chNode.getQualifiedName()}' and min is ${min}`));
+        if (min !== null && childCount < min) {
+            errors.push(new ValidationException(node.getLine(),"INVALID_NUMBER",`${childCount} nodes of '${childDef.getQualifiedName()}' and min is ${min}`));
         }
 
-        if (max !== null && num > max) {
+        if (max !== null && childCount > max) {
             // Error en el parent
-            errors.push(new ValidationException(node.getLine(),"INVALID_NUMBER",`${num} nodes of '${chNode.getQualifiedName()}' and max is ${max}`));
+            errors.push(new ValidationException(node.getLine(),"INVALID_NUMBER",`${childCount} nodes of '${childDef.getQualifiedName()}' and max is ${max}`));
             
             // Error en cada nodo hijo que excede el máximo permitido
             for (const child of children) {
                 errors.push(new ValidationException(
                     child.getLine(),
                     "INVALID_NUMBER",
-                    `Too many '${chNode.getQualifiedName()}' nodes: found ${num}, max is ${max}`
+                    `Too many '${childDef.getQualifiedName()}' nodes: found ${childCount}, max is ${max}`
                 ));
             }
         }

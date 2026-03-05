@@ -7,10 +7,10 @@ export function regexType(name: string, pattern: RegExp, error: string): Type {
     return {
         getName: () => name,
 
-        validate(ndef: NodeDefinition, n: Node): void {
-            const value = n.getText();
+        validate(nodeDef: NodeDefinition, node: Node): void {
+            const value = node.getText();
             if (!pattern.test(value)) {
-                throw new ValidationException(n.getLine(),"INVALID_VALUE",`${n.getName()}: ${error} (${value})`);
+                throw new ValidationException(node.getLine(),"INVALID_VALUE",`${node.getName()}: ${error} (${value})`);
             }
         },
     };

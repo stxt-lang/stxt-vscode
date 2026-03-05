@@ -6,9 +6,9 @@ exports.BLOCK = {
     getName() {
         return "BLOCK";
     },
-    validate(ndef, n) {
-        if (n.getValue().length > 0) {
-            throw new ValidationException_1.ValidationException(n.getLine(), "NOT_ALLOWED_VALUE", `Not allowed inline text in node ${n.getQualifiedName()}`);
+    validate(nodeDef, node) {
+        if (node.getValue().length > 0) {
+            throw new ValidationException_1.ValidationException(node.getLine(), "NOT_ALLOWED_VALUE", `Not allowed inline text in node ${node.getQualifiedName()}`);
         }
     },
 };
