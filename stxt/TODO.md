@@ -1,5 +1,6 @@
 # Plugin VSCode
 
+* console.log a logger.info(), etc.
 * Error o warning con mezcla de identación?
 * Parseo en proyecto node separado
 * Goto (click) para ir a la definición del schema
