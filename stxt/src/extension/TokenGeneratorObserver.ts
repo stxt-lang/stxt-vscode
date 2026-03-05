@@ -1,162 +1,14 @@
 import { Observer } from '../processors/Observer';
 import { Node } from '../core/Node';
 import { StxtToken } from './Tokens';
-import { parseLine } from '../core/LineParser';
+import { Parser } from '../core/Parser';
 
 export class TokenGeneratorObserver implements Observer {
     private tokens: StxtToken[] = [];
     private nodeByLine = new Map<number, Node>();
 
     onTextLine(node: Node, lineNumber: number, line: string): void {
-        // Colorear contenido de nodos template especiales
-        if (this.isTemplateContentNode(node)) {
-            this.generateTokensForTemplateLine(lineNumber, line, node.getLevel());
-        }
-    }
-
-    private isTemplateContentNode(node: Node): boolean {
-        if (node.getNamespace() !== '@stxt.template') {
-            return false;
-        }
-        const normalizedName = node.getNormalizedName();
-        return normalizedName === 'structure' || normalizedName === 'description';
-    }
-
-    private generateTokensForTemplateLine(lineNumber: number, lineString: string, parentLevel: number): void {
-        try {
-            // Parsear la línea sin validación estricta
-            const line = parseLine(lineString, true, parentLevel, lineNumber, false);
-            
-            if (line.isComment) {
-                // Línea de comentario
-                this.tokens.push({
-                    line: lineNumber - 1,
-                    startChar: 0,
-                    length: lineString.length,
-                    type: 'comment'
-                });
-                return;
-            }
-
-            if (line.isEmpty()) {
-                return;
-            }
-
-            const lineIndex = lineNumber - 1;
-            const content = line.content;
-            const indentLength = line.indentLength;
-
-            // Detectar si es un nodo de texto (contiene >>)
-            const textSepIndex = content.indexOf('>>');
-            
-            if (textSepIndex !== -1) {
-                // Es un nodo de texto
-                this.generateTextNodeTokens(lineIndex, content, indentLength, textSepIndex);
-            } else {
-                // Es un nodo inline (contiene :)
-                const colonIndex = content.indexOf(':');
-                if (colonIndex !== -1) {
-                    this.generateInlineNodeTokens(lineIndex, content, indentLength, colonIndex);
-                }
-            }
-        } catch (e) {
-            // Si hay error al parsear, simplemente no generamos tokens para esta línea
-        }
-    }
-
-    private generateTextNodeTokens(lineIndex: number, content: string, indentLength: number, textSepIndex: number): void {
-        const head = content.substring(0, textSepIndex);
-        const nsOpen = head.indexOf('(');
-        const nsClose = head.indexOf(')');
-
-        if (nsOpen !== -1 && nsClose !== -1) {
-            // Tiene namespace
-            this.tokens.push({
-                line: lineIndex,
-                startChar: indentLength,
-                length: nsOpen,
-                type: 'macro'
-            });
-            this.tokens.push({
-                line: lineIndex,
-                startChar: indentLength + nsOpen,
-                length: nsClose - nsOpen + 1,
-                type: 'namespace'
-            });
-            this.tokens.push({
-                line: lineIndex,
-                startChar: indentLength + nsClose + 1,
-                length: content.length - (nsClose + 1),
-                type: 'macro'
-            });
-        } else {
-            // Sin namespace
-            this.tokens.push({
-                line: lineIndex,
-                startChar: indentLength,
-                length: textSepIndex,
-                type: 'macro'
-            });
-            this.tokens.push({
-                line: lineIndex,
-                startChar: indentLength + textSepIndex,
-                length: 2,
-                type: 'macro'
-            });
-        }
-    }
-
-    private generateInlineNodeTokens(lineIndex: number, content: string, indentLength: number, colonIndex: number): void {
-        const head = content.substring(0, colonIndex);
-        const nsOpen = head.indexOf('(');
-        const nsClose = head.indexOf(')');
-
-        if (nsOpen !== -1 && nsClose !== -1) {
-            // Tiene namespace
-            this.tokens.push({
-                line: lineIndex,
-                startChar: indentLength,
-                length: nsOpen,
-                type: 'property'
-            });
-            this.tokens.push({
-                line: lineIndex,
-                startChar: indentLength + nsOpen,
-                length: nsClose - nsOpen + 1,
-                type: 'namespace'
-            });
-            this.tokens.push({
-                line: lineIndex,
-                startChar: indentLength + nsClose + 1,
-                length: colonIndex - (nsClose + 1) + 1,
-                type: 'property'
-            });
-        } else {
-            // Sin namespace
-            this.tokens.push({
-                line: lineIndex,
-                startChar: indentLength,
-                length: colonIndex,
-                type: 'property'
-            });
-            this.tokens.push({
-                line: lineIndex,
-                startChar: indentLength + colonIndex,
-                length: 1,
-                type: 'property'
-            });
-        }
-
-        // Valor después del colon
-        const valueStart = indentLength + colonIndex + 1;
-        if (valueStart < indentLength + content.length) {
-            this.tokens.push({
-                line: lineIndex,
-                startChar: valueStart,
-                length: indentLength + content.length - valueStart,
-                type: 'string'
-            });
-        }
+        // No operation
     }
 
     onCreate(node: Node, line: string): void {
@@ -170,7 +22,73 @@ export class TokenGeneratorObserver implements Observer {
     }
 
     onFinish(node: Node): void {
-        // No necesitamos hacer nada aquí por ahora
+        // Si es un nodo especial de template, parsear su contenido para colorear
+        if (this.isTemplateContentNode(node)) {
+            this.parseTemplateContent(node);
+        }
+    }
+
+    private isTemplateContentNode(node: Node): boolean {
+        if (node.getNamespace() !== '@stxt.template') {
+            return false;
+        }
+        const normalizedName = node.getNormalizedName();
+        return normalizedName === 'structure' || normalizedName === 'description';
+    }
+
+    private parseTemplateContent(node: Node): void {
+        try {
+            const content = node.getText();
+            if (!content || content.trim() === '') {
+                return;
+            }
+
+            // Obtener las líneas originales con su indentación
+            const textLines = node.getTextLines();
+
+            // Crear parser sin validación de schemas
+            const parser = new Parser();
+            
+            // Crear observer interno para generar tokens
+            const innerObserver = new TokenGeneratorObserver();
+            parser.registerObserver(innerObserver);
+
+            // Parsear el contenido del nodo
+            parser.parseResult(content);
+
+            // Obtener tokens generados y ajustar los números de línea y startChar
+            const lineOffset = node.getLine(); // Offset desde el inicio del nodo
+            const innerTokens = innerObserver.getTokens();
+
+            for (const token of innerTokens) {
+                const relativeLineIndex = token.line;
+                
+                // Obtener la indentación de la línea original
+                const originalLine = textLines[relativeLineIndex] || '';
+                const indentation = this.calculateIndentation(originalLine);
+
+                this.tokens.push({
+                    line: token.line + lineOffset,
+                    startChar: token.startChar + indentation,
+                    length: token.length,
+                    type: token.type
+                });
+            }
+        } catch (e) {
+            // Si hay error al parsear, simplemente no añadimos tokens para este nodo
+        }
+    }
+
+    private calculateIndentation(line: string): number {
+        let count = 0;
+        for (const char of line) {
+            if (char === '\t' || char === ' ') {
+                count++;
+            } else {
+                break;
+            }
+        }
+        return count;
     }
 
     onComment(lineNumber: number, line: string): void {
