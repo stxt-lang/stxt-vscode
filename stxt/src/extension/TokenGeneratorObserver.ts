@@ -2,13 +2,19 @@ import { Observer } from '../processors/Observer';
 import { Node } from '../core/Node';
 import { StxtToken } from './Tokens';
 import { Parser } from '../core/Parser';
+import { Line } from '../core/Line';
 
 export class TokenGeneratorObserver implements Observer {
     private tokens: StxtToken[] = [];
     private nodeByLine = new Map<number, Node>();
+    private templateNodeByLine = new Map<number, Line>();
 
-    onTextLine(node: Node, lineNumber: number, line: string): void {
-        // No operation
+    onTextLine(node: Node, lineNumber: number, lineString: string, line: Line): void {
+        // Guardar información de líneas dentro de nodos template
+        if (this.isTemplateContentNode(node)) {
+            // lineNumber es 1-indexed y absoluto en el documento
+            this.templateNodeByLine.set(lineNumber, line);
+        }
     }
 
     onCreate(node: Node, line: string): void {
@@ -19,12 +25,19 @@ export class TokenGeneratorObserver implements Observer {
 
         // Generar tokens para este nodo
         this.generateTokensForNode(node, lineIndex, line);
+
+        // Inicializar mapa para nodos template
+        if (this.isTemplateContentNode(node)) {
+            this.templateNodeByLine.clear();
+        }
     }
 
     onFinish(node: Node): void {
         // Si es un nodo especial de template, parsear su contenido para colorear
         if (this.isTemplateContentNode(node)) {
             this.parseTemplateContent(node);
+            // Limpiar el mapa después de procesar
+            this.templateNodeByLine.clear();
         }
     }
 
@@ -43,9 +56,6 @@ export class TokenGeneratorObserver implements Observer {
                 return;
             }
 
-            // Obtener las líneas originales con su indentación
-            const textLines = node.getTextLines();
-
             // Crear parser sin validación de schemas
             const parser = new Parser();
             
@@ -57,19 +67,22 @@ export class TokenGeneratorObserver implements Observer {
             parser.parseResult(content);
 
             // Obtener tokens generados y ajustar los números de línea y startChar
-            const lineOffset = node.getLine(); // Offset desde el inicio del nodo
+            const lineOffset = node.getLine(); // Offset desde el inicio del nodo (1-indexed)
             const innerTokens = innerObserver.getTokens();
 
             for (const token of innerTokens) {
-                const relativeLineIndex = token.line;
+                // token.line es 0-indexed, necesitamos la línea absoluta del documento (1-indexed)
+                const absoluteLineNumber = lineOffset + token.line + 1;
                 
                 // Obtener la indentación de la línea original
-                const originalLine = textLines[relativeLineIndex] || '';
-                const indentation = this.calculateIndentation(originalLine);
+                const originalLine = this.templateNodeByLine.get(absoluteLineNumber);
+                // indentLength es el índice del último carácter de indentación,
+                // el contenido empieza en indentLength + 1
+                const offset = originalLine ? originalLine.indentLength + 1 : 0;
 
                 this.tokens.push({
                     line: token.line + lineOffset,
-                    startChar: token.startChar + indentation,
+                    startChar: token.startChar + offset,
                     length: token.length,
                     type: token.type
                 });
@@ -77,18 +90,6 @@ export class TokenGeneratorObserver implements Observer {
         } catch (e) {
             // Si hay error al parsear, simplemente no añadimos tokens para este nodo
         }
-    }
-
-    private calculateIndentation(line: string): number {
-        let count = 0;
-        for (const char of line) {
-            if (char === '\t' || char === ' ') {
-                count++;
-            } else {
-                break;
-            }
-        }
-        return count;
     }
 
     onComment(lineNumber: number, line: string): void {

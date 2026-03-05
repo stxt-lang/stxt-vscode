@@ -82,7 +82,7 @@ export class Parser {
 				
 				// Notificar a observers sobre la línea de texto
 				this.observers.forEach(observer => {
-					observer.onTextLine(lastNode!, lineNumber, lineString);
+					observer.onTextLine(lastNode!, lineNumber, lineString, line);
 				});
 				
 				return;
