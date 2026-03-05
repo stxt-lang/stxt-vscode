@@ -15,16 +15,7 @@ class StxtCompletionProvider {
             return [];
         }
         // Buscar el nodo anterior para obtener lastLevel y lastNodeBlock
-        let lastNode = null;
-        let searchLine = position.line;
-        while (searchLine > 0) {
-            searchLine = searchLine - 1;
-            const nodeAtLine = lastAnalisis.nodeByLine.get(searchLine);
-            if (nodeAtLine) {
-                lastNode = nodeAtLine;
-                break;
-            }
-        }
+        const lastNode = getLastNode(lastAnalisis, position.line);
         const lastLevel = lastNode ? lastNode.getLevel() : 0;
         const lastNodeBlock = lastNode ? lastNode.isTextNode() : false;
         const completionContext = getCompletionContext(linePrefix, lastNodeBlock, lastLevel);
@@ -46,16 +37,7 @@ class StxtCompletionProvider {
             return (0, CompletionProviderSearch_1.buscarSugerenciasPrimerNivel)(completionContext.prefix);
         }
         // Buscamos parent
-        let parent = null;
-        let parentLine = position.line;
-        while (parentLine > 0) {
-            parentLine = parentLine - 1;
-            const nodeAtLine = lastAnalisis.nodeByLine.get(parentLine);
-            if (nodeAtLine?.getLevel() === level - 1) {
-                parent = nodeAtLine;
-                break;
-            }
-        }
+        const parent = getParentNode(lastAnalisis, position.line, level);
         if (parent) {
             console.log(`Parent *****: ${parent.getQualifiedName()} (${parent.getLine()})`);
             return (0, CompletionProviderSearch_1.buscarSugerenciasPorParent)(parent, completionContext.prefix);
@@ -64,6 +46,34 @@ class StxtCompletionProvider {
     }
 }
 exports.StxtCompletionProvider = StxtCompletionProvider;
+/**
+ * Busca el primer nodo anterior a la línea dada.
+ */
+function getLastNode(analysis, currentLine) {
+    let searchLine = currentLine;
+    while (searchLine > 0) {
+        searchLine = searchLine - 1;
+        const nodeAtLine = analysis.nodeByLine.get(searchLine);
+        if (nodeAtLine) {
+            return nodeAtLine;
+        }
+    }
+    return null;
+}
+/**
+ * Busca el nodo padre (nivel-1) anterior a la línea dada.
+ */
+function getParentNode(analysis, currentLine, level) {
+    let parentLine = currentLine;
+    while (parentLine > 0) {
+        parentLine = parentLine - 1;
+        const nodeAtLine = analysis.nodeByLine.get(parentLine);
+        if (nodeAtLine?.getLevel() === level - 1) {
+            return nodeAtLine;
+        }
+    }
+    return null;
+}
 function getCompletionContext(linePrefix, lastNodeBlock, lastLevel) {
     const trimmed = linePrefix.trimStart();
     if (trimmed.startsWith(Constants_1.Constants.COMMENT_CHAR)) {
