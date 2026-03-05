@@ -6,8 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
-## [0.3.1]
-
+- Syntax highlighting for template content: `@stxt.template:structure` and `@stxt.template:description` nodes now display colorized STXT syntax within their text blocks.
 - Improved hover information layout: better organization of node properties, schema information, and text content.
 - Internal refactor: improved code clarity and maintainability with consistent naming conventions (renamed Spanish function names to English, improved variable names, added constants for separators).
 - Internal refactor: unified line parsing logic with `Line` class improvements and removed `LineUtils.ts`.
