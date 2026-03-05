@@ -1,6 +1,5 @@
 # Plugin VSCode
 
-* Unificar core/LineIndent y core/LineIndentParse
 * Hover para texto. Quizá añadir a observer el añadido de una línea también
 
 * Colores distintos para documentos con namespace y sin namespace

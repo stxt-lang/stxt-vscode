@@ -6,6 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Internal refactor: unified line parsing logic with `Line` class improvements and removed `LineUtils.ts`.
 - Cardinality max errors now show on both parent and each child node that exceeds the limit.
 - Node methods `getChild` and `getChildrenByName` now filter by namespace (defaults to parent's namespace).
 
