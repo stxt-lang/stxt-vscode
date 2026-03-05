@@ -23,25 +23,26 @@ function parseLine(line, lastNodeBlock, lastLevel, numLine) {
             spaces = 0;
         }
         else if (c === Constants_1.Constants.COMMENT_CHAR) {
-            return null;
+            return new Line_1.Line(level, line.substring(pointer + 1), true, false);
         }
         else {
             // Primer carácter no espacio/tab/comentario => fin de indentación
             break;
         }
-        pointer++;
         // Dentro del bloque de texto
         if (lastNodeBlock && level > lastLevel) {
-            return new Line_1.Line(level, StringUtils_1.StringUtils.rightTrim(line.substring(pointer)));
+            return new Line_1.Line(level, StringUtils_1.StringUtils.rightTrim(line.substring(pointer + 1)), false, true);
         }
+        // Aumentamos pointer
+        pointer++;
     }
     // En este punto ya estamos fuera de bloque de texto (si existía)
     // Empty
     if (pointer === line.length) {
         if (lastNodeBlock) {
-            return new Line_1.Line(lastLevel + 1, "");
+            return new Line_1.Line(level, "", false, true);
         }
-        return null;
+        return new Line_1.Line(level, "", false, false);
     }
     // Indentación no es múltiplo de 4 con espacios
     if (spaces > 0) {
@@ -52,6 +53,6 @@ function parseLine(line, lastNodeBlock, lastLevel, numLine) {
         throw new ParseException_1.ParseException(numLine, "INDENTATION_LEVEL_NOT_VALID", `Level of indent incorrect: ${level}`);
     }
     // Caso general: devolver la línea sin la indentación consumida
-    return new Line_1.Line(level, line.substring(pointer).trim());
+    return new Line_1.Line(level, line.substring(pointer).trim(), false, false);
 }
 //# sourceMappingURL=LineParser.js.map

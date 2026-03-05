@@ -63,9 +63,9 @@ export class Parser {
 			const lastNodeText = lastNode ? lastNode.isTextNode() : false;
 
 			// Parseamos línea
-			const line: Line | null = parseLine(lineString, lastNodeText, lastLevel, lineNumber);
+			const line: Line = parseLine(lineString, lastNodeText, lastLevel, lineNumber);
 
-			if (line === null) {
+			if (line.isComment) {
 				// Pasamos a observers
 				this.observers.forEach(observer => {
 					observer.onComment(lineNumber, lineString);
@@ -77,8 +77,13 @@ export class Parser {
 
 			// Si estamos dentro de un nodo texto, y el nivel indica que sigue siendo texto,
 			// añadimos línea de texto y no creamos nodo.
-			if (lastNodeText && currentLevel > lastLevel) {
+			if (line.isBlock) {
 				lastNode!.addTextLine(line.content);
+				return;
+			}
+
+			// Si es línea vacía no hacemos nada
+			if (line.isEmpty()) {
 				return;
 			}
 

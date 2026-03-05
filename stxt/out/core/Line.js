@@ -5,9 +5,16 @@ class Line {
     // Igual que en Java: campos públicos e inmutables
     level;
     content;
-    constructor(level, line) {
+    isComment;
+    isBlock;
+    constructor(level, content, isComment, isBlock) {
         this.level = level;
-        this.content = line;
+        this.content = content;
+        this.isComment = isComment;
+        this.isBlock = isBlock;
+    }
+    isEmpty() {
+        return this.content.trim() === "";
     }
 }
 exports.Line = Line;

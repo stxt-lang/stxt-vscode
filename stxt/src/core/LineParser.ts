@@ -3,7 +3,7 @@ import { StringUtils } from "./StringUtils";
 import { ParseException } from "../exceptions/ParseException";
 import { Line } from "./Line";
 
-export function parseLine(line: string, lastNodeBlock: boolean, lastLevel: number, numLine: number): Line | null {
+export function parseLine(line: string, lastNodeBlock: boolean, lastLevel: number, numLine: number): Line {
 	let level = 0;
 	let spaces = 0;
 	let pointer = 0;
@@ -21,18 +21,19 @@ export function parseLine(line: string, lastNodeBlock: boolean, lastLevel: numbe
 			level++;
 			spaces = 0;
 		} else if (c === Constants.COMMENT_CHAR) {
-			return null;
+			return new Line(level, line.substring(pointer + 1), true, false);
 		} else {
 			// Primer carácter no espacio/tab/comentario => fin de indentación
 			break;
 		}
 
-		pointer++;
-
 		// Dentro del bloque de texto
 		if (lastNodeBlock && level > lastLevel) {
-			return new Line(level, StringUtils.rightTrim(line.substring(pointer)));
+			return new Line(level, StringUtils.rightTrim(line.substring(pointer + 1)), false, true);
 		}
+
+		// Aumentamos pointer
+		pointer++;
 	}
 
 	// En este punto ya estamos fuera de bloque de texto (si existía)
@@ -40,9 +41,9 @@ export function parseLine(line: string, lastNodeBlock: boolean, lastLevel: numbe
 	// Empty
 	if (pointer === line.length) {
 		if (lastNodeBlock) {
-			return new Line(lastLevel + 1, "");
+			return new Line(level, "", false, true);
 		}
-		return null;
+		return new Line(level, "", false, false);
 	}
 
 	// Indentación no es múltiplo de 4 con espacios
@@ -56,5 +57,5 @@ export function parseLine(line: string, lastNodeBlock: boolean, lastLevel: numbe
 	}
 
 	// Caso general: devolver la línea sin la indentación consumida
-	return new Line(level, line.substring(pointer).trim());
+	return new Line(level, line.substring(pointer).trim(), false, false);
 }
