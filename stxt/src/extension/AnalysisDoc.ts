@@ -45,6 +45,7 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
     // Obtener tokens y nodeByLine generados por el observer
     const tokens = tokenObserver.getTokens();
     const nodeByLine = tokenObserver.getNodeByLine();
+    const commentLines = tokenObserver.getCommentLines();
 
     // Convertir errores a diagnostics
     for (const error of parseResult.getErrors()) {
@@ -65,7 +66,7 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
     diagnosticCollection.set(document.uri, diagnostics);
 
     // Guardamos resultados
-    const result: AnalysisResult = { tokens, nodeByLine };
+    const result: AnalysisResult = { tokens, nodeByLine, commentLines };
     LAST_ANALYSIS_BY_URI.set(document.uri.toString(), result);
 
     //console.log("Parse end.");

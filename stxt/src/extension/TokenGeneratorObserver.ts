@@ -7,6 +7,7 @@ import { Line } from '../core/Line';
 export class TokenGeneratorObserver implements Observer {
     private tokens: StxtToken[] = [];
     private nodeByLine = new Map<number, Node>();
+    private commentLines = new Set<number>();
     private templateNodeByLine = new Map<number, Line>();
 
     onTextLine(node: Node, lineNumber: number, lineString: string, line: Line): void {
@@ -97,6 +98,7 @@ export class TokenGeneratorObserver implements Observer {
         const trimmedLine = line.trim();
         if (trimmedLine.startsWith('#')) {
             const lineIndex = lineNumber - 1;
+            this.commentLines.add(lineIndex);
             this.tokens.push({ 
                 line: lineIndex, 
                 startChar: 0, 
@@ -112,6 +114,10 @@ export class TokenGeneratorObserver implements Observer {
 
     getNodeByLine(): Map<number, Node> {
         return this.nodeByLine;
+    }
+
+    getCommentLines(): Set<number> {
+        return this.commentLines;
     }
 
     private generateTokensForNode(node: Node, lineIndex: number, line: string): void {

@@ -5,6 +5,7 @@ const Parser_1 = require("../core/Parser");
 class TokenGeneratorObserver {
     tokens = [];
     nodeByLine = new Map();
+    commentLines = new Set();
     templateNodeByLine = new Map();
     onTextLine(node, lineNumber, lineString, line) {
         // Guardar información de líneas dentro de nodos template
@@ -80,6 +81,7 @@ class TokenGeneratorObserver {
         const trimmedLine = line.trim();
         if (trimmedLine.startsWith('#')) {
             const lineIndex = lineNumber - 1;
+            this.commentLines.add(lineIndex);
             this.tokens.push({
                 line: lineIndex,
                 startChar: 0,
@@ -93,6 +95,9 @@ class TokenGeneratorObserver {
     }
     getNodeByLine() {
         return this.nodeByLine;
+    }
+    getCommentLines() {
+        return this.commentLines;
     }
     generateTokensForNode(node, lineIndex, line) {
         if (node.isTextNode()) {

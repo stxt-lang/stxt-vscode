@@ -42,6 +42,7 @@ function analysisDoc(document, diagnosticCollection) {
     // Obtener tokens y nodeByLine generados por el observer
     const tokens = tokenObserver.getTokens();
     const nodeByLine = tokenObserver.getNodeByLine();
+    const commentLines = tokenObserver.getCommentLines();
     // Convertir errores a diagnostics
     for (const error of parseResult.getErrors()) {
         const line = error.line > 0 ? error.line - 1 : 0;
@@ -58,7 +59,7 @@ function analysisDoc(document, diagnosticCollection) {
     // Fin de diagnosis
     diagnosticCollection.set(document.uri, diagnostics);
     // Guardamos resultados
-    const result = { tokens, nodeByLine };
+    const result = { tokens, nodeByLine, commentLines };
     LAST_ANALYSIS_BY_URI.set(document.uri.toString(), result);
     //console.log("Parse end.");
     return result;

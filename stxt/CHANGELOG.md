@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Improved hover for comments: now displays the actual comment content with visual icon.
+- Enhanced hover with visual icons for better readability (name, value, schema, etc.).
 - Syntax highlighting for template content: `@stxt.template:structure` and `@stxt.template:description` nodes now display colorized STXT syntax within their text blocks.
 - Improved hover information layout: better organization of node properties, schema information, and text content.
 - Internal refactor: improved code clarity and maintainability with consistent naming conventions (renamed Spanish function names to English, improved variable names, added constants for separators).

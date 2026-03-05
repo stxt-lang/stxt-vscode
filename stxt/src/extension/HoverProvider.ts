@@ -10,20 +10,30 @@ export class StxtHoverProvider implements HoverProvider {
 			return;
 		}
 
+		// Verificar si es un comentario
+		if (analysis.commentLines.has(position.line)) {
+			const markdown = new MarkdownString();
+			const commentText = document.lineAt(position.line).text;
+			markdown.appendMarkdown("### 💬 Comment\n\n");
+			markdown.appendCodeblock(commentText, 'stxt');
+			markdown.isTrusted = false;
+			return new Hover(markdown);
+		}
+
 		const node = analysis.nodeByLine.get(position.line);
 		if (!node) {
 			return;
 		}
 
 		const markdown = new MarkdownString();
-		markdown.appendMarkdown(node.isTextNode() ? "### BLOCK " : "### INLINE");
+		markdown.appendMarkdown(node.isTextNode() ? "### 📄 TEXT BLOCK " : "### 📌 INLINE");
 		markdown.appendMarkdown(` (Level ${node.getLevel()})\n`);
-		markdown.appendMarkdown(`- **Name:** \`${escapeMd(node.getName())}\`\n`);
-		markdown.appendMarkdown(`- **Normalized name:** \`${escapeMd(node.getNormalizedName())}\`\n`);
-		markdown.appendMarkdown(`- **Qualified name:** \`${escapeMd(node.getQualifiedName())}\`\n`);
+		markdown.appendMarkdown(`- **🏷️ Name:** \`${escapeMd(node.getName())}\`\n`);
+		markdown.appendMarkdown(`- **🔤 Normalized name:** \`${escapeMd(node.getNormalizedName())}\`\n`);
+		markdown.appendMarkdown(`- **🎯 Qualified name:** \`${escapeMd(node.getQualifiedName())}\`\n`);
 
 		if (!node.isTextNode()) {
-			markdown.appendMarkdown(`- **Value:** \`${escapeMd(node.getValue())}\`\n`);
+			markdown.appendMarkdown(`- **💎 Value:** \`${escapeMd(node.getValue())}\`\n`);
 		}
 
 		if (node.getNamespace()) {
@@ -34,14 +44,14 @@ export class StxtHoverProvider implements HoverProvider {
 					// Mostrar el tipo
 					const type = nodeDef.getType();
 					markdown.appendMarkdown(`\n---\n`);
-					markdown.appendMarkdown(`### Schema\n- **Type**: \`${type}\`\n`);
+					markdown.appendMarkdown(`### 📋 Schema\n- **Type**: \`${type}\`\n`);
 
 					// Si es ENUM, mostrar los valores permitidos
 					if (type === 'ENUM') {
 						const values = nodeDef.getValues();
 						if (values.size > 0) {
 							const valueList = Array.from(values).map(v => `\`${escapeMd(v)}\``).join(', ');
-							markdown.appendMarkdown(`- **Allowed values**: ${valueList}\n`);
+							markdown.appendMarkdown(`- **✅ Allowed values**: ${valueList}\n`);
 						}
 					}
 
@@ -59,7 +69,7 @@ export class StxtHoverProvider implements HoverProvider {
 			const text = node.getText();
 
 			markdown.appendMarkdown(`\n---\n`);
-			markdown.appendMarkdown(`### Text\n\n`);
+			markdown.appendMarkdown(`### 📄 Text Content\n\n`);
 			markdown.appendCodeblock(text, 'stxt');
 		}
 
