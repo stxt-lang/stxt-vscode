@@ -1,9 +1,9 @@
 import { Constants } from "./Constants";
 import { StringUtils } from "./StringUtils";
 import { ParseException } from "../exceptions/ParseException";
-import { LineIndent } from "./LineIndent";
+import { Line } from "./Line";
 
-export function parseLineIndent(line: string, lastNodeBlock: boolean, lastLevel: number, numLine: number): LineIndent | null {
+export function parseLine(line: string, lastNodeBlock: boolean, lastLevel: number, numLine: number): Line | null {
 	let level = 0;
 	let spaces = 0;
 	let pointer = 0;
@@ -31,7 +31,7 @@ export function parseLineIndent(line: string, lastNodeBlock: boolean, lastLevel:
 
 		// Dentro del bloque de texto
 		if (lastNodeBlock && level > lastLevel) {
-			return new LineIndent(level, StringUtils.rightTrim(line.substring(pointer)));
+			return new Line(level, StringUtils.rightTrim(line.substring(pointer)));
 		}
 	}
 
@@ -40,7 +40,7 @@ export function parseLineIndent(line: string, lastNodeBlock: boolean, lastLevel:
 	// Empty
 	if (pointer === line.length) {
 		if (lastNodeBlock) {
-			return new LineIndent(lastLevel + 1, "");
+			return new Line(lastLevel + 1, "");
 		}
 		return null;
 	}
@@ -56,5 +56,5 @@ export function parseLineIndent(line: string, lastNodeBlock: boolean, lastLevel:
 	}
 
 	// Caso general: devolver la línea sin la indentación consumida
-	return new LineIndent(level, line.substring(pointer).trim());
+	return new Line(level, line.substring(pointer).trim());
 }

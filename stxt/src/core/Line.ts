@@ -1,4 +1,4 @@
-export class LineIndent {
+export class Line {
 	// Igual que en Java: campos públicos e inmutables
 	public readonly indentLevel: number;
 	public readonly lineWithoutIndent: string;

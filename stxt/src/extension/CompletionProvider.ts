@@ -1,7 +1,7 @@
 import { getLastAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
 import { Constants } from '../core/Constants';
-import { calculateIndentLevel, getIndentationLength } from '../core/IndentUtils';
+import { calculateIndentLevel, getIndentationLength } from '../core/LineUtils';
 import { buscarSugerenciasPorParent, buscarSugerenciasPrimerNivel, buscarValoresEnum } from './CompletionProviderSearch';
 import { CompletionItem, CompletionItemProvider, Position, ProviderResult, TextDocument } from 'vscode';
 

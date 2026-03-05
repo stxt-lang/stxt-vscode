@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
-const LineIndentParser_1 = require("./LineIndentParser");
+const LineParser_1 = require("./LineParser");
 const NodeCreator_1 = require("./NodeCreator");
 const ParseResult_1 = require("./ParseResult");
 const ParseException_1 = require("../exceptions/ParseException");
@@ -48,7 +48,7 @@ class Parser {
             const lastLevel = lastNode ? lastNode.getLevel() : 0;
             const lastNodeText = lastNode ? lastNode.isTextNode() : false;
             // Parseamos línea
-            const lineIndent = (0, LineIndentParser_1.parseLineIndent)(line, lastNodeText, lastLevel, lineNumber);
+            const lineIndent = (0, LineParser_1.parseLine)(line, lastNodeText, lastLevel, lineNumber);
             if (lineIndent === null) {
                 // Pasamos a observers
                 this.observers.forEach(observer => {

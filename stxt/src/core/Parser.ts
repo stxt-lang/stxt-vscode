@@ -1,6 +1,6 @@
 import { Node } from "./Node";
-import { parseLineIndent } from "./LineIndentParser";
-import { LineIndent } from "./LineIndent";
+import { parseLine } from "./LineParser";
+import { Line } from "./Line";
 import { createNode } from "./NodeCreator";
 import { Observer } from "../processors/Observer";
 import { Validator } from "../processors/Validator";
@@ -63,7 +63,7 @@ export class Parser {
 			const lastNodeText = lastNode ? lastNode.isTextNode() : false;
 
 			// Parseamos línea
-			const lineIndent: LineIndent | null = parseLineIndent(line, lastNodeText, lastLevel, lineNumber);
+			const lineIndent: Line | null = parseLine(line, lastNodeText, lastLevel, lineNumber);
 
 			if (lineIndent === null) {
 				// Pasamos a observers

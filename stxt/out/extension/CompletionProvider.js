@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StxtCompletionProvider = void 0;
 const AnalysisDoc_1 = require("./AnalysisDoc");
 const Constants_1 = require("../core/Constants");
-const IndentUtils_1 = require("../core/IndentUtils");
+const LineUtils_1 = require("../core/LineUtils");
 const CompletionProviderSearch_1 = require("./CompletionProviderSearch");
 class StxtCompletionProvider {
     provideCompletionItems(document, position) {
@@ -56,8 +56,8 @@ function getCompletionContext(linePrefix) {
     if (trimmed.startsWith(Constants_1.Constants.COMMENT_CHAR)) {
         return null;
     }
-    const level = (0, IndentUtils_1.calculateIndentLevel)(linePrefix);
-    const indentationLength = (0, IndentUtils_1.getIndentationLength)(linePrefix);
+    const level = (0, LineUtils_1.calculateIndentLevel)(linePrefix);
+    const indentationLength = (0, LineUtils_1.getIndentationLength)(linePrefix);
     // Detectar si estamos completando un valor (después de ':' o '>>')
     const sepIndex = trimmed.indexOf(Constants_1.Constants.SEP_NODE);
     const textSepIndex = trimmed.indexOf('>>');
