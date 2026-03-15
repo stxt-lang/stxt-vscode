@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.3.2]
+
 - ENUM values are now matched exactly as defined; normalized values are no longer accepted.
 
 ## [0.3.1]
