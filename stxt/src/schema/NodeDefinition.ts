@@ -10,7 +10,6 @@ export class NodeDefinition {
 
     private readonly children: Map<string, ChildDefinition> = new Map();
     private readonly values: Set<string> = new Set();
-    private readonly normalizedValues: Map<string, string> = new Map();
 
     constructor(name: string, type: string, line: number, description: string | undefined) {
         this.name = StringUtils.compactSpaces(name);
@@ -43,8 +42,8 @@ export class NodeDefinition {
         return this.description;
     }
 
-setDescription(description: string): void {
-		this.description = description;
+    setDescription(description: string): void {
+        this.description = description;
     }
 
     addChildDefinition(childDefinition: ChildDefinition): void {
@@ -56,27 +55,22 @@ setDescription(description: string): void {
     }
 
     addValue(value: string, line?: number): void {
-        const normalized = StringUtils.normalize(value);
-        
-        if (this.normalizedValues.has(normalized)) {
-            const existing = this.normalizedValues.get(normalized)!;
+        if (this.values.has(value)) {
             throw new ValidationException(
                 line ?? 0,
                 "DUPLICATE_ENUM_VALUE",
-                `Duplicate enum value: '${value}' normalizes to '${normalized}', which is already defined by '${existing}'`
+                `Duplicate enum value: '${value}'`
             );
         }
-        
+
         this.values.add(value);
-        this.normalizedValues.set(normalized, value);
     }
 
     isAllowedValue(value: string): boolean {
         if (this.values.size === 0) {
             return true;
         }
-        const normalized = StringUtils.normalize(value);
-        return this.normalizedValues.has(normalized);
+        return this.values.has(value);
     }
 
     getValues(): ReadonlySet<string> {
