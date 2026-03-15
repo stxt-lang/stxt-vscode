@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- ENUM values are now matched exactly as defined; normalized values are no longer accepted.
+
 ## [0.3.1]
 
 - Improved hover for comments: now displays the actual comment content with visual icon.
