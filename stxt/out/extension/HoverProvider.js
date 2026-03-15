@@ -22,16 +22,18 @@ class StxtHoverProvider {
         const node = analysis.nodeByLine.get(position.line);
         // Verificar si es una línea de texto dentro de un nodo TEXT BLOCK
         if (!node) {
+            /*
             const parentNode = analysis.textLineByLineNumber.get(position.line);
-            if (parentNode) {
-                const markdown = new vscode_1.MarkdownString();
-                const currentLine = document.lineAt(position.line).text;
+            const currentLine = document.lineAt(position.line);
+            if (parentNode && !currentLine.isEmptyOrWhitespace && position.character >= currentLine.firstNonWhitespaceCharacterIndex) {
+                const markdown = new MarkdownString();
                 markdown.appendMarkdown("### 📝 Text Line\n");
-                markdown.appendMarkdown(`Part of text block: **${escapeMd(parentNode.getName())}**\n\n`);
-                markdown.appendCodeblock(currentLine, 'stxt');
+                markdown.appendMarkdown(`Part of text block: \`${escapeMd(parentNode.getQualifiedName())}\`\n\n`);
+                markdown.appendMarkdown(`Defined at line ${parentNode.getLine()}.`);
                 markdown.isTrusted = false;
-                return new vscode_1.Hover(markdown);
+                return new Hover(markdown);
             }
+            */
             return;
         }
         const markdown = new vscode_1.MarkdownString();
