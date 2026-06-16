@@ -21,6 +21,7 @@ Template (@stxt.template): dev.stxt.website
 				Page:
 
 * La descripción del namespace vendrá en `Namespace`, claro :-D
+* Poder configurar el entorno, por `developer-mode:off` y otras cosas. Por ejemplo para no ver tanta info de un nodo, y sólo descripción si existe.
 * console.log a logger.info(), etc.
 * Error o warning con mezcla de identación?
 * Parseo en proyecto node separado
