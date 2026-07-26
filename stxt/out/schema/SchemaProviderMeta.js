@@ -53,9 +53,12 @@ class SchemaProviderMeta {
             Value: NATURAL
             Value: NUMBER
             Value: DATE
+            Value: TIME
             Value: TIMESTAMP
+            Value: UUID
             Value: EMAIL
             Value: HEXADECIMAL
+            Value: BINARY
             Value: BASE64
             Value: GROUP
             Value: ENUM

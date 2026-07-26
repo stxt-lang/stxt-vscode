@@ -111,6 +111,11 @@ function addToSchema(schema: Schema, node: Node): void {
 				schemaNode.addValue(v, node.getLine());
 			}
 		}
+
+		// Un ENUM sin lista de valores es un template inválido (STXT-TEMPLATE-SPEC 9 y 13.7)
+		if (type === "ENUM" && (!values || values.length === 0)) {
+			throw new ValidationException(node.getLine(), "VALUES_EMPTY_FOR_ENUM", "ENUM Type must include values");
+		}
 	} else {
 		let type = cl.getType();
 		if (!type || !type.startsWith("@")) {

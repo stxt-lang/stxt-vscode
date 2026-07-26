@@ -50,7 +50,7 @@ class UnifiedSchemaProvider {
     addTemplateNode(node) {
         // Validar contra el meta-schema de templates
         const schemaValidator = new SchemaValidator_1.SchemaValidator(this.templateMeta, true);
-        schemaValidator.validate(node);
+        UnifiedSchemaProvider.throwIfInvalid(schemaValidator.validate(node));
         // Transformar el template a schema
         const schema = (0, TemplateParser_1.transformTemplateNodeToSchema)(node);
         const key = StringUtils_1.StringUtils.lowerCase(schema.getNamespace());
@@ -59,11 +59,17 @@ class UnifiedSchemaProvider {
     addSchemaNode(node) {
         // Validar contra el meta-schema de schemas
         const schemaValidator = new SchemaValidator_1.SchemaValidator(this.schemaMeta, true);
-        schemaValidator.validate(node);
+        UnifiedSchemaProvider.throwIfInvalid(schemaValidator.validate(node));
         // Transformar el nodo a schema
         const schema = (0, SchemaParser_1.transformNodeToSchema)(node);
         const key = StringUtils_1.StringUtils.lowerCase(schema.getNamespace());
         this.schemas.set(key, schema);
+    }
+    // Un schema/template que no valida contra su meta-schema no debe cargarse
+    static throwIfInvalid(errors) {
+        if (errors.length > 0) {
+            throw errors[0];
+        }
     }
     clear() {
         this.schemas.clear();
