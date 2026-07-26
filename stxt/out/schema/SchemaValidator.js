@@ -38,7 +38,19 @@ class SchemaValidator {
             return errors;
         }
         errors.push(...SchemaValidator.validateValue(schemaNode, node));
+        errors.push(...SchemaValidator.validateChildrenDeclared(schemaNode, node));
         errors.push(...SchemaValidator.validateCount(schemaNode, node));
+        return errors;
+    }
+    // Modelo de contenido cerrado (STXT-SCHEMA-SPEC, sección 6): solo se permiten
+    // los hijos directos declarados en la definición del padre; sin Children, cierre total
+    static validateChildrenDeclared(nodeDef, node) {
+        const errors = [];
+        for (const child of node.getChildren()) {
+            if (!nodeDef.getChildren().has(child.getQualifiedName())) {
+                errors.push(new ValidationException_1.ValidationException(child.getLine(), "CHILD_NOT_DECLARED", `Child '${child.getQualifiedName()}' not declared in node '${node.getQualifiedName()}'`));
+            }
+        }
         return errors;
     }
     static validateValue(nodeDef, node) {
