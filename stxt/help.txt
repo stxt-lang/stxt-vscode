@@ -1,3 +1,6 @@
+Para probar F5 y se abre nuevo VSCode con la extensión cargada.
+Desde el nuevo VSCode pulsar F9??? para recargar sin empezar de nuevo todo y que sea más rápido.
+
 ******************
 Para crear package
 ******************
