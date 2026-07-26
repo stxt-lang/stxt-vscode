@@ -64,6 +64,7 @@ class SchemaProviderMeta {
             Value: ENUM
             Value: MARKDOWN
     Node: Values
+        Type: GROUP
         Children:
             Child: Value
                 Min: 1

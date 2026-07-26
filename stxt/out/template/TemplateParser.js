@@ -118,6 +118,10 @@ function addToSchema(schema, node) {
     }
     // Una vez ya existe, si tiene hijos los intentamos crear.
     const childrenNode = node.getChildren();
+    // Error de template 14.9: nodo con hijos y tipo efectivo que no admite hijos
+    if (childrenNode.length > 0 && !TypeRegistry_1.TypeRegistry.admitsChildren(schemaNode.getType())) {
+        throw new ValidationException_1.ValidationException(node.getLine(), "CHILDREN_NOT_ALLOWED_FOR_TYPE", `Type ${schemaNode.getType()} does not allow children (node ${node.getName()})`);
+    }
     // Insertamos childs
     for (const child of childrenNode) {
         cl = ChildLineParser_1.ChildLineParser.parse(child.getValue(), child.getLine());

@@ -5,6 +5,7 @@ import { Node } from "../core/Node";
 import { ValidationException } from "../exceptions/ValidationException";
 import { RuntimeException } from "../exceptions/RuntimeException";
 import { NameNamespaceParser } from "../core/NameNamespaceParser";
+import { TypeRegistry } from "./TypeRegistry";
 
 export function transformNodeToSchema(node: Node): Schema {
     // Node name
@@ -71,6 +72,10 @@ function createFrom(n: Node, namespace: string): NodeDefinition {
 
     const children = n.getChild("children");
     if (children) {
+        // Error de schema 13.5: Children en un Node cuyo tipo no admite hijos
+        if (!TypeRegistry.admitsChildren(type)) {
+            throw new ValidationException(children.getLine(), "CHILDREN_NOT_ALLOWED_FOR_TYPE", `Type ${type} does not allow children (node ${name})`);
+        }
         for (const child of children.getChildrenByName("child")) {
             putChildToSchemaNode(result, child, namespace);
         }

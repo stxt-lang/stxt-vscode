@@ -7,7 +7,8 @@ exports.GROUP = {
         return "GROUP";
     },
     validate(nodeDef, node) {
-        if (node.getValue().length > 0 || node.getTextLines().length > 0) {
+        // Forma del valor NONE (STXT-SCHEMA-SPEC 9.2): ni valor inline ni bloque '>>'
+        if (node.getValue().length > 0 || node.isTextNode()) {
             throw new ValidationException_1.ValidationException(node.getLine(), "INVALID_VALUE", `Node '${node.getName()}' has to be empty`);
         }
     },

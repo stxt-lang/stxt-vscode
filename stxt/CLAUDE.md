@@ -49,10 +49,10 @@ Dos capas, con una regla estricta: **nada bajo `src/core`, `src/schema`, `src/te
 
 ### Núcleo del lenguaje
 
-- **`core/Parser.ts`** — motor único de parseo. Recorre líneas manteniendo una pila de nodos abiertos; al cerrar un nodo lo congela (`freeze()`), lo pasa por los `Validator` registrados y lo adjunta al padre. Expone `parse()` (lanza la primera excepción) y `parseResult()` (devuelve `ParseResult` con nodos + lista de errores, que es lo que usa la extensión para no abortar en el primer error).
+- **`core/Parser.ts`** — motor único de parseo. Recorre líneas manteniendo una pila de nodos abiertos; al cerrar un nodo lo pasa por los `Validator` registrados y lo adjunta al padre (o a la lista de documentos si es raíz). Expone `parse()` (lanza la primera excepción) y `parseResult()` (devuelve `ParseResult` con nodos + lista de errores, que es lo que usa la extensión para no abortar en el primer error).
 - **`core/LineParser.ts`** — calcula nivel de indentación (1 tab = 1 nivel, 4 espacios = 1 nivel) y decide si la línea es comentario, línea dentro de bloque `>>`, vacía o nodo.
 - **`core/NodeCreator.ts` + `NameNamespaceParser.ts`** — separan `Nombre (ns): valor` / `Nombre (ns) >>`; el namespace se **hereda del padre** si no se declara.
-- **`core/Node.ts`** — nodo inmutable tras `freeze()`. Guarda `name`, `normalizedName` (ver `StringUtils.normalize`), `namespace`, `value` o `textLines`, línea y nivel.
+- **`core/Node.ts`** — nodo del árbol (mutable: el parser le añade hijos y líneas de texto tras crearlo). Guarda `name`, `normalizedName` (ver `StringUtils.normalize`), `namespace`, `value` o `textLines`, línea y nivel. Valida en el constructor el formato del nombre (STXT-SPEC 4.2) y del namespace.
 - **`processors/Observer.ts` y `processors/Validator.ts`** — puntos de extensión del parser. Los observers reciben eventos (`onCreate`, `onFinish`, `onComment`, `onTextLine`); los validators devuelven `ValidationException[]` por nodo cerrado.
 
 ### Schemas y templates
@@ -88,7 +88,7 @@ Los errores de parseo se muestran como `Error`; los de validación de schema (`V
 ## Convenciones
 
 - Comentarios y mensajes internos están **en castellano**; los códigos de error (`INVALID_NAMESPACE`, `NODE_NOT_EXIST_IN_SCHEMA`…) y los `getName()` de los tipos, en inglés y en MAYÚSCULAS. Mantener ese reparto.
-- Errores: `ParseException` (sintaxis) y `ValidationException extends ParseException` (semántica), ambos con `line` y `code`. `RuntimeException` es para errores de programación (nodo congelado, tipo duplicado). Nunca lanzar `Error` pelado desde el núcleo.
+- Errores: `ParseException` (sintaxis) y `ValidationException extends ParseException` (semántica), ambos con `line` y `code`. `RuntimeException` es para errores de programación (uso incorrecto de la API, tipo duplicado). Nunca lanzar `Error` pelado desde el núcleo.
 - El código fuente usa **tabuladores**, igual que los ficheros `.stxt`. `tsconfig` está en `strict: true`.
 - Al añadir un ítem al changelog, `CHANGELOG.md` va por versiones y la versión se sube en `package.json`.
 

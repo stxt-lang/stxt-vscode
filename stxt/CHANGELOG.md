@@ -6,6 +6,15 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.4.4]
+
+- Declaring `Children` in a schema `Node` whose type does not admit children (everything except `INLINE` and `GROUP`) now fails to load with `CHILDREN_NOT_ALLOWED_FOR_TYPE` (STXT-SCHEMA-SPEC 13.5). Same for template nodes that have children under a leaf type (STXT-TEMPLATE-SPEC 14.9).
+- `HEXADECIMAL` now follows STXT-SCHEMA-SPEC 9.5 exactly: any `[0-9A-Fa-f]+` string. The even-length requirement and the `#` prefix (inherited from the Java port) are gone; spec wins over code.
+- The binary types (`HEXADECIMAL`, `BINARY`, `BASE64`) validate the block form on the concatenation of lines, trimming each line (STXT-SCHEMA-SPEC 9.5). Whitespace *inside* a line is no longer silently removed before validating.
+- Value forms are now enforced per type (STXT-SCHEMA-SPEC 9.2–9.4): inline-only types (`NUMBER`, `DATE`, `BOOLEAN`, `ENUM`, `URL`, `EMAIL`, …) reject the `>>` block form with `NOT_ALLOWED_TEXT`; `BLOCK` requires the `>>` form and rejects inline nodes (even empty ones) with `BLOCK_FORM_REQUIRED`; `GROUP` rejects the `>>` form as well as inline values.
+- The embedded meta-schema now declares `Values` with `Type: GROUP` (STXT-SCHEMA-SPEC 15.2), so `Values: texto` no longer passes meta-validation.
+- CLAUDE.md architecture notes updated: `Node` is mutable during parsing; `freeze()` no longer exists.
+
 ## [0.4.3]
 
 - **Breaking**: canonical node names now follow the updated STXT-SPEC 4.3 (IDN model): NFC + Unicode lowercase, separator sequences (`-`, `_`, space) collapse to a single `-`, and **diacritics and non-Latin letters are preserved** (`Título` → `título`, `Пример 1` → `пример-1`). Name equality is now accent- and script-sensitive: `Año` and `Ano` are different nodes.

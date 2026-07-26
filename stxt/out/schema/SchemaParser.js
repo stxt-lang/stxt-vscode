@@ -7,6 +7,7 @@ const ChildDefinition_1 = require("./ChildDefinition");
 const ValidationException_1 = require("../exceptions/ValidationException");
 const RuntimeException_1 = require("../exceptions/RuntimeException");
 const NameNamespaceParser_1 = require("../core/NameNamespaceParser");
+const TypeRegistry_1 = require("./TypeRegistry");
 function transformNodeToSchema(node) {
     // Node name
     const nodeName = node.getNormalizedName();
@@ -56,6 +57,10 @@ function createFrom(n, namespace) {
     const result = new NodeDefinition_1.NodeDefinition(name, type, n.getLine(), description);
     const children = n.getChild("children");
     if (children) {
+        // Error de schema 13.5: Children en un Node cuyo tipo no admite hijos
+        if (!TypeRegistry_1.TypeRegistry.admitsChildren(type)) {
+            throw new ValidationException_1.ValidationException(children.getLine(), "CHILDREN_NOT_ALLOWED_FOR_TYPE", `Type ${type} does not allow children (node ${name})`);
+        }
         for (const child of children.getChildrenByName("child")) {
             putChildToSchemaNode(result, child, namespace);
         }

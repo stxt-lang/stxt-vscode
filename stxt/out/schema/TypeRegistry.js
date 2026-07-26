@@ -48,6 +48,10 @@ class TypeRegistry {
         TypeRegistry.register(MARKDOWN_1.MARKDOWN);
         return true;
     })();
+    // STXT-SCHEMA-SPEC 9 / STXT-TEMPLATE-SPEC 15: sólo INLINE y GROUP admiten hijos
+    static admitsChildren(nodeType) {
+        return nodeType === "INLINE" || nodeType === "GROUP";
+    }
     static get(nodeType) {
         // fuerza que se ejecute _init al cargar la clase (por si el bundler hiciera cosas raras)
         void this._init;

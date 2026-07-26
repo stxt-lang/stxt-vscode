@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BASE64 = void 0;
 const ValidationException_1 = require("../../exceptions/ValidationException");
-const StringUtils_1 = require("../../core/StringUtils");
+const binaryValue_1 = require("./binaryValue");
 exports.BASE64 = {
     getName() {
         return "BASE64";
     },
     validate(ndef, n) {
-        const raw = StringUtils_1.StringUtils.cleanSpaces(n.getText());
+        const raw = (0, binaryValue_1.binaryValue)(n);
         try {
             // Intentamos decodificar
             const buf = Buffer.from(raw, "base64");

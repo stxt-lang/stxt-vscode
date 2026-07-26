@@ -7,7 +7,8 @@ exports.INLINE = {
         return "INLINE";
     },
     validate(nodeDef, node) {
-        if (node.getTextLines().length > 0) {
+        // Forma del valor INLINE (STXT-SCHEMA-SPEC 9.2): no admite bloque '>>'
+        if (node.isTextNode()) {
             throw new ValidationException_1.ValidationException(node.getLine(), "NOT_ALLOWED_TEXT", `Not allowed text in node ${node.getQualifiedName()}`);
         }
     },

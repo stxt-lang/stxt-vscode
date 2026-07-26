@@ -3,7 +3,7 @@ import { ValidationException } from "../../exceptions/ValidationException";
 import { RuntimeException } from "../../exceptions/RuntimeException";
 import { NodeDefinition } from "../NodeDefinition";
 import { Type } from "../Type";
-import { StringUtils } from "../../core/StringUtils";
+import { binaryValue } from "./binaryValue";
 
 export const BASE64: Type = {
     getName(): string {
@@ -11,7 +11,7 @@ export const BASE64: Type = {
     },
 
     validate(ndef: NodeDefinition, n: Node): void {
-        const raw = StringUtils.cleanSpaces(n.getText());
+        const raw = binaryValue(n);
 
         try {
             // Intentamos decodificar

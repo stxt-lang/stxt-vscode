@@ -52,6 +52,11 @@ export class TypeRegistry {
         return true;
     })();
 
+    // STXT-SCHEMA-SPEC 9 / STXT-TEMPLATE-SPEC 15: sólo INLINE y GROUP admiten hijos
+    static admitsChildren(nodeType: string): boolean {
+        return nodeType === "INLINE" || nodeType === "GROUP";
+    }
+
     static get(nodeType: string): Type | undefined {
         // fuerza que se ejecute _init al cargar la clase (por si el bundler hiciera cosas raras)
         void this._init;

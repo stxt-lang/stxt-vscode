@@ -7,6 +7,10 @@ exports.URL = {
         return "URL";
     },
     validate(ndef, n) {
+        // Forma del valor INLINE (STXT-SCHEMA-SPEC 9.4): no admite bloque '>>'
+        if (n.isTextNode()) {
+            throw new ValidationException_1.ValidationException(n.getLine(), "NOT_ALLOWED_TEXT", `Not allowed text in node ${n.getQualifiedName()}`);
+        }
         const url = n.getValue();
         try {
             const parsed = new globalThis.URL(url);
