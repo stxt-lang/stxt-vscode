@@ -15,7 +15,6 @@ class Node {
     line;
     level;
     children = [];
-    isFrozen = false;
     constructor(line, level, name, namespace, textNode, value) {
         this.level = level;
         this.line = line;
@@ -53,9 +52,6 @@ class Node {
         return this.children;
     }
     addChild(node) {
-        if (this.isFrozen) {
-            throw new RuntimeException_1.RuntimeException("NODE_FROZEN", "Node is frozen");
-        }
         this.children.push(node);
     }
     getValue() {
@@ -75,17 +71,6 @@ class Node {
     }
     getText() {
         return this.isTextNode() ? this.textLines.join("\n") : this.value;
-    }
-    freeze() {
-        if (this.isFrozen) {
-            return;
-        }
-        for (const n of this.children) {
-            n.freeze();
-        }
-        Object.freeze(this.children);
-        Object.freeze(this.textLines);
-        this.isFrozen = true;
     }
     getChild(cname, namespace) {
         const result = this.getChildrenByName(cname, namespace);

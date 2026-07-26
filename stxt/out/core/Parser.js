@@ -103,7 +103,6 @@ class Parser {
     closeToLevel(stack, documents, targetLevel, result) {
         while (stack.length > targetLevel) {
             const completed = stack.pop();
-            completed.freeze();
             // Pasamos validators
             this.validators.forEach(validator => {
                 try {

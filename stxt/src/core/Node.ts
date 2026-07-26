@@ -14,7 +14,6 @@ export class Node {
 	private readonly line: number;
 	private readonly level: number;
 	private children: Node[] = [];
-	private isFrozen = false;
 
 	constructor(line: number,level: number,name: string,namespace: string | null | undefined,textNode: boolean,value: string | null | undefined) {
 		this.level = level;
@@ -64,9 +63,6 @@ export class Node {
 	}
 
 	addChild(node: Node): void {
-		if (this.isFrozen) {
-			throw new RuntimeException("NODE_FROZEN", "Node is frozen");
-		}
 		this.children.push(node);
 	}
 
@@ -92,21 +88,6 @@ export class Node {
 
 	getText(): string {
 		return this.isTextNode() ? this.textLines.join("\n") : this.value;
-	}
-
-	freeze(): void {
-		if (this.isFrozen) {
-			return;
-		}
-
-		for (const n of this.children) {
-			n.freeze();
-		}
-
-		Object.freeze(this.children);
-		Object.freeze(this.textLines);
-
-		this.isFrozen = true;
 	}
 
 	getChild(cname: string, namespace?: string): Node | null {
