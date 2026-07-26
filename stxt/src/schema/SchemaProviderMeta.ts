@@ -59,6 +59,7 @@ export class SchemaProviderMeta implements SchemaProvider {
             Value: BASE64
             Value: GROUP
             Value: ENUM
+            Value: MARKDOWN
     Node: Values
         Children:
             Child: Value

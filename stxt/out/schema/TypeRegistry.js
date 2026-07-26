@@ -17,6 +17,7 @@ const HEXADECIMAL_1 = require("./type/HEXADECIMAL");
 const BASE64_1 = require("./type/BASE64");
 const GROUP_1 = require("./type/GROUP");
 const ENUM_1 = require("./type/ENUM");
+const MARKDOWN_1 = require("./type/MARKDOWN");
 class TypeRegistry {
     static REGISTRY = new Map();
     // Inicialización estática (sin INSTANCE)
@@ -38,6 +39,7 @@ class TypeRegistry {
         TypeRegistry.register(BASE64_1.BASE64);
         TypeRegistry.register(GROUP_1.GROUP);
         TypeRegistry.register(ENUM_1.ENUM);
+        TypeRegistry.register(MARKDOWN_1.MARKDOWN);
         return true;
     })();
     static get(nodeType) {

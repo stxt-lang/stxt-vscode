@@ -16,6 +16,7 @@ import { HEXADECIMAL } from "./type/HEXADECIMAL";
 import { BASE64 } from "./type/BASE64";
 import { GROUP } from "./type/GROUP";
 import { ENUM } from "./type/ENUM";
+import { MARKDOWN } from "./type/MARKDOWN";
 
 export class TypeRegistry {
     private static readonly REGISTRY: Map<string, Type> = new Map();
@@ -40,6 +41,7 @@ export class TypeRegistry {
         TypeRegistry.register(BASE64);
         TypeRegistry.register(GROUP);
         TypeRegistry.register(ENUM);
+        TypeRegistry.register(MARKDOWN);
 
         return true;
     })();
