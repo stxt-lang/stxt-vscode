@@ -25,6 +25,10 @@ Ante cualquier duda sobre comportamiento correcto del parser, validador o format
 
 Existen otras implementaciones hermanas del mismo lenguaje (`../../stxt-java`, `../../stxt-js`, `../../stxt-python`). El código de `src/core`, `src/schema` y `src/template` es un port casi literal de la versión Java (quedan comentarios que lo mencionan). Si hay que resolver una ambigüedad de comportamiento, comparar con `../../stxt-java` es útil, pero la spec sigue mandando.
 
+## Trabajo en curso
+
+`PENDIENTES.md` (en esta carpeta) es la lista viva de desajustes conocidos entre las specs y la implementación, con su estado. Consultarla antes de emprender trabajo de conformidad y mantenerla al día (los puntos resueltos se eliminan y se anotan en `CHANGELOG.md`).
+
 ## Comandos
 
 ```bash

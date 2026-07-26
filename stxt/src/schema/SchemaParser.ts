@@ -111,7 +111,15 @@ function putChildToSchemaNode(schemaNode: NodeDefinition, child: Node, defNamesp
     const name = ns.getName();
     const namespace = ns.getNamespace();
 
-    const schemaChild = new ChildDefinition(name, namespace, getInteger(child, "min"), getInteger(child, "max"), child.getLine());
+    const min = getInteger(child, "min");
+    const max = getInteger(child, "max");
+
+    // Cardinalidad inválida si Min > Max (STXT-SCHEMA-SPEC 10 y 13.7)
+    if (min !== null && max !== null && min > max) {
+        throw new ValidationException(child.getLine(), "MIN_GREATER_THAN_MAX", `Min ${min} greater than Max ${max}`);
+    }
+
+    const schemaChild = new ChildDefinition(name, namespace, min, max, child.getLine());
     schemaNode.addChildDefinition(schemaChild);
 }
 

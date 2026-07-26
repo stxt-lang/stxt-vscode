@@ -31,6 +31,11 @@ function transformTemplateNodeToSchema(node) {
         }
     }
     catch (e) {
+        // ValidationException extiende ParseException: comprobar primero para no degradar
+        // la severidad (la extensión pinta ValidationException como Warning)
+        if (e instanceof ValidationException_1.ValidationException) {
+            throw new ValidationException_1.ValidationException(e.line + offset, e.code, e.message);
+        }
         if (e instanceof ParseException_1.ParseException) {
             throw new ParseException_1.ParseException(e.line + offset, e.code, e.message);
         }
@@ -145,6 +150,10 @@ function addDescriptions(schema, nodes) {
         const nodeDef = schema.getNodeDefinition(node.getName());
         if (!nodeDef) {
             throw new ValidationException_1.ValidationException(node.getLine(), "NODE_NOT_FOUND", `Not found node with name: ${node.getName()}`);
+        }
+        // No se permite más de una entrada por nodo (STXT-TEMPLATE-SPEC 12)
+        if (nodeDef.getDescription() !== undefined) {
+            throw new ValidationException_1.ValidationException(node.getLine(), "DESCRIPTION_ALREADY_DEFINED", `Exists a previous description for node: ${node.getName()}`);
         }
         nodeDef.setDescription(node.getText());
     });

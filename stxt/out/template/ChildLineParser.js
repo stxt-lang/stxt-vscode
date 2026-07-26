@@ -35,43 +35,30 @@ class ChildLineParser {
             max = null;
         }
         else if (count.endsWith("+")) {
-            const expectedNum = parseInt(count.substring(0, count.length - 1), 10);
-            if (Number.isNaN(expectedNum)) {
-                throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
-            }
-            min = expectedNum;
+            min = ChildLineParser.parseCount(count.substring(0, count.length - 1), count, rawLine, lineNumber);
             max = null;
         }
         else if (count.endsWith("-")) {
-            const expectedNum = parseInt(count.substring(0, count.length - 1), 10);
-            if (Number.isNaN(expectedNum)) {
-                throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
-            }
             min = null;
-            max = expectedNum;
+            max = ChildLineParser.parseCount(count.substring(0, count.length - 1), count, rawLine, lineNumber);
         }
         else if (count.includes(",")) {
-            try {
-                const [a, b] = count.split(",", 2);
-                const aNum = parseInt(a.trim(), 10);
-                const bNum = parseInt(b.trim(), 10);
-                if (Number.isNaN(aNum) || Number.isNaN(bNum)) {
-                    throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
-                }
-                min = aNum;
-                max = bNum;
-            }
-            catch {
+            const parts = count.split(",");
+            if (parts.length !== 2) {
                 throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
             }
+            const aNum = ChildLineParser.parseCount(parts[0].trim(), count, rawLine, lineNumber);
+            const bNum = ChildLineParser.parseCount(parts[1].trim(), count, rawLine, lineNumber);
+            // Cardinalidad inválida si min > max (STXT-TEMPLATE-SPEC 7.1)
+            if (aNum > bNum) {
+                throw new ValidationException_1.ValidationException(lineNumber, "MIN_GREATER_THAN_MAX", `Min ${aNum} greater than Max ${bNum} in line: ${rawLine}`);
+            }
+            min = aNum;
+            max = bNum;
         }
         else {
-            const expectedNum = parseInt(count, 10);
-            if (Number.isNaN(expectedNum)) {
-                throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
-            }
-            min = expectedNum;
-            max = expectedNum;
+            min = ChildLineParser.parseCount(count, count, rawLine, lineNumber);
+            max = min;
         }
         // values
         let values = null;
@@ -95,6 +82,13 @@ class ChildLineParser {
         }
         // type es string|null en nuestra clase
         return new ChildLine_1.ChildLine(type ?? null, min, max, values);
+    }
+    // num, min y max deben ser enteros no negativos, sin texto sobrante (STXT-TEMPLATE-SPEC 7.1)
+    static parseCount(num, count, rawLine, lineNumber) {
+        if (!/^\d+$/.test(num)) {
+            throw new ValidationException_1.ValidationException(lineNumber, "INVALID_CHILD_COUNT", `Invalid count ${count} in line: ${rawLine}`);
+        }
+        return parseInt(num, 10);
     }
 }
 exports.ChildLineParser = ChildLineParser;
