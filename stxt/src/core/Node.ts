@@ -4,6 +4,9 @@ import { NamespaceValidator } from "./NamespaceValidator";
 import { StringUtils } from "./StringUtils";
 
 export class Node {
+	// STXT-SPEC 4.2: letras y dígitos Unicode (categorías L y Nd) más '-', '_' y espacio
+	private static readonly VALID_NAME = /^[\p{L}\p{Nd}\-_ ]+$/u;
+
 	private readonly name: string;
 	private readonly normalizedName: string;
 	private readonly namespace: string;
@@ -29,6 +32,10 @@ export class Node {
 
 		if (this.value.length > 0 && this.isTextNode()) {
 			throw new RuntimeException("INLINE_VALUE_NOT_VALID", "Not empty value with textNode");
+		}
+
+		if (!Node.VALID_NAME.test(name)) {
+			throw new ParseException(line, "INVALID_NODE_NAME", `Node name contains invalid characters: ${name}`);
 		}
 
 		if (this.normalizedName.length === 0) {

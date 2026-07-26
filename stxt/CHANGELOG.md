@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.4.3]
+
+- **Breaking**: canonical node names now follow the updated STXT-SPEC 4.3 (IDN model): NFC + Unicode lowercase, separator sequences (`-`, `_`, space) collapse to a single `-`, and **diacritics and non-Latin letters are preserved** (`Título` → `título`, `Пример 1` → `пример-1`). Name equality is now accent- and script-sensitive: `Año` and `Ano` are different nodes.
+- Node names are validated against STXT-SPEC 4.2 (error rule 8): only Unicode letters and digits (categories L and Nd) plus `-`, `_` and space. `Nombre$: x` or `Nombre?: x` are now rejected with `INVALID_NODE_NAME`.
+- Namespaces no longer tolerate spaces inside `( )` (STXT-SPEC 7/16, error rule 9): `Nodo ( a.b ): x` is now rejected with `INVALID_NAMESPACE`.
+
 ## [0.4.2]
 
 - Duplicate entries for the same node in a template `Description` block are now rejected with `DESCRIPTION_ALREADY_DEFINED` (STXT-TEMPLATE-SPEC 12); previously the last entry silently overwrote the earlier one.

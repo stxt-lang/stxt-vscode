@@ -6,6 +6,8 @@ const RuntimeException_1 = require("../exceptions/RuntimeException");
 const NamespaceValidator_1 = require("./NamespaceValidator");
 const StringUtils_1 = require("./StringUtils");
 class Node {
+    // STXT-SPEC 4.2: letras y dígitos Unicode (categorías L y Nd) más '-', '_' y espacio
+    static VALID_NAME = /^[\p{L}\p{Nd}\-_ ]+$/u;
     name;
     normalizedName;
     namespace;
@@ -26,6 +28,9 @@ class Node {
         NamespaceValidator_1.NamespaceValidator.validateNamespaceFormat(this.namespace, line);
         if (this.value.length > 0 && this.isTextNode()) {
             throw new RuntimeException_1.RuntimeException("INLINE_VALUE_NOT_VALID", "Not empty value with textNode");
+        }
+        if (!Node.VALID_NAME.test(name)) {
+            throw new ParseException_1.ParseException(line, "INVALID_NODE_NAME", `Node name contains invalid characters: ${name}`);
         }
         if (this.normalizedName.length === 0) {
             throw new ParseException_1.ParseException(line, "INVALID_NODE_NAME", `Node name not valid: ${name}`);

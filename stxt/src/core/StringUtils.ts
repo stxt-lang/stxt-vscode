@@ -1,5 +1,3 @@
-const DIACRITICS = /[\u0300-\u036f]+/g;
-
 export class StringUtils {
 	private constructor() {
 	}
@@ -39,7 +37,8 @@ export class StringUtils {
 		return s.trim().replace(/\s+/g, " ");
 	}
 
-	// Usados para name normalizado de nodos
+	// Usados para name normalizado de nodos (STXT-SPEC 4.3): NFC + minúsculas,
+	// conservando diacríticos y alfabetos no latinos (modelo IDN)
 	static normalize(input: string | null | undefined): string {
 		if (input == null) {
 			return "";
@@ -49,14 +48,11 @@ export class StringUtils {
 			return "";
 		}
 
-		// Similar a Normalizer.Form.NFKD
-		s = s.normalize("NFKD");
-		s = s.replace(DIACRITICS, "");
+		s = s.normalize("NFC");
 		s = s.toLowerCase();
-		s = StringUtils.compactSpaces(s);
 
-		// cualquier cosa que no sea [a-z0-9] => '-'
-		s = s.replace(/[^a-z0-9]+/g, "-");
+		// toda secuencia de separadores ('-', '_', espacios) => un solo '-'
+		s = s.replace(/[-_\s]+/g, "-");
 
 		// trim de '-'
 		s = s.replace(/^-+|-+$/g, "");

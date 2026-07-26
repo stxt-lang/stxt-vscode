@@ -8,12 +8,7 @@ En cada punto hay que decidir primero si manda la spec o se cambia la spec.
 
 ## Núcleo (`src/core`)
 
-1. **Caracteres no permitidos en nombres de nodo** — STXT-SPEC 4.2 y regla de error 8:
-   solo alfanuméricos, `-`, `_` y espacio. Hoy `Nombre$: x` o `Nombre?: x` parsean sin
-   error (solo se comprueba que el nombre canónico no quede vacío, `Node.ts`).
-2. **Namespace con espacios interiores** — `Nodo ( a.b ): x` se acepta porque
-   `NameNamespaceParser` hace trim; la gramática de STXT-SPEC 7/16 no admite espacios
-   dentro de `( )`.
+(sin pendientes; los puntos 1 y 2 se resolvieron en 0.4.3)
 
 ## Schemas (`src/schema`)
 
@@ -43,3 +38,12 @@ En cada punto hay que decidir primero si manda la spec o se cambia la spec.
 
 8. **CLAUDE.md desfasado** — describe `freeze()` en `core/Node.ts` y ese método ya no
    existe (el nodo es mutable tras el parseo). Actualizar la sección de arquitectura.
+
+## Fuera de este repositorio (requiere tocar `stxt-web`, solo lectura desde aquí)
+
+9. **Template con referencia sin acento** — con la normalización nueva (STXT-SPEC 4.3,
+   sensible a acentos, 0.4.3) el fichero
+   `../../stxt-web/.stxt/templates/com.example.dokumentando.documento.stxt` línea 16
+   (`Título: (1) @Titulo`) ya no carga: la referencia debe ser `@Título`. Corregirlo
+   en `stxt-web`. El resto de schemas/templates y todos los documentos de `docs/` y
+   `es/` siguen validando sin cambios.
