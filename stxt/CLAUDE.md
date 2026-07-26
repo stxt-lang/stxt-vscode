@@ -91,7 +91,6 @@ Los errores de parseo se muestran como `Error`; los de validación de schema (`V
 ## Trampas conocidas
 
 - **`out/` y `node_modules/` están versionados en git.** `out/` arrastra artefactos obsoletos de una refactorización anterior (`STXTAnalysis.js`, `StxtCompletionProvider.js`, `core/LineIndentParser.js`, `core/IndentUtils.js`…) que ya no existen en `src/`: `tsc` no limpia el directorio. Son código muerto, pero ojo al buscar en el repo — **grepear siempre sobre `src/`, no sobre `out/`**.
-- **La indentación mixta no se detecta.** La spec (`stxt-core-ref.stxt`, secciones 8.1 y 8.3) declara error de parseo mezclar tabs y espacios en la indentación de una misma línea, pero `core/LineParser.ts` los suma sin más y acepta la línea. Divergencia real pendiente.
 - `language-configuration.json` está **vacío** (`{}`): no hay reglas de comentarios, brackets ni auto-indent declarativas. Todo el resaltado viene de semantic tokens, no de una gramática TextMate.
 - El `parseLine()` de `CompletionProvider` se llama con `validate: false` a propósito, porque la línea que se está escribiendo suele estar incompleta.
 - Hay `console.log` de depuración activos en `CompletionProvider`/`CompletionProviderSearch`/`SchemaLoader`.

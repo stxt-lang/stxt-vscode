@@ -9,9 +9,12 @@ function parseLine(line, lastNodeBlock, lastLevel, numLine, validate = true) {
     let level = 0;
     let spaces = 0;
     let pointer = 0;
+    let sawSpace = false;
+    let sawTab = false;
     while (pointer < line.length) {
         const c = line.charAt(pointer);
         if (c === Constants_1.Constants.SPACE) {
+            sawSpace = true;
             spaces++;
             if (spaces === Constants_1.Constants.TAB_SPACES) {
                 level++;
@@ -19,6 +22,7 @@ function parseLine(line, lastNodeBlock, lastLevel, numLine, validate = true) {
             }
         }
         else if (c === Constants_1.Constants.TAB) {
+            sawTab = true;
             level++;
             spaces = 0;
         }
@@ -31,7 +35,13 @@ function parseLine(line, lastNodeBlock, lastLevel, numLine, validate = true) {
         }
         // Dentro del bloque de texto
         if (lastNodeBlock && level > lastLevel) {
-            return new Line_1.Line(level, StringUtils_1.StringUtils.rightTrim(line.substring(pointer + 1)), false, true, pointer);
+            const text = StringUtils_1.StringUtils.rightTrim(line.substring(pointer + 1));
+            // El prefijo que cubre el nivel de bloque debe ser homogéneo (spec 10.2, regla 2);
+            // las líneas vacías se preservan siempre y quedan exentas (spec 10.3)
+            if (validate && sawSpace && sawTab && text.length > 0) {
+                throw new ParseException_1.ParseException(numLine, "MIXED_INDENTATION", `Mixed tabs and spaces in indentation`);
+            }
+            return new Line_1.Line(level, text, false, true, pointer);
         }
         // Aumentamos pointer
         pointer++;
@@ -43,6 +53,10 @@ function parseLine(line, lastNodeBlock, lastLevel, numLine, validate = true) {
             return new Line_1.Line(level, "", false, true, pointer);
         }
         return new Line_1.Line(level, "", false, false, pointer);
+    }
+    // Mezcla de espacios y tabuladores en la indentación (spec 8.1 y 8.3)
+    if (validate && sawSpace && sawTab) {
+        throw new ParseException_1.ParseException(numLine, "MIXED_INDENTATION", `Mixed tabs and spaces in indentation`);
     }
     // Indentación no es múltiplo de 4 con espacios
     if (validate && spaces > 0) {
