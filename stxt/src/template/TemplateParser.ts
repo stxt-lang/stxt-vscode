@@ -128,7 +128,10 @@ function addToSchema(schema: Schema, node: Node): void {
 		const values = cl.getValues();
 		if (values) {
 			if (type !== "ENUM") {
-				throw new ValidationException(node.getLine(), "VALUES_NOT_IN_ENUM", `Values only allowed with type ENUM`);
+				// Mismo código que SchemaParser: un template es azúcar equivalente a un schema
+				// (STXT-TEMPLATE-SPEC 13), así que la misma condición no debe cambiar de código
+				// según la puerta de entrada
+				throw new ValidationException(node.getLine(), "VALUES_ONLY_SUPPORTED_BY_ENUM", `Values only supported for type ENUM, not for type ${type}`);
 			}
 			for (const v of values) {
 				schemaNode.addValue(v, node.getLine());
