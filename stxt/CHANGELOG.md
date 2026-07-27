@@ -6,6 +6,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.5.0]
+
+- A cross-namespace line in a template `Structure` may now only declare cardinality (STXT-TEMPLATE-SPEC 6.4, 10 and 14.15). Declaring `ENUM` values fails with `VALUES_NOT_ALLOWED_IN_EXTERNAL_NAMESPACE` and hanging children below it with `CHILDREN_NOT_ALLOWED_IN_EXTERNAL_NAMESPACE`; both used to be dropped silently, so part of the template was ignored without any warning. The explicit type was already rejected.
+- A `@Node` reference may override the cardinality but no longer redefine the node (STXT-TEMPLATE-SPEC 6.4): values are rejected with `VALUES_NOT_ALLOWED_IN_REFERENCE` and children with `CHILDREN_NOT_ALLOWED_IN_REFERENCE`, instead of being silently ignored.
+- Declaring a reference and an explicit type on the same line (`Título: (1) @Título TEXT`) now reports `REFERENCE_WITH_TYPE_NOT_ALLOWED` (STXT-TEMPLATE-SPEC 14.13). It used to be reported as `NODE_REFERENCE_NOT_VALID`, whose message claimed the reference name was wrong. Node names may contain spaces, so the type is only recognised when the remaining text is exactly the name of the node itself: `Max Threads: (?) @Max Threads` is still a plain reference.
+- A reference that resolves to neither a previous definition nor an open ancestor now reports `REFERENCE_NOT_FOUND` (STXT-TEMPLATE-SPEC 14.11) instead of `TYPE_NOT_VALID: @Nombre`. Recursion through an open ancestor (`Sección: (*) @Sección`) keeps working.
+
 ## [0.4.4]
 
 - Declaring `Children` in a schema `Node` whose type does not admit children (everything except `INLINE` and `GROUP`) now fails to load with `CHILDREN_NOT_ALLOWED_FOR_TYPE` (STXT-SCHEMA-SPEC 13.5). Same for template nodes that have children under a leaf type (STXT-TEMPLATE-SPEC 14.9).

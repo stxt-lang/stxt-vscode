@@ -16,7 +16,13 @@ En cada punto hay que decidir primero si manda la spec o se cambia la spec.
 
 ## Templates (`src/template`)
 
-7. **Cross-namespace y referencias ignoran cosas en silencio** — STXT-TEMPLATE-SPEC
-   errores 14.13 y 14.15: en una línea cross-namespace se rechaza el tipo pero los
-   valores `[a, b]` y los hijos se ignoran sin error; los hijos colgando de una
-   referencia `@Nodo` también se ignoran sin error (`TemplateParser.addToSchema`).
+(sin pendientes; el punto 7 se resolvió en 0.5.0)
+
+## Fuera de este repositorio
+
+(sin pendientes; el punto 10 se resolvió corrigiendo los dos documentos en `stxt-web`)
+
+---
+
+No quedan desajustes conocidos del repaso de 2026-07-26. Los puntos nuevos que
+aparezcan se añaden aquí con la referencia a la sección de la spec correspondiente.

@@ -84,10 +84,20 @@ function addToSchema(schema: Schema, node: Node): void {
 	}
 
 	if (namespace !== schema.getNamespace()) {
-		// Validamos type vacío
+		// Un nodo externo solo puede declarar cardinalidad: ni tipo, ni valores ENUM,
+		// ni hijos (STXT-TEMPLATE-SPEC 6.4, 10 y 14.15)
 		const type = cl.getType();
 		if (type != null && type.trim().length > 0) {
 			throw new ValidationException(node.getLine(), "TYPE_DEFINITION_NOT_ALLOWED", "Not allowed type definition in external namespaces");
+		}
+
+		const values = cl.getValues();
+		if (values && values.length > 0) {
+			throw new ValidationException(node.getLine(), "VALUES_NOT_ALLOWED_IN_EXTERNAL_NAMESPACE", `Not allowed values in external namespaces (node ${node.getName()})`);
+		}
+
+		if (node.getChildren().length > 0) {
+			throw new ValidationException(node.getLine(), "CHILDREN_NOT_ALLOWED_IN_EXTERNAL_NAMESPACE", `Not allowed children in external namespaces (node ${node.getName()})`);
 		}
 
 		// No hacemos nada con creación de nodos que no son de @stxt.template!!
@@ -100,6 +110,14 @@ function addToSchema(schema: Schema, node: Node): void {
 	if (!schemaNode) {
 		// Nuevo
 		const type = cl.getType() == null ? "INLINE" : cl.getType()!;
+
+		// En este punto el schema ya contiene tanto las definiciones previas ya cerradas
+		// como los ancestros abiertos, así que una referencia que no resuelve aquí no
+		// resuelve a nada (STXT-TEMPLATE-SPEC 6.4 y 14.11)
+		if (type.startsWith("@")) {
+			throw new ValidationException(node.getLine(), "REFERENCE_NOT_FOUND", `Reference '${type}' does not point to a previous definition or an open ancestor`);
+		}
+
 		schemaNode = new NodeDefinition(node.getName(), type, node.getLine(), undefined);
 		schema.addNodeDefinition(schemaNode);
 
@@ -122,19 +140,35 @@ function addToSchema(schema: Schema, node: Node): void {
 			throw new ValidationException(node.getLine(), "VALUES_EMPTY_FOR_ENUM", "ENUM Type must include values");
 		}
 	} else {
-		let type = cl.getType();
+		const type = cl.getType();
 		if (!type || !type.startsWith("@")) {
 			throw new ValidationException(node.getLine(), "NODE_DEFINED_MULTIPLE_TIMES", `Multiple node reference must start with @: ${node.getName()}`);
 		}
 
-		type = type.substring(1);
-		type = StringUtils.normalize(type);
+		const reference = type.substring(1).trim();
 
-		if (type === node.getNormalizedName()) {
-			return; // OK Definition
+		// Referencia y tipo explícito en la misma línea (STXT-TEMPLATE-SPEC 14.13)
+		const explicitType = referenceType(reference, node.getNormalizedName());
+		if (explicitType) {
+			throw new ValidationException(node.getLine(), "REFERENCE_WITH_TYPE_NOT_ALLOWED", `Reference '@${node.getName()}' can not declare a type: ${explicitType}`);
 		}
 
-		throw new ValidationException(node.getLine(), "NODE_REFERENCE_NOT_VALID", `Reference must be '@${node.getName()}', not '${type}'`);
+		if (StringUtils.normalize(reference) !== node.getNormalizedName()) {
+			throw new ValidationException(node.getLine(), "NODE_REFERENCE_NOT_VALID", `Reference must be '@${node.getName()}', not '${reference}'`);
+		}
+
+		// La referencia puede sobrescribir la cardinalidad, pero no redefinir valores
+		// ENUM ni hijos (STXT-TEMPLATE-SPEC 6.4)
+		const values = cl.getValues();
+		if (values && values.length > 0) {
+			throw new ValidationException(node.getLine(), "VALUES_NOT_ALLOWED_IN_REFERENCE", `Reference '@${node.getName()}' can not redefine ENUM values`);
+		}
+
+		if (node.getChildren().length > 0) {
+			throw new ValidationException(node.getLine(), "CHILDREN_NOT_ALLOWED_IN_REFERENCE", `Reference '@${node.getName()}' can not redefine children`);
+		}
+
+		return; // OK Definition
 	}
 
 	// Una vez ya existe, si tiene hijos los intentamos crear.
@@ -160,6 +194,29 @@ function addToSchema(schema: Schema, node: Node): void {
 
 		addToSchema(schema, child);
 	}
+}
+
+/**
+ * Distingue `@Nombre Nodo TIPO` (referencia + tipo, error 14.13) de `@Otro Nombre`
+ * (referencia con nombre distinto, error 14.12). Como los nombres de nodo admiten
+ * espacios, la única lectura fiable es: si el último token es un tipo conocido y lo
+ * que queda delante es el nombre del propio nodo, la línea declara ambas cosas.
+ * Devuelve el tipo declarado, o null si la referencia no lleva tipo.
+ */
+function referenceType(reference: string, normalizedName: string): string | null {
+	const cut = reference.lastIndexOf(" ");
+	if (cut < 0) {
+		return null;
+	}
+
+	const candidate = reference.substring(cut + 1).trim();
+	const rest = reference.substring(0, cut);
+
+	if (TypeRegistry.get(candidate) && StringUtils.normalize(rest) === normalizedName) {
+		return candidate;
+	}
+
+	return null;
 }
 
 function addDescriptions(schema: Schema, nodes: Node[]) {
