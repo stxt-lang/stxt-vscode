@@ -35,13 +35,23 @@ No hay desajustes conocidos entre las specs y la implementación: el repaso comp
 npm run compile      # tsc -p ./  → out/
 npm run watch        # compilación incremental (es el default build task de VS Code)
 npm run lint         # eslint src (hoy: 0 errores, 8 warnings de eqeqeq preexistentes)
-npm test             # vscode-test
+npm test             # pretest (compile + lint) y mocha sobre out/test/**/*.test.js
 vsce package         # genera el .vsix
 ```
 
 Para probar a mano: **F5** abre una ventana de VS Code con la extensión cargada (ver `help.txt`).
 
-**No hay tests reales.** `.vscode-test.mjs` busca `out/test/**/*.test.js` y no existe ningún `*.test.ts` en `src/`, así que `npm test` no ejecuta nada. `test/` solo contiene ficheros `.stxt` de ejemplo. `src/test.ts` es un script manual (`node out/test.js` desde `stxt/`) que parsea `test/demo.stxt` y lo reimprime con `NodeWriter`; no es un test automatizado. Al cambiar el parser, verificar a mano contra ficheros de `../../stxt-web/docs/`.
+### Tests
+
+`src/test/` contiene tests de regresión (mocha) **contra el corpus real de `../../stxt-web`**, que no se copia a este repositorio a propósito: deben fallar cuando la implementación se separa de los documentos normativos, no de una copia congelada.
+
+- `schemas.test.ts` — cada `.stxt` de `stxt-web/.stxt/**` carga como schema o template (parseo + meta-schema + transformación a `Schema`), uno por test para localizar el fichero culpable.
+- `documents.test.ts` — cada `.stxt` de `stxt-web/docs`, `/es` y `/en` parsea y valida sin errores contra esos schemas; comprueba además que todos declaran namespace con schema conocido (si no, el `ConditionalValidator` no validaría nada y los tests pasarían en vacío) y que un schema y su template del mismo namespace validan exactamente igual.
+- `writer.test.ts` — lo que escribe `NodeWriter` (en tabs y en 4 espacios) vuelve a parsear dando el mismo árbol. Sustituye al antiguo script manual `src/test.ts`.
+
+Los helpers están en `src/test/corpus.ts`. Si `stxt-web` no está al lado, los tests quedan **pending** en vez de fallar; para indicar otra ruta, `STXT_WEB=/ruta npm test`.
+
+No hay tests de la capa de VS Code: nada bajo `src/test` importa `vscode`, por eso el runner es mocha directo y no `vscode-test` (que arrancaría un Electron). `@vscode/test-cli` sigue en `devDependencies` (de ahí sale mocha), pero su `.vscode-test.mjs` se eliminó; si algún día se prueba la capa del editor, hay que recrearlo con un script aparte.
 
 ## Arquitectura
 
