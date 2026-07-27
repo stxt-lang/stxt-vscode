@@ -27,7 +27,7 @@ Existen otras implementaciones hermanas del mismo lenguaje (`../../stxt-java`, `
 
 ## Trabajo en curso
 
-`PENDIENTES.md` (en esta carpeta) es la lista viva de desajustes conocidos entre las specs y la implementación, con su estado. Consultarla antes de emprender trabajo de conformidad y mantenerla al día (los puntos resueltos se eliminan y se anotan en `CHANGELOG.md`).
+No hay desajustes conocidos entre las specs y la implementación: el repaso completo de 2026-07-26 se cerró en la versión 0.5.0. El histórico de correcciones de conformidad, con la referencia a la sección de spec de cada una, está en `CHANGELOG.md`. Si aparece un desajuste nuevo y no se corrige en el momento, anotarlo aquí o en `CHANGELOG.md` bajo `[Unreleased]`.
 
 ## Comandos
 
