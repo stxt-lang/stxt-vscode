@@ -7,7 +7,7 @@ class NameNamespaceParser {
     constructor() {
     }
     static parse(rawName, inheritedNs, lineNumber, fullLine) {
-        if (rawName == null) {
+        if (rawName === null || rawName === undefined) {
             throw new ParseException_1.ParseException(lineNumber, "INVALID_LINE", `Line not valid: ${fullLine}`);
         }
         rawName = rawName.trim();

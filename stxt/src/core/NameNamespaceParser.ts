@@ -6,7 +6,7 @@ export class NameNamespaceParser {
 	}
 
 	static parse(rawName: string | null | undefined, inheritedNs: string | null | undefined, lineNumber: number, fullLine: string): NameNamespace {
-		if (rawName == null) {
+		if (rawName === null || rawName === undefined) {
 			throw new ParseException(lineNumber, "INVALID_LINE", `Line not valid: ${fullLine}`);
 		}
 

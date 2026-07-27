@@ -75,7 +75,7 @@ function addToSchema(schema, node) {
         // Un nodo externo solo puede declarar cardinalidad: ni tipo, ni valores ENUM,
         // ni hijos (STXT-TEMPLATE-SPEC 6.4, 10 y 14.15)
         const type = cl.getType();
-        if (type != null && type.trim().length > 0) {
+        if (type && type.trim().length > 0) {
             throw new ValidationException_1.ValidationException(node.getLine(), "TYPE_DEFINITION_NOT_ALLOWED", "Not allowed type definition in external namespaces");
         }
         const values = cl.getValues();
@@ -92,7 +92,7 @@ function addToSchema(schema, node) {
     let schemaNode = schema.getNodeDefinition(name);
     if (!schemaNode) {
         // Nuevo
-        const type = cl.getType() == null ? "INLINE" : cl.getType();
+        const type = cl.getType() ?? "INLINE";
         // En este punto el schema ya contiene tanto las definiciones previas ya cerradas
         // como los ancestros abiertos, así que una referencia que no resuelve aquí no
         // resuelve a nada (STXT-TEMPLATE-SPEC 6.4 y 14.11)

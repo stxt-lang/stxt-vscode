@@ -34,7 +34,7 @@ No hay desajustes conocidos entre las specs y la implementación: el repaso comp
 ```bash
 npm run compile      # tsc -p ./  → out/
 npm run watch        # compilación incremental (es el default build task de VS Code)
-npm run lint         # eslint src (hoy: 0 errores, 8 warnings de eqeqeq preexistentes)
+npm run lint         # eslint src (hoy: limpio, 0 errores y 0 warnings)
 npm test             # pretest (compile + lint) y mocha sobre out/test/**/*.test.js
 vsce package         # genera el .vsix
 ```

@@ -6,6 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- `npm run lint` is clean (0 errors, 0 warnings). The 8 `eqeqeq` warnings were all the `x == null` idiom on `string | null` parameters, rewritten with `??` or an explicit check so `undefined` keeps being covered; behavior is unchanged and the test suite confirms it.
 - Real test suite (`npm test` now runs mocha over `src/test/`, 224 tests): every schema and template of `../../stxt-web/.stxt` must load, every document of its `docs/`, `es/` and `en/` must parse and validate without errors against them, a schema and its template for the same namespace must validate identically, and `NodeWriter` output must reparse to the same tree in both indent styles. This replaces the manual check that was done after each conformance change. The `test/` folder of sample documents and the `src/test.ts` script that printed `test/demo.stxt` are gone, as is the unused `.vscode-test.mjs` (no test needs the VS Code API).
 
 ## [0.5.0]

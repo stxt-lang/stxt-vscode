@@ -5,7 +5,7 @@ const ParseException_1 = require("../exceptions/ParseException");
 class NamespaceValidator {
     static NAMESPACE_FORMAT = /^@?[a-z0-9]+(\.[a-z0-9]+)+$/;
     static validateNamespaceFormat(namespace, lineNumber) {
-        if (namespace == null || namespace.length === 0) {
+        if (!namespace) {
             return;
         }
         if (!NamespaceValidator.NAMESPACE_FORMAT.test(namespace)) {
