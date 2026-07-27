@@ -44,11 +44,15 @@ class NodeDefinition {
         }
         this.children.set(qname, childDefinition);
     }
+    // STXT-SCHEMA-SPEC 13.9 / STXT-TEMPLATE-SPEC 14.14: no puede haber valores duplicados
+    // tras la normalización por trim. Mismo código que ChildLineParser: es la misma condición
+    // por la otra puerta de entrada.
     addValue(value, line) {
-        if (this.values.has(value)) {
-            throw new ValidationException_1.ValidationException(line ?? 0, "DUPLICATE_ENUM_VALUE", `Duplicate enum value: '${value}'`);
+        const trimmed = value?.trim() ?? "";
+        if (this.values.has(trimmed)) {
+            throw new ValidationException_1.ValidationException(line ?? 0, "VALUE_DUPLICATED", `The values ${trimmed} is duplicated`);
         }
-        this.values.add(value);
+        this.values.add(trimmed);
     }
     isAllowedValue(value) {
         if (this.values.size === 0) {
