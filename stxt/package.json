@@ -15,17 +15,28 @@
   "categories": [
     "Programming Languages"
   ],
-  "keywords": ["stxt", "semantic text", "language", "syntax"],
+  "keywords": [
+    "stxt",
+    "semantic text",
+    "language",
+    "syntax"
+  ],
   "icon": "images/icon.png",
   "main": "./out/extension.js",
   "contributes": {
     "languages": [
-    {
-      "id": "stxt",
-      "aliases": ["STXT (Semantic Text)","STXT"],
-      "extensions": [".stxt"],
-      "configuration": "./language-configuration.json"
-    }],
+      {
+        "id": "stxt",
+        "aliases": [
+          "STXT (Semantic Text)",
+          "STXT"
+        ],
+        "extensions": [
+          ".stxt"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
     "configurationDefaults": {
       "[stxt]": {
         "editor.tabSize": 4,
@@ -48,6 +59,9 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "mocha \"out/test/**/*.test.js\""
+  },
+  "dependencies": {
+    "stxt-parser-js": "file:../../stxt-js"
   },
   "devDependencies": {
     "@types/vscode": "^1.109.0",
