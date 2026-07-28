@@ -1,5 +1,5 @@
 import vscode from 'vscode';
-import { Node, Parser, ParseException, ParseResult, Schema, SchemaValidator, ConditionalValidator, transformNodeToSchema, transformTemplateNodeToSchema } from '@stxt-lang/core';
+import { Node, Parser, ParseException, ParseResult, Schema, SchemaValidator, ConditionalValidator, ValidationException, transformNodeToSchema, transformTemplateNodeToSchema } from '@stxt-lang/core';
 import { AnalysisResult } from './AnalysisResult';
 import { SchemaLoaderExtension } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';
@@ -45,8 +45,8 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
         const line = error.line > 0 ? error.line - 1 : 0;
         const lineText = document.lineAt(line).text;
         const range = new vscode.Range(line, 0, line, lineText.length);
-        const severity = error.name === 'ValidationException' 
-            ? vscode.DiagnosticSeverity.Warning 
+        const severity = error instanceof ValidationException
+            ? vscode.DiagnosticSeverity.Warning
             : vscode.DiagnosticSeverity.Error;
         diagnostics.push(new vscode.Diagnostic(range, `[${error.code}]: ${error.message}`, severity));
     }

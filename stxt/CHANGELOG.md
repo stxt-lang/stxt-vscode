@@ -6,6 +6,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.5.2]
+
+- `@stxt-lang/core` now exports `ValidationException`, so the extension distinguishes schema warnings from syntax errors with `error instanceof ValidationException` instead of comparing `error.name` against the `'ValidationException'` string. Same behaviour, but the compiler checks it now.
+- The npm package got its public face: a `README.md` (the npm page was blank), a `LICENSE`, and `author`/`keywords`/`homepage`/`bugs` filled in. The licence is MIT across the whole `stxt-lang` org — `@stxt-lang/core` declared `ISC` until now, while this extension already said MIT.
+- The published tarball no longer ships `.js.map` files. `src/` is not published, so every source map dangled; dropping them takes it from 169 files / 38 kB to 115 / 27 kB.
+- No parser, schema or template behaviour changed in this release.
+
 ## [0.5.1]
 
 - Duplicate `ENUM` values now report `VALUE_DUPLICATED` from a schema too, the code `ChildLineParser` already used for the same condition in templates; `NodeDefinition.addValue` had its own `DUPLICATE_ENUM_VALUE`. It also trims the value before comparing, so `Value: alta` and `Value:   alta` are caught as duplicates (STXT-SCHEMA-SPEC 13.9 and STXT-TEMPLATE-SPEC 14.14 both say "tras la normalización por trim"); the schema path used to compare raw values and let that pair through.
