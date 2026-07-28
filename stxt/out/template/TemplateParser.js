@@ -79,7 +79,7 @@ function addToSchema(schema, node) {
             throw new ValidationException_1.ValidationException(node.getLine(), "TYPE_DEFINITION_NOT_ALLOWED", "Not allowed type definition in external namespaces");
         }
         const values = cl.getValues();
-        if (values && values.length > 0) {
+        if (values) {
             throw new ValidationException_1.ValidationException(node.getLine(), "VALUES_NOT_ALLOWED_IN_EXTERNAL_NAMESPACE", `Not allowed values in external namespaces (node ${node.getName()})`);
         }
         if (node.getChildren().length > 0) {
@@ -138,7 +138,7 @@ function addToSchema(schema, node) {
         // La referencia puede sobrescribir la cardinalidad, pero no redefinir valores
         // ENUM ni hijos (STXT-TEMPLATE-SPEC 6.4)
         const values = cl.getValues();
-        if (values && values.length > 0) {
+        if (values) {
             throw new ValidationException_1.ValidationException(node.getLine(), "VALUES_NOT_ALLOWED_IN_REFERENCE", `Reference '@${node.getName()}' can not redefine ENUM values`);
         }
         if (node.getChildren().length > 0) {

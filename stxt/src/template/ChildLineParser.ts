@@ -80,9 +80,12 @@ export class ChildLineParser {
                 list.push(part);
             }
 
-            if (list.length > 0) {
-                values = list;
-            }
+            // Los corchetes presentes (aunque vengan vacíos, "[]") cuentan como una definición
+            // explícita de valores: se devuelve un array no-nulo (posiblemente vacío) para
+            // distinguirlo de la ausencia total de corchetes (valuesStr null/undefined, values
+            // permanece null). Así "[]" se trata como redefinición/definición real (ported
+            // from stxt-java).
+            values = list;
         }
 
         // type es string|null en nuestra clase

@@ -92,7 +92,7 @@ function addToSchema(schema: Schema, node: Node): void {
 		}
 
 		const values = cl.getValues();
-		if (values && values.length > 0) {
+		if (values) {
 			throw new ValidationException(node.getLine(), "VALUES_NOT_ALLOWED_IN_EXTERNAL_NAMESPACE", `Not allowed values in external namespaces (node ${node.getName()})`);
 		}
 
@@ -163,7 +163,7 @@ function addToSchema(schema: Schema, node: Node): void {
 		// La referencia puede sobrescribir la cardinalidad, pero no redefinir valores
 		// ENUM ni hijos (STXT-TEMPLATE-SPEC 6.4)
 		const values = cl.getValues();
-		if (values && values.length > 0) {
+		if (values) {
 			throw new ValidationException(node.getLine(), "VALUES_NOT_ALLOWED_IN_REFERENCE", `Reference '@${node.getName()}' can not redefine ENUM values`);
 		}
 
