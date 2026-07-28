@@ -1,9 +1,5 @@
-import { Node } from '../core/Node';
-import { StringUtils } from '../core/StringUtils';
+import { Node, StringUtils, Schema, NodeDefinition, ChildDefinition } from 'stxt-parser-js';
 import { getSchemas, SchemaLoaderExtension } from './SchemaLoader';
-import { Schema } from '../schema/Schema';
-import { NodeDefinition } from '../schema/NodeDefinition';
-import { ChildDefinition } from '../schema/ChildDefinition';
 import { CompletionItem, CompletionItemKind } from 'vscode';
 
 let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();

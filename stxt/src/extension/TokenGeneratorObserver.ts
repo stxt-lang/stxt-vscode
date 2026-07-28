@@ -1,8 +1,5 @@
-import { Observer } from '../processors/Observer';
-import { Node } from '../core/Node';
+import { Observer, Node, Parser, Line } from 'stxt-parser-js';
 import { StxtToken } from './Tokens';
-import { Parser } from '../core/Parser';
-import { Line } from '../core/Line';
 
 export class TokenGeneratorObserver implements Observer {
     private tokens: StxtToken[] = [];

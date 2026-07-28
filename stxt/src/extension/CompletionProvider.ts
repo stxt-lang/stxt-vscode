@@ -1,7 +1,6 @@
 import { getLastAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
-import { Constants } from '../core/Constants';
-import { parseLine } from '../core/LineParser';
+import { Constants, parseLine } from 'stxt-parser-js';
 import { findSuggestionsByParent, findRootLevelSuggestions, findEnumValues } from './CompletionProviderSearch';
 import { CompletionItem, CompletionItemProvider, Position, ProviderResult, TextDocument } from 'vscode';
 

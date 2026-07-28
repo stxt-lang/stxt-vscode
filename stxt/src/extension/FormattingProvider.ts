@@ -1,6 +1,5 @@
 import { getLastAnalysis } from './AnalysisDoc';
-import type { Node } from '../core/Node';
-import { StringUtils } from '../core/StringUtils';
+import { StringUtils, type Node } from 'stxt-parser-js';
 import { DocumentFormattingEditProvider, Range, TextDocument, TextEdit } from 'vscode';
 
 export class StxtFormattingProvider implements DocumentFormattingEditProvider {

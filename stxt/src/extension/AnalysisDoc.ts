@@ -1,17 +1,9 @@
 import vscode from 'vscode';
-import { Node } from '../core/Node';
+import { Node, Parser, ParseException, ParseResult, Schema, SchemaValidator, ConditionalValidator, transformNodeToSchema, transformTemplateNodeToSchema } from 'stxt-parser-js';
 import { AnalysisResult } from './AnalysisResult';
-import { SchemaValidator } from '../schema/SchemaValidator';
 import { SchemaLoaderExtension } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';
-import { Parser } from '../core/Parser';
-import { ParseException } from '../exceptions/ParseException';
-import { ParseResult } from '../core/ParseResult';
-import { transformTemplateNodeToSchema } from '../template/TemplateParser';
-import { transformNodeToSchema } from '../schema/SchemaParser';
-import { Schema } from '../schema/Schema';
 import { TokenGeneratorObserver } from './TokenGeneratorObserver';
-import { ConditionalValidator } from '../runtime/ConditionalValidator';
 
 const LAST_ANALYSIS_BY_URI  = new Map<string, AnalysisResult>();
 const SCHEMA_VALIDATOR      = new SchemaValidator(new SchemaLoaderExtension());
