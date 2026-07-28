@@ -1,4 +1,4 @@
-import { Node } from 'stxt-parser-js';
+import { Node } from '@stxt-lang/core';
 import type { StxtToken } from './Tokens';
 
 export interface AnalysisResult {

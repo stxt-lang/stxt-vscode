@@ -1,4 +1,4 @@
-import { Observer, Node, Parser, Line } from 'stxt-parser-js';
+import { Observer, Node, Parser, Line } from '@stxt-lang/core';
 import { StxtToken } from './Tokens';
 
 export class TokenGeneratorObserver implements Observer {

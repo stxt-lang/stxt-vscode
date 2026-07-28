@@ -1,5 +1,5 @@
 import vscode from 'vscode';
-import { Node, Parser, ParseException, ParseResult, Schema, SchemaValidator, ConditionalValidator, transformNodeToSchema, transformTemplateNodeToSchema } from 'stxt-parser-js';
+import { Node, Parser, ParseException, ParseResult, Schema, SchemaValidator, ConditionalValidator, transformNodeToSchema, transformTemplateNodeToSchema } from '@stxt-lang/core';
 import { AnalysisResult } from './AnalysisResult';
 import { SchemaLoaderExtension } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';

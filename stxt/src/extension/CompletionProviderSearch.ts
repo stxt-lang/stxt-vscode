@@ -1,4 +1,4 @@
-import { Node, StringUtils, Schema, NodeDefinition, ChildDefinition } from 'stxt-parser-js';
+import { Node, StringUtils, Schema, NodeDefinition, ChildDefinition } from '@stxt-lang/core';
 import { getSchemas, SchemaLoaderExtension } from './SchemaLoader';
 import { CompletionItem, CompletionItemKind } from 'vscode';
 

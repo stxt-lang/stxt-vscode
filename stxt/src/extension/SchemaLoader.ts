@@ -1,5 +1,5 @@
 import vscode from 'vscode';
-import { Schema, SchemaProvider, UnifiedSchemaProvider } from 'stxt-parser-js';
+import { Schema, SchemaProvider, UnifiedSchemaProvider } from '@stxt-lang/core';
 
 const STXT_DIR_REL = ['.stxt'];
 const STXT_FILES_GLOB = '**/.stxt/**/*.stxt';
