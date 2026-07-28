@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.5.1]
+
 - Duplicate `ENUM` values now report `VALUE_DUPLICATED` from a schema too, the code `ChildLineParser` already used for the same condition in templates; `NodeDefinition.addValue` had its own `DUPLICATE_ENUM_VALUE`. It also trims the value before comparing, so `Value: alta` and `Value:   alta` are caught as duplicates (STXT-SCHEMA-SPEC 13.9 and STXT-TEMPLATE-SPEC 14.14 both say "tras la normalización por trim"); the schema path used to compare raw values and let that pair through.
 - Declaring `[values]` on a non-`ENUM` type now reports `VALUES_ONLY_SUPPORTED_BY_ENUM` from a template too, not just from a schema. `TemplateParser` used its own `VALUES_NOT_IN_ENUM` for the identical condition, so the same authoring mistake changed code depending on whether it came in through `@stxt.schema` or `@stxt.template`. A template is sugar equivalent to a schema (STXT-TEMPLATE-SPEC 13), so the code should not depend on the entry point; the message is now the schema one, which also names the offending type. Raised from stxt-java, where both paths already shared the code.
 - `npm run lint` is clean (0 errors, 0 warnings). The 8 `eqeqeq` warnings were all the `x == null` idiom on `string | null` parameters, rewritten with `??` or an explicit check so `undefined` keeps being covered; behavior is unchanged and the test suite confirms it.
