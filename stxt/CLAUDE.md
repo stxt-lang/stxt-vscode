@@ -100,4 +100,4 @@ Los errores de parseo se muestran como `Error`; los de validación de schema (`V
 - `language-configuration.json` está **vacío** (`{}`): no hay reglas de comentarios, brackets ni auto-indent declarativas. Todo el resaltado viene de semantic tokens, no de una gramática TextMate.
 - El `parseLine()` de `CompletionProvider` se llama con `validate: false` a propósito, porque la línea que se está escribiendo suele estar incompleta.
 - Hay tres `console.log` de depuración activos en `CompletionProvider` (líneas 13, 41 y 50); el resto del código los tiene comentados.
-- `CLAUDE.md` **no está en `.vscodeignore`**, así que hoy se empaqueta dentro del `.vsix` y se publica al Marketplace.
+- `CLAUDE.md` está en `.vscodeignore` desde 0.5.3, así que ya no viaja dentro del `.vsix` (hasta 0.5.2 sí se publicó al Marketplace). Al añadir documentación interna nueva en la raíz, acordarse de excluirla también.

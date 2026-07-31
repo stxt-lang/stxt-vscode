@@ -23,6 +23,8 @@ documented and in one language. No parser, schema or template behaviour changed.
 - The one exception message that was still in Spanish is now English: `NOT_STXT_SCHEMA` reads
   `Expected schema(...) but got ...`, the same text `stxt-java` emits. The error code is unchanged.
 - The public surface of `all.ts` is untouched; `npm test` is still 224 passing.
+- `CLAUDE.md` is now listed in `.vscodeignore`. That file is internal guidance for working on this
+  repository, and up to 0.5.2 it was packaged into the `.vsix` and published to the Marketplace.
 
 ## [0.5.2]
 
