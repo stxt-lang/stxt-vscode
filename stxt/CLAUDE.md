@@ -6,7 +6,7 @@ Guía para Claude Code (claude.ai/code) al trabajar en este repositorio.
 
 Extensión de Visual Studio Code para el lenguaje **STXT (Semantic Text)** (`.stxt`), publicada en el Marketplace como `stxt-lang.stxt`. Contiene **solo la capa de integración con el editor**: diagnósticos, semantic tokens, hover, autocompletado y formateo. Todo `src/` son 11 ficheros: `extension.ts` y `extension/`.
 
-La **implementación del lenguaje** (parser, schemas, templates, tipos, writer) **ya no vive aquí**. Es el paquete npm **`@stxt-lang/core`**, que se desarrolla en el repositorio hermano `../../stxt-js` y que esta extensión consume como dependencia normal (`"@stxt-lang/core": "^0.5.1"`). El split se hizo en 0.5.1: las carpetas `src/core`, `src/schema`, `src/template`, `src/runtime`, `src/processors`, `src/exceptions` y `src/test` se borraron de este repositorio.
+La **implementación del lenguaje** (parser, schemas, templates, tipos, writer) **ya no vive aquí**. Es el paquete npm **`@stxt-lang/core`**, que se desarrolla en el repositorio hermano `../../stxt-js` y que esta extensión consume como dependencia normal (`"@stxt-lang/core": "^0.5.3"`). El split se hizo en 0.5.1: las carpetas `src/core`, `src/schema`, `src/template`, `src/runtime`, `src/processors`, `src/exceptions` y `src/test` se borraron de este repositorio.
 
 **Regla que sustituye a la antigua separación de capas: si un cambio necesita tocar el parser, los schemas o la validación, se hace en `../../stxt-js`**, se publica una versión nueva de `@stxt-lang/core` y se sube el rango en `package.json` de aquí. No reintroducir copias de esas clases bajo `src/`.
 
@@ -63,7 +63,7 @@ El paquete exporta todo por un único barrel (`out/all.js`). Lo que la extensió
 - **`transformNodeToSchema` / `transformTemplateNodeToSchema`** — usados directamente por `AnalysisDoc` para dar errores al editar un schema o un template.
 - **`StringUtils`, `parseLine`, `Constants`, `Line`, `Schema`, `NodeDefinition`, `ChildDefinition`, `SchemaProvider`, `ParseException`, `NodeWriter`/`IndentStyle`.**
 
-Si hace falta algo del núcleo que no esté exportado (`ValidationException`, `TypeRegistry`, `RuntimeException`, `SchemaProviderMemory`… hoy no lo están), **se añade a `src/all.ts` de `../../stxt-js` y se republica el paquete**; no vale llegar a los subpaths internos de `node_modules`.
+Si hace falta algo del núcleo que no esté exportado (`TypeRegistry`, `RuntimeException`, `SchemaProviderMemory`… hoy no lo están), **se añade a `src/all.ts` de `../../stxt-js` y se republica el paquete**; no vale llegar a los subpaths internos de `node_modules`.
 
 ### Capa VS Code
 
@@ -96,7 +96,6 @@ Los errores de parseo se muestran como `Error`; los de validación de schema (`V
 
 ## Trampas conocidas
 
-- **`AnalysisDoc` distingue Warning de Error comparando `error.name === 'ValidationException'`** ([AnalysisDoc.ts:48](src/extension/AnalysisDoc.ts#L48)), por cadena y no con `instanceof`, porque `@stxt-lang/core` **no exporta** `ValidationException`. Funciona (el nombre sobrevive al empaquetado, no hay minificación), pero es frágil: si algún día se minifica o se renombra la clase, todos los avisos de schema pasarían a ser errores en silencio. La solución limpia es exportar `ValidationException` desde `all.ts` en `../../stxt-js`.
 - **`out/` puede arrastrar artefactos obsoletos**: `tsc` no limpia el directorio. Tras el split de 0.5.1 pueden quedar ahí `out/core/`, `out/schema/`, `out/template/`, `out/runtime/`, `out/processors/` y `out/exceptions/`, que ya no existen en `src/`. Si aparecen, son código muerto — **grepear siempre sobre `src/`, no sobre `out/`**. `out/`, `node_modules/` y los `.vsix` están en `.gitignore` y no se versionan.
 - `language-configuration.json` está **vacío** (`{}`): no hay reglas de comentarios, brackets ni auto-indent declarativas. Todo el resaltado viene de semantic tokens, no de una gramática TextMate.
 - El `parseLine()` de `CompletionProvider` se llama con `validate: false` a propósito, porque la línea que se está escribiendo suele estar incompleta.

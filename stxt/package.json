@@ -2,7 +2,7 @@
   "name": "stxt",
   "displayName": "STXT - Semantic Text",
   "description": "Semantic Text syntax (.stxt)",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "publisher": "stxt-lang",
   "repository": {
     "type": "git",
@@ -59,7 +59,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@stxt-lang/core": "^0.5.2"
+    "@stxt-lang/core": "^0.5.3"
   },
   "devDependencies": {
     "@types/node": "22.x",

@@ -6,6 +6,24 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.5.3]
+
+A documentation release, matching `dev.stxt:stxt-core` 0.5.3: the API the editor shows is now
+documented and in one language. No parser, schema or template behaviour changed.
+
+- All source comments of `@stxt-lang/core` are now written in **English**, so the whole project is
+  in one language (the README, the licence and the error messages already were). This covers `src/`
+  and `src/test`: class descriptions, inline comments, the references to the normative specs and
+  the mocha `describe`/`it` titles.
+- **Every exported member now carries a JSDoc comment**, which `tsc` copies into the published
+  `out/**/*.d.ts`: that is what a consumer of the package reads on hover in the editor, the
+  TypeScript equivalent of the javadoc Java publishes to javadoc.io. The package went from **11
+  doc comments in 6 files** (4 of them tests) to **203 across all 59 source files** — the only one
+  left without any is `all.ts`, which is just re-exports.
+- The one exception message that was still in Spanish is now English: `NOT_STXT_SCHEMA` reads
+  `Expected schema(...) but got ...`, the same text `stxt-java` emits. The error code is unchanged.
+- The public surface of `all.ts` is untouched; `npm test` is still 224 passing.
+
 ## [0.5.2]
 
 - `@stxt-lang/core` now exports `ValidationException`, so the extension distinguishes schema warnings from syntax errors with `error instanceof ValidationException` instead of comparing `error.name` against the `'ValidationException'` string. Same behaviour, but the compiler checks it now.
