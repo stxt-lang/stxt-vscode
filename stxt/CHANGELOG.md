@@ -6,6 +6,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- **`@vscode/test-cli` and `@vscode/test-electron` are out of `devDependencies`.** They were never
+  used: the test suite runs on plain Node against `src/test/stub/vscode.ts`, so nothing here ever
+  launched Electron. 0.5.4 kept them around for a possible smoke test of `activate()` and the
+  `FileSystemWatcher` — the one thing the stub cannot reach — but an unused dependency parked for a
+  test that does not exist yet is just install weight, and reinstalling them the day that test is
+  written costs one command. `npm test` is still 380 passing and `npm run lint` still clean.
+
 ## [0.5.4]
 
 An editor-layer release: the extension no longer writes to the shared developer console, it

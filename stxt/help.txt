@@ -7,15 +7,18 @@ Tests
 
 npm test
 
-Compila, pasa eslint y ejecuta mocha sobre out/test/**/*.test.js (src/test/).
-Son tests de regresión contra el corpus real del proyecto hermano ../../stxt-web:
+Compila y ejecuta mocha sobre out/test/**/*.test.js (src/test/).
+Son tests de la capa de editor contra el corpus real del proyecto hermano ../../stxt-web:
 
-  - schemas.test.ts   todos los .stxt de stxt-web/.stxt cargan como schema o template
-  - documents.test.ts todos los .stxt de stxt-web/docs, /es y /en parsean y validan
-                      sin errores contra esos schemas; y un schema y su template
-                      del mismo namespace validan exactamente igual
-  - writer.test.ts    lo que escribe NodeWriter (tabs y 4 espacios) vuelve a parsear
-                      dando el mismo árbol
+  - corpus.test.ts    para cada documento de stxt-web/docs, /es y /en: los tokens caen
+                      dentro de su línea, van en orden y no se solapan, su codificación
+                      relativa no los mueve, el formateo es idempotente y conserva el
+                      árbol, y ni el hover ni el autocompletado lanzan en ninguna
+                      posición del cursor
+  - providers.test.ts casos dirigidos del observer, el formateador y la búsqueda de
+                      sugerencias
+
+La conformidad del lenguaje no se prueba aquí, sino en ../../stxt-js.
 
 No se copia el corpus aquí a propósito: la gracia es fallar cuando la implementación
 se separa de los documentos reales, no de una copia congelada. Si stxt-web no está
@@ -23,8 +26,8 @@ al lado, los tests quedan como "pending" en vez de fallar; para indicar otra rut
 
   STXT_WEB=/ruta/a/stxt-web npm test
 
-No hay tests de la capa de VS Code (nada bajo src/test importa vscode), por eso el
-runner es mocha directo y no vscode-test.
+El runner es mocha directo, sin Electron: src/test/stub/vscode.ts reimplementa lo que
+la extensión usa del API y src/test/register.ts intercepta require('vscode').
 
 ******************
 Para crear package
