@@ -101,6 +101,15 @@ export class Uri {
 	}
 }
 
+/** Patrón relativo a una carpeta, tal como lo pide `createFileSystemWatcher` fuera del workspace. */
+export class RelativePattern {
+	readonly baseUri: Uri;
+
+	constructor(base: Uri, public readonly pattern: string) {
+		this.baseUri = base;
+	}
+}
+
 export enum FileType {
 	Unknown = 0,
 	File = 1,
@@ -212,12 +221,36 @@ const workspaceFs = {
 	}
 };
 
+// Oyentes registrados por la extensión, para poder disparar los eventos desde un test.
+const documentListeners = {
+	open: [] as ((document: unknown) => unknown)[],
+	change: [] as ((event: unknown) => unknown)[],
+	close: [] as ((document: unknown) => unknown)[]
+};
+
+function subscribe<T>(listeners: ((arg: T) => unknown)[], listener: (arg: T) => unknown): Disposable {
+	listeners.push(listener);
+	return { dispose: () => { listeners.splice(listeners.indexOf(listener), 1); } };
+}
+
 export const workspace = {
 	workspaceFolders: [] as WorkspaceFolder[],
 	textDocuments: [] as unknown[],
 	fs: workspaceFs,
 
-	createFileSystemWatcher(): Disposable & {
+	onDidOpenTextDocument(listener: (document: unknown) => unknown): Disposable {
+		return subscribe(documentListeners.open, listener);
+	},
+
+	onDidChangeTextDocument(listener: (event: unknown) => unknown): Disposable {
+		return subscribe(documentListeners.change, listener);
+	},
+
+	onDidCloseTextDocument(listener: (document: unknown) => unknown): Disposable {
+		return subscribe(documentListeners.close, listener);
+	},
+
+	createFileSystemWatcher(_pattern?: unknown): Disposable & {
 		onDidCreate(listener: () => void): Disposable;
 		onDidChange(listener: () => void): Disposable;
 		onDidDelete(listener: () => void): Disposable;
@@ -235,6 +268,17 @@ export const workspace = {
 /** Apunta el workspace del stub a un directorio real del disco. */
 export function setWorkspaceFolder(folderPath: string): void {
 	workspace.workspaceFolders = [{ uri: Uri.file(folderPath), name: path.basename(folderPath), index: 0 }];
+}
+
+/** Documentos que el editor ya tiene abiertos, los que ve `activate()` al arrancar. */
+export function setOpenDocuments(documents: readonly unknown[]): void {
+	workspace.textDocuments = [...documents];
+}
+
+/** Dispara `onDidOpenTextDocument`, como al abrir un fichero con la extensión ya activa. */
+export async function openDocument(document: unknown): Promise<void> {
+	workspace.textDocuments = [...workspace.textDocuments, document];
+	await Promise.all(documentListeners.open.map(listener => listener(document)));
 }
 
 /** Líneas registradas por el canal de log, para poder afirmar sobre ellas. */
@@ -260,10 +304,29 @@ export const window = {
 	}
 };
 
+let onSemanticTokensProvider: ((provider: unknown) => void) | undefined;
+
+/** Se avisa en cuanto `activate()` registra el provider de semantic tokens. */
+export function whenSemanticTokensProviderRegistered(listener: ((provider: unknown) => void) | undefined): void {
+	onSemanticTokensProvider = listener;
+}
+
 export const languages = {
 	createDiagnosticCollection(name: string): DiagnosticCollection {
 		return new DiagnosticCollection(name);
-	}
+	},
+
+	// Los providers se registran en activate() y los tests los invocan directamente:
+	// aquí basta con aceptar el registro y devolver algo que se pueda liberar.
+	registerDocumentSemanticTokensProvider: (_selector: unknown, provider: unknown) => {
+		// VS Code empieza a pedir tokens en cuanto el provider existe, sin esperar a que
+		// termine activate(): el enganche deja mirar el editor justo en ese instante.
+		onSemanticTokensProvider?.(provider);
+		return NOOP_DISPOSABLE;
+	},
+	registerHoverProvider: () => NOOP_DISPOSABLE,
+	registerCompletionItemProvider: () => NOOP_DISPOSABLE,
+	registerDocumentFormattingEditProvider: () => NOOP_DISPOSABLE
 };
 
 /**
@@ -279,6 +342,7 @@ const api = {
 	DiagnosticSeverity,
 	DiagnosticCollection,
 	Uri,
+	RelativePattern,
 	FileType,
 	CompletionItem,
 	CompletionItemKind,

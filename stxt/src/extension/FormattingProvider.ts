@@ -1,4 +1,4 @@
-import { getLastAnalysis } from './AnalysisDoc';
+import { getAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
 import { StringUtils, type Node } from '@stxt-lang/core';
 import { DocumentFormattingEditProvider, Range, TextDocument, TextEdit } from 'vscode';
@@ -6,7 +6,7 @@ import { DocumentFormattingEditProvider, Range, TextDocument, TextEdit } from 'v
 export class StxtFormattingProvider implements DocumentFormattingEditProvider {
 
     provideDocumentFormattingEdits(document: TextDocument): TextEdit[] {
-        const analysis = getLastAnalysis(document);
+        const analysis = getAnalysis(document);
         const edits: TextEdit[] = [];
 
         const lines = document.getText().split(/\r?\n/);

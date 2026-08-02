@@ -1,7 +1,7 @@
 import vscode from 'vscode';
 import { Node, Parser, ParseException, ParseResult, Schema, SchemaValidator, ConditionalValidator, ValidationException, transformNodeToSchema, transformTemplateNodeToSchema } from '@stxt-lang/core';
 import { AnalysisResult } from './AnalysisResult';
-import { SchemaLoaderExtension } from './SchemaLoader';
+import { SchemaLoaderExtension, getSchemas } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';
 import { TokenGeneratorObserver } from './TokenGeneratorObserver';
 import { log } from './Log';
@@ -9,8 +9,31 @@ import { log } from './Log';
 const LAST_ANALYSIS_BY_URI  = new Map<string, AnalysisResult>();
 const SCHEMA_VALIDATOR      = new SchemaValidator(new SchemaLoaderExtension());
 
-export function getLastAnalysis(document: vscode.TextDocument): AnalysisResult | undefined {
-    return LAST_ANALYSIS_BY_URI.get(document.uri.toString());
+/** Código que emite `SchemaValidator` cuando no encuentra el schema del namespace de un nodo. */
+const SCHEMA_NOT_FOUND      = 'SCHEMA_NOT_FOUND';
+
+/**
+ * El análisis que usan los providers: el del caché si el documento ya se ha analizado,
+ * y si no uno nuevo, hecho en el momento.
+ *
+ * El caso frío es real y hay que cubrirlo: VS Code pide los semantic tokens en cuanto
+ * pinta el documento, y eso puede llegar antes que el `onDidOpenTextDocument` que lo
+ * analiza —o antes de que termine la carga inicial de schemas, que es asíncrona—. Un
+ * provider que se limitara a mirar el caché devolvería vacío y el documento se quedaría
+ * **sin colorear hasta que se tocase**.
+ *
+ * @param document documento del que se quiere el análisis.
+ * @returns el análisis, o undefined si la extensión aún no está activada (solo en tests).
+ */
+export function getAnalysis(document: vscode.TextDocument): AnalysisResult | undefined {
+    const cached = LAST_ANALYSIS_BY_URI.get(document.uri.toString());
+
+    if (cached || !diagnosticCollection) {
+        return cached;
+    }
+
+    log.trace(`Análisis en frío, el caché no lo tenía: ${document.uri.toString()}`);
+    return analysisDoc(document, diagnosticCollection);
 }
 
 export function analysisAllDocs(): void{
@@ -41,7 +64,16 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
     const textLineByLineNumber = tokenObserver.getTextLineByLineNumber();
 
     // Convertir errores a diagnostics
+    const hasSchemas = getSchemas().length > 0;
+
     for (const error of parseResult.getErrors()) {
+        // STXT-SPEC §15 y §17.2: los schemas son una capa separada y opcional. Si no hay
+        // ninguno cargado en ninguna parte, un documento con namespace no está mal, solo
+        // no se puede validar: avisar en cada nodo llenaría el fichero de subrayados.
+        if (!hasSchemas && error.code === SCHEMA_NOT_FOUND) {
+            continue;
+        }
+
         const line = error.line > 0 ? error.line - 1 : 0;
         const lineText = document.lineAt(line).text;
         const range = new vscode.Range(line, 0, line, lineText.length);

@@ -16,6 +16,7 @@ export interface TestTextLine {
 export class TestDocument {
 	readonly uri: Uri;
 	readonly languageId = 'stxt';
+	readonly isUntitled = false;
 	private readonly lines: string[];
 
 	constructor(filePath: string, private readonly text: string) {

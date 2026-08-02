@@ -1,4 +1,4 @@
-import { getLastAnalysis } from './AnalysisDoc';
+import { getAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
 import { Constants, parseLine } from '@stxt-lang/core';
 import { findSuggestionsByParent, findRootLevelSuggestions, findEnumValues } from './CompletionProviderSearch';
@@ -14,7 +14,7 @@ export class StxtCompletionProvider implements CompletionItemProvider {
         log.trace(`Completado en la línea ${position.line}.`);
 
         // Si no hay análisis no mostramos nada
-        let lastAnalysis: AnalysisResult | undefined = getLastAnalysis(document);
+        let lastAnalysis: AnalysisResult | undefined = getAnalysis(document);
         if (!lastAnalysis) {
             return [];
         }

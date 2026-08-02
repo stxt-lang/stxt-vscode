@@ -6,12 +6,43 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- **A document is coloured as soon as it is shown, without having to touch it first.** The providers
+  read the analysis from the cache of `AnalysisDoc`, and nothing guaranteed the cache was warm when
+  VS Code asked for the semantic tokens — which it does the moment it paints the document, and does
+  not ask again until an edit or a reopen invalidates it. So the file stayed black and white until
+  it was touched. Two paths were losing that race: documents already open when the extension
+  activates never get `onDidOpenTextDocument`, and were only analysed at the end of the initial
+  schema load, which is asynchronous; and, since the upwards search was added, the open handler
+  awaited it before analysing. Now `activate()` analyses the open documents **before** registering
+  the providers, the open handler analyses **before** awaiting the schema search, and `getAnalysis()`
+  analyses on the spot if it is ever asked for a document the cache has not seen.
+- **A document with no schema anywhere is no longer reported as a problem.** `SCHEMA_NOT_FOUND` is
+  emitted by the validator for **every node** —the namespace is inherited from the parent— so
+  opening a `.stxt` file where no schema had been loaded filled the whole file with warnings, one
+  per line. It is now suppressed while no schema at all is loaded: STXT-SPEC §15 and §17.2 make
+  schemas a separate and **optional** layer («@STXT@ **NO DEBE** imponer reglas semánticas
+  provenientes de schemas»), so such a document is not invalid, it just cannot be validated. As
+  soon as any schema is loaded the warning comes back, because then an unresolved namespace is
+  usually a typo. Syntax errors are unaffected. The filter lives in `AnalysisDoc`, not in the core.
+- **The `.stxt` directory is now searched upwards**, from each workspace folder and from the folder
+  of every document that is opened, up to the first one that exists or to the filesystem root — the
+  same rule `tsconfig.json` and `.editorconfig` follow. Until now only `<workspace root>/.stxt` was
+  read, so opening a subfolder of a project in VS Code, or a single file outside any folder, meant
+  no schemas at all: no validation, no completion and no hover descriptions. Directories found
+  outside the workspace get their own `FileSystemWatcher`, so editing a schema still reloads
+  everything.
 - **`@vscode/test-cli` and `@vscode/test-electron` are out of `devDependencies`.** They were never
   used: the test suite runs on plain Node against `src/test/stub/vscode.ts`, so nothing here ever
   launched Electron. 0.5.4 kept them around for a possible smoke test of `activate()` and the
   `FileSystemWatcher` — the one thing the stub cannot reach — but an unused dependency parked for a
   test that does not exist yet is just install weight, and reinstalling them the day that test is
-  written costs one command. `npm test` is still 380 passing and `npm run lint` still clean.
+  written costs one command.
+- `npm test` is **391 passing**, with two new suites that do not use the stxt-web corpus, because
+  what they check is not documents: `schemaLoader.test.ts` builds a throwaway tree with the schema
+  one level above the workspace root, and `activation.test.ts` runs `activate()` itself and asks the
+  provider for tokens at the exact instant it is registered. Each of its three tests fails if its
+  own fix is undone. That took the stub a bit further — it now serves the document events and the
+  `registerXProvider` calls — which is most of what the deferred smoke test of `activate()` needed.
 
 ## [0.5.4]
 

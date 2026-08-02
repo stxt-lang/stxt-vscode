@@ -1,11 +1,11 @@
 import { Hover, HoverProvider, MarkdownString, Position, ProviderResult, TextDocument } from 'vscode';
-import { getLastAnalysis } from './AnalysisDoc';
+import { getAnalysis } from './AnalysisDoc';
 import { getSchema } from './SchemaLoader';
 
 export class StxtHoverProvider implements HoverProvider {
 	provideHover(document: TextDocument, position: Position): ProviderResult<Hover> {
 
-		const analysis = getLastAnalysis(document);
+		const analysis = getAnalysis(document);
 		if (!analysis) {
 			return;
 		}
