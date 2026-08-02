@@ -6,6 +6,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.5.5]
+
+An editor-layer release about **where the schemas come from and when the document gets analysed**.
+Nothing here is a new capability: it is three things that were wrong, and a document with `.stxt/`
+at the root of its workspace behaves exactly as it did in 0.5.4. `@stxt-lang/core` stays at 0.5.3 —
+no parser, schema or template behaviour changed.
+
 - **A document is coloured as soon as it is shown, without having to touch it first.** The providers
   read the analysis from the cache of `AnalysisDoc`, and nothing guaranteed the cache was warm when
   VS Code asked for the semantic tokens — which it does the moment it paints the document, and does
