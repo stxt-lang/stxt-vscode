@@ -6,6 +6,47 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.6.0]
+
+A release about **where schemas come from**. Until now that answer was written here, in the editor,
+and it was the editor's own answer: the first `.stxt/` found on the way up. STXT now has a fourth
+normative specification, **STXT-DISCOVERY-SPEC** (`stxt-web/es/stxt-discovery-ref.stxt`), that
+defines resolution for every tool at once, and this version implements it. `@stxt-lang/core` moves
+to **0.6.0**, which is where the resolution logic now lives — so the extension and the `stxt`
+command line resolve identically by construction, not by two implementations happening to agree.
+A project whose schemas sit in `<workspace>/.stxt/` behaves exactly as it did in 0.5.5.
+
+- **The upward search no longer stops at the first `.stxt/`.** Every ancestor `.stxt/` takes part
+  in the chain, nearest first (STXT-DISCOVERY-SPEC §4.1). In a monorepo the subproject's schemas
+  and the repository root's are now both available, which was the case that made the old
+  first-match rule visibly wrong.
+- **Two new levels after the project ones**: `~/.stxt` for the user and `/etc/stxt` for the system
+  (`%USERPROFILE%\.stxt` and `%ProgramData%\stxt` on Windows), per §4.2. Schemas shared across
+  every project no longer have to be copied into each one.
+- **`STXT_PATH` replaces the whole chain when it is defined** (§6), project levels included. It is
+  what CI and the tests use to resolve against a controlled set of directories and nothing else.
+- **Precedence is per namespace, not per directory** (§5): the nearest level that defines a
+  namespace wins, and levels further out still contribute the namespaces nobody nearer defines.
+  Two definitions of the same namespace at the same level are a resolution error (§8): it is
+  reported in the **STXT** output channel and leaves that namespace with no active definition,
+  instead of one of the two silently winning.
+- **Validation is per document** (§7). Each document is validated against the chain of its own
+  directory, so two files in different projects of the same window no longer see each other's
+  schemas: `SchemaLoaderExtension` now carries the document's Uri, and hover resolves the same way.
+  Completion still reads the union of everything resolved, because a completion request has no
+  document context to narrow it down.
+- **`SchemaLoader.ts` is now just the editor's side of the spec**: two adapters —
+  `vscode.workspace.fs` and the process environment — over `DiscoveryResolver`, plus per-directory
+  caching of the results and a `FileSystemWatcher` per resolution level. Any change on disk still
+  clears the cache, re-resolves and re-analyses the open documents. `ensureSchemasForDocument()`
+  keeps resolving a document's chain before analysing it, which is what covers opening a subfolder
+  of a project whose `.stxt/` sits above the workspace root.
+- `npm test` is **410 passing**. `schemaLoader.test.ts` grew a suite for the chain itself — the
+  user level loading alongside the project one, `STXT_PATH` replacing everything, and a nested
+  `.stxt/` validating against the nearest definition — and every registration in it now injects an
+  isolated `DiscoveryEnvironment`, so the tests no longer depend on whatever `~/.stxt` the machine
+  running them happens to have.
+
 ## [0.5.5]
 
 An editor-layer release about **where the schemas come from and when the document gets analysed**.

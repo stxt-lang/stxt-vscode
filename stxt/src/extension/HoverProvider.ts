@@ -1,6 +1,6 @@
 import { Hover, HoverProvider, MarkdownString, Position, ProviderResult, TextDocument } from 'vscode';
 import { getAnalysis } from './AnalysisDoc';
-import { getSchema } from './SchemaLoader';
+import { getSchemaForDocument } from './SchemaLoader';
 
 export class StxtHoverProvider implements HoverProvider {
 	provideHover(document: TextDocument, position: Position): ProviderResult<Hover> {
@@ -51,7 +51,8 @@ export class StxtHoverProvider implements HoverProvider {
 		}
 
 		if (node.getNamespace()) {
-			const schema = getSchema(node.getNamespace());
+			// La cadena de resolución es por documento (STXT-DISCOVERY-SPEC sección 7).
+			const schema = getSchemaForDocument(document.uri, node.getNamespace());
 			if (schema) {
 				const nodeDef = schema.getNodeDefinition(node.getName());
 				if (nodeDef) {

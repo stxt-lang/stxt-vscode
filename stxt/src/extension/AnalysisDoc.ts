@@ -1,13 +1,12 @@
 import vscode from 'vscode';
 import { Node, Parser, ParseException, ParseResult, Schema, SchemaValidator, ConditionalValidator, ValidationException, transformNodeToSchema, transformTemplateNodeToSchema } from '@stxt-lang/core';
 import { AnalysisResult } from './AnalysisResult';
-import { SchemaLoaderExtension, getSchemas } from './SchemaLoader';
+import { SchemaLoaderExtension, getSchemasForDocument } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';
 import { TokenGeneratorObserver } from './TokenGeneratorObserver';
 import { log } from './Log';
 
 const LAST_ANALYSIS_BY_URI  = new Map<string, AnalysisResult>();
-const SCHEMA_VALIDATOR      = new SchemaValidator(new SchemaLoaderExtension());
 
 /** Código que emite `SchemaValidator` cuando no encuentra el schema del namespace de un nodo. */
 const SCHEMA_NOT_FOUND      = 'SCHEMA_NOT_FOUND';
@@ -51,10 +50,12 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
     // Crear observer para generar tokens y nodeByLine durante el parsing
     const tokenObserver = new TokenGeneratorObserver();
 
-    // Parsear documento con validación de schema
+    // Parsear documento con validación de schema. El provider se crea con el Uri del
+    // documento: cada documento valida contra su propia cadena de resolución
+    // (STXT-DISCOVERY-SPEC sección 7), no contra la unión de todo lo cargado.
     const parser = new Parser();
     parser.registerObserver(tokenObserver);
-    parser.registerValidator(new ConditionalValidator(SCHEMA_VALIDATOR));
+    parser.registerValidator(new ConditionalValidator(new SchemaValidator(new SchemaLoaderExtension(document.uri))));
     const parseResult: ParseResult = parser.parseResult(document.getText());
 
     // Obtener tokens y nodeByLine generados por el observer
@@ -64,7 +65,7 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
     const textLineByLineNumber = tokenObserver.getTextLineByLineNumber();
 
     // Convertir errores a diagnostics
-    const hasSchemas = getSchemas().length > 0;
+    const hasSchemas = getSchemasForDocument(document.uri).length > 0;
 
     for (const error of parseResult.getErrors()) {
         // STXT-SPEC §15 y §17.2: los schemas son una capa separada y opcional. Si no hay

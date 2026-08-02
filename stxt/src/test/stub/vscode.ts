@@ -92,6 +92,11 @@ export class Uri {
 		return new Uri(path.join(base.fsPath, ...segments));
 	}
 
+	// El inverso de toString(), igual que en el API real.
+	static parse(value: string): Uri {
+		return new Uri(value.startsWith('file://') ? value.substring('file://'.length) : value);
+	}
+
 	get path(): string {
 		return this.fsPath;
 	}
