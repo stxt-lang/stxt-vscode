@@ -8,33 +8,25 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [0.5.4]
 
-An editor-layer release: the extension no longer writes to the shared developer console, and the
-language finally declares its comment and indentation rules. `@stxt-lang/core` stays at 0.5.3 — no
-parser, schema or template behaviour changed.
+An editor-layer release: the extension no longer writes to the shared developer console.
+`@stxt-lang/core` stays at 0.5.3 — no parser, schema or template behaviour changed.
 
 - **The 22 `console.log` calls are gone** — 15 of them active, the other 7 left commented out. The
   five in `CompletionProvider` and `CompletionProviderSearch` fired on every keystroke inside a
   `.stxt` file, and all of them wrote into the Extension Host console shared by every extension.
   They now go through a new `extension/Log.ts`, which owns a **`STXT` channel in the Output panel**
-  created with
-  `{ log: true }`: VS Code timestamps each line, tags it with its level, and honours the level chosen
-  in *Developer: Set Log Level…*. Per-keystroke messages (analysis, completion) log at `trace`, so
+  created with `{ log: true }`: VS Code timestamps each line, tags it with its level, and honours
+  the level chosen in *Developer: Set Log Level…*. Per-keystroke messages (analysis, completion) log at `trace`, so
   they are off by default; schema loading logs at `info`; a schema under `.stxt/**` that cannot be
   read or fails to load logs at `error`, which used to be indistinguishable from the rest. The
   commented-out `console.log` lines in `extension.ts` and `AnalysisDoc.ts` became `trace` calls
   instead of dead code.
-- **`language-configuration.json` is no longer empty** (it was literally `{}`). It now declares:
-  - `#` as the line comment, so `Ctrl+/` toggles comments (STXT-SPEC 9; there is no block comment
-    form). The command used to do nothing at all: with no `lineComment` declared, VS Code does not
-    know what to insert.
-  - An indentation rule so the line after a `Nombre >>` text node opens indented. An inline node
-    `Nombre: valor` does not increase the indent, since it may or may not have children, and nothing
-    ever de-indents automatically because STXT has no token that closes a level.
-  - No `brackets` for the namespace `(a.b.c)` or for an `ENUM [a, b, c]` value list, on purpose.
-    Bracket matching buys nothing in a language whose brackets are short, single-line and never
-    nested, and declaring them would make things worse: the namespace parentheses are *inside* the
-    `namespace` semantic token, and VS Code's bracket pair colorization — on by default — would
-    repaint those two characters with its own colour.
+- `language-configuration.json` stays **empty** (`{}`), and that is now a documented decision rather
+  than an oversight. Comment, bracket and indentation rules were written into it during this release
+  and then dropped again: every editor behaviour in this extension is derived from parsing the
+  document with `@stxt-lang/core`, so the language is defined in exactly one place — the core, which
+  follows the spec — instead of being restated as a second set of hand-written regular expressions
+  that drifts out of sync without anyone noticing.
 
 ## [0.5.3]
 

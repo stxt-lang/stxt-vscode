@@ -90,6 +90,7 @@ Los errores de parseo se muestran como `Error`; los de validación de schema (`V
 
 ## Convenciones
 
+- **Todo el comportamiento del editor sale del parseo, no de configuración declarativa.** El resaltado, la estructura y cualquier regla que dependa de la sintaxis se derivan del `Parser` y de las clases de `@stxt-lang/core` (vía `TokenGeneratorObserver` y `AnalysisDoc`), nunca de una gramática TextMate ni de reglas escritas a mano en `language-configuration.json`, que se mantiene vacío a propósito. El motivo es que hay una sola definición del lenguaje —la del núcleo, que sigue la spec— y no una segunda copia en forma de expresiones regulares que se desincroniza en silencio. Si en algún momento hace falta declararle algo a VS Code (comentario de línea, indentación), la vía es `vscode.languages.setLanguageConfiguration()` en la activación, construido desde `Constants` (`COMMENT_CHAR`, `SEP_TEXT_NODE`…), no un literal en el JSON.
 - Comentarios y mensajes internos están **en castellano**; los códigos de error (`INVALID_NAMESPACE`, `NODE_NOT_EXIST_IN_SCHEMA`…), que vienen del núcleo, en inglés y en MAYÚSCULAS.
 - Errores del núcleo: `ParseException` (sintaxis) y `ValidationException extends ParseException` (semántica), ambos con `line` y `code`.
 - El código fuente usa **tabuladores**, igual que los ficheros `.stxt`. `tsconfig` está en `strict: true`.
@@ -98,6 +99,6 @@ Los errores de parseo se muestran como `Error`; los de validación de schema (`V
 ## Trampas conocidas
 
 - **`out/` puede arrastrar artefactos obsoletos**: `tsc` no limpia el directorio. Tras el split de 0.5.1 pueden quedar ahí `out/core/`, `out/schema/`, `out/template/`, `out/runtime/`, `out/processors/` y `out/exceptions/`, que ya no existen en `src/`. Si aparecen, son código muerto — **grepear siempre sobre `src/`, no sobre `out/`**. `out/`, `node_modules/` y los `.vsix` están en `.gitignore` y no se versionan.
-- `language-configuration.json` declara desde 0.5.4 comentario de línea (`#`) y una regla de indentación tras `>>`, y nada más; está en JSONC (admite comentarios). **No declarar `brackets` para `(a.b.c)` ni `[a, b, c]`**: los paréntesis del namespace van dentro del token semántico `namespace`, y la colorización de pares de brackets (activa por defecto en VS Code) los repintaría por encima. **No hay gramática TextMate**: todo el resaltado sigue viniendo de semantic tokens.
+- `language-configuration.json` está **vacío** (`{}`) y **es deliberado, no un olvido** (ver la regla de "todo sale del parseo" en Convenciones). No hay gramática TextMate ni reglas declarativas de comentarios, brackets o auto-indent.
 - El `parseLine()` de `CompletionProvider` se llama con `validate: false` a propósito, porque la línea que se está escribiendo suele estar incompleta.
 - `CLAUDE.md` está en `.vscodeignore` desde 0.5.3, así que ya no viaja dentro del `.vsix` (hasta 0.5.2 sí se publicó al Marketplace). Al añadir documentación interna nueva en la raíz, acordarse de excluirla también.
