@@ -16,10 +16,14 @@ import { registerSchemaLoader, getSchemas } from '../extension/SchemaLoader';
  * desvía de los documentos reales, no de una copia congelada.
  */
 
-// Carpetas de stxt-web con schemas y templates (las que carga SchemaLoader).
-export const SCHEMA_DIRS = ['.stxt'];
-
-// Carpetas de stxt-web con documentos que deben validar contra esos schemas.
+/**
+ * Carpetas de stxt-web con los documentos que deben validar sin errores. Son las mismas
+ * que mira `../../stxt-js` a propósito, para que los dos repositorios prueben el mismo
+ * conjunto; `examples/` y `tutorial/` se quedan fuera por eso.
+ *
+ * Los schemas y templates no se listan aquí: los carga el `SchemaLoader` real, que ya
+ * recorre `<workspace>/.stxt/**` por su cuenta (ver `loadSchemas`).
+ */
 export const DOC_DIRS = ['docs', 'es', 'en'];
 
 /**
