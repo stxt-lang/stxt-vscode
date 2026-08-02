@@ -3,6 +3,7 @@ import { AnalysisResult } from './AnalysisResult';
 import { Constants, parseLine } from '@stxt-lang/core';
 import { findSuggestionsByParent, findRootLevelSuggestions, findEnumValues } from './CompletionProviderSearch';
 import { CompletionItem, CompletionItemProvider, Position, ProviderResult, TextDocument } from 'vscode';
+import { log } from './Log';
 
 export class StxtCompletionProvider implements CompletionItemProvider {
 
@@ -10,7 +11,7 @@ export class StxtCompletionProvider implements CompletionItemProvider {
 
         const linePrefix = document.lineAt(position).text.slice(0, position.character);
 
-        console.log(`Position: ${position.line}`);
+        log.trace(`Completado en la línea ${position.line}.`);
 
         // Si no hay análisis no mostramos nada
         let lastAnalysis: AnalysisResult | undefined = getLastAnalysis(document);
@@ -38,7 +39,7 @@ export class StxtCompletionProvider implements CompletionItemProvider {
 
         // Buscamos nivel del cursor
         let level = completionContext.level;
-        console.log("Level: " + level);
+        log.trace(`Nivel del cursor: ${level}.`);
 
         if (level === 0) {
             return findRootLevelSuggestions(completionContext.prefix);
@@ -47,7 +48,7 @@ export class StxtCompletionProvider implements CompletionItemProvider {
         // Buscamos parent
         const parent = getParentNode(lastAnalysis, position.line, level);
         if (parent) {
-            console.log(`Parent *****: ${parent.getQualifiedName()} (${parent.getLine()})`);
+            log.trace(`Nodo padre: ${parent.getQualifiedName()} (línea ${parent.getLine()}).`);
             return findSuggestionsByParent(parent, completionContext.prefix);
         }
 

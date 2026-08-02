@@ -1,5 +1,6 @@
 import vscode from 'vscode';
 import { Schema, SchemaProvider, UnifiedSchemaProvider } from '@stxt-lang/core';
+import { log } from './Log';
 
 const STXT_DIR_REL = ['.stxt'];
 const STXT_FILES_GLOB = '**/.stxt/**/*.stxt';
@@ -39,13 +40,13 @@ export async function registerSchemaLoader(context: vscode.ExtensionContext, onS
 
 async function reloadAllSchemaData(reason: string, onSchemasChanged: () => void | Promise<void>) {
     try {
-        console.log(`[stxt] reloading schema data (${reason})...`);
+        log.info(`Recargando schemas (${reason})...`);
         PROVIDER.clear();
         await loadAllWorkspaceFiles();
         await onSchemasChanged();
-        console.log(`[stxt] schema data reloaded (${reason}).`);
+        log.info(`Schemas recargados (${reason}).`);
     } catch (e) {
-        console.log(`[stxt] error reloading schema data (${reason})`, e);
+        log.error(`Error recargando schemas (${reason}): ${String(e)}`);
     }
 }
 
@@ -55,16 +56,14 @@ async function reloadAllSchemaData(reason: string, onSchemasChanged: () => void 
 
 async function loadAllWorkspaceFiles() {
     try {
-        console.log("Init loading workspace files...");
         const folders = vscode.workspace.workspaceFolders ?? [];
         for (const f of folders) {
-            console.log(`Folder: ${f.uri}`);
+            log.trace(`Carpeta del workspace: ${f.uri.toString()}`);
             const dirUri = vscode.Uri.joinPath(f.uri, ...STXT_DIR_REL);
             await loadFilesFromDir(dirUri);
         }
-        console.log("Ok loading workspace.");
     } catch (e) {
-        console.log("Error loading all workspace", e);
+        log.error(`Error cargando los ficheros del workspace: ${String(e)}`);
     }
 }
 
@@ -83,7 +82,8 @@ async function loadFilesFromDir(dirUri: vscode.Uri) {
             }
         }
     } catch (e) {
-        console.log(`[stxt] dir not found: ${dirUri.toString()} (${String(e)})`);
+        // Lo normal es que el workspace no tenga directorio .stxt: no es un error.
+        log.trace(`Directorio no encontrado: ${dirUri.toString()} (${String(e)})`);
     }
 }
 
@@ -91,9 +91,9 @@ async function addSchemaFile(uri: vscode.Uri, reason: 'initial' | 'changed' | 'c
     try {
         const bytes = await vscode.workspace.fs.readFile(uri);
         const text = new TextDecoder('utf-8').decode(bytes);
-        console.log(`\n[stxt] file ${reason}: ${uri.toString()}\n${text.length} chars.`);
+        log.info(`Fichero (${reason}): ${uri.toString()} — ${text.length} caracteres.`);
         PROVIDER.addFile(text);
     } catch (e) {
-        console.log(`[stxt] file ${reason}: could not read ${uri.toString()} (${String(e)})`);
+        log.error(`Fichero (${reason}): no se ha podido cargar ${uri.toString()} (${String(e)})`);
     }
 }

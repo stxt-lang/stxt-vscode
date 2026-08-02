@@ -72,6 +72,7 @@ Si hace falta algo del núcleo que no esté exportado (`TypeRegistry`, `RuntimeE
 - **`extension/TokenGeneratorObserver.ts`** — observer que genera los semantic tokens y los mapas `nodeByLine` / `commentLines` / `textLineByLineNumber` durante el parseo. También reparsea recursivamente el contenido de `@stxt.template:structure` y `:description` para colorear el STXT que hay dentro de esos bloques de texto.
 - **`extension/SchemaLoader.ts`** — carga **todos** los `.stxt` de `<workspace>/.stxt/**` (recursivo) en el `UnifiedSchemaProvider`, con un `FileSystemWatcher`. Cualquier cambio provoca `clear()` + recarga completa + reanálisis de todos los documentos abiertos.
 - **`extension/HoverProvider.ts` / `CompletionProvider.ts` (+ `CompletionProviderSearch.ts`) / `FormattingProvider.ts` / `SemanticTokensProvider.ts`** — consumidores del `AnalysisResult` y del `SchemaLoader`.
+- **`extension/Log.ts`** — canal `STXT` del panel Output (`createOutputChannel(..., { log: true })`), creado de forma perezosa y registrado en `context.subscriptions` al activar. **No usar `console.log`**: `log.trace()` para lo que ocurre en cada pulsación (análisis, autocompletado), que VS Code descarta salvo que el usuario suba el nivel con *Developer: Set Log Level…*; `log.info()` para hitos (carga de schemas); `log.error()` para fallos que no se ven de otra forma, como un schema de `.stxt/**` que no carga.
 
 ### Flujo completo
 
@@ -97,7 +98,6 @@ Los errores de parseo se muestran como `Error`; los de validación de schema (`V
 ## Trampas conocidas
 
 - **`out/` puede arrastrar artefactos obsoletos**: `tsc` no limpia el directorio. Tras el split de 0.5.1 pueden quedar ahí `out/core/`, `out/schema/`, `out/template/`, `out/runtime/`, `out/processors/` y `out/exceptions/`, que ya no existen en `src/`. Si aparecen, son código muerto — **grepear siempre sobre `src/`, no sobre `out/`**. `out/`, `node_modules/` y los `.vsix` están en `.gitignore` y no se versionan.
-- `language-configuration.json` está **vacío** (`{}`): no hay reglas de comentarios, brackets ni auto-indent declarativas. Todo el resaltado viene de semantic tokens, no de una gramática TextMate.
+- `language-configuration.json` declara desde 0.5.4 comentario de línea (`#`) y una regla de indentación tras `>>`, y nada más; está en JSONC (admite comentarios). **No declarar `brackets` para `(a.b.c)` ni `[a, b, c]`**: los paréntesis del namespace van dentro del token semántico `namespace`, y la colorización de pares de brackets (activa por defecto en VS Code) los repintaría por encima. **No hay gramática TextMate**: todo el resaltado sigue viniendo de semantic tokens.
 - El `parseLine()` de `CompletionProvider` se llama con `validate: false` a propósito, porque la línea que se está escribiendo suele estar incompleta.
-- Hay tres `console.log` de depuración activos en `CompletionProvider` (líneas 13, 41 y 50); el resto del código los tiene comentados.
 - `CLAUDE.md` está en `.vscodeignore` desde 0.5.3, así que ya no viaja dentro del `.vsix` (hasta 0.5.2 sí se publicó al Marketplace). Al añadir documentación interna nueva en la raíz, acordarse de excluirla también.

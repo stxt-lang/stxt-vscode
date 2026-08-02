@@ -4,6 +4,7 @@ import { AnalysisResult } from './AnalysisResult';
 import { SchemaLoaderExtension } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';
 import { TokenGeneratorObserver } from './TokenGeneratorObserver';
+import { log } from './Log';
 
 const LAST_ANALYSIS_BY_URI  = new Map<string, AnalysisResult>();
 const SCHEMA_VALIDATOR      = new SchemaValidator(new SchemaLoaderExtension());
@@ -15,14 +16,13 @@ export function getLastAnalysis(document: vscode.TextDocument): AnalysisResult |
 export function analysisAllDocs(): void{
 	for (const doc of vscode.workspace.textDocuments) {
 		if (doc.languageId === 'stxt') {
-			//console.log('Documento STXT ya cargado inicial:', doc.uri.toString());
+			log.trace(`Reanalizando documento abierto: ${doc.uri.toString()}`);
 			analysisDoc(doc, diagnosticCollection);
 		}
 	}
 }
 
 export function analysisDoc(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection): AnalysisResult {
-    //console.log("Parse init...");
     const diagnostics: vscode.Diagnostic[] = [];
 
     // Crear observer para generar tokens y nodeByLine durante el parsing
@@ -62,7 +62,7 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
     const result: AnalysisResult = { tokens, nodeByLine, commentLines, textLineByLineNumber };
     LAST_ANALYSIS_BY_URI.set(document.uri.toString(), result);
 
-    //console.log("Parse end.");
+    log.trace(`Análisis de ${document.uri.toString()}: ${tokens.length} tokens, ${diagnostics.length} diagnósticos.`);
     return result;
 }
 

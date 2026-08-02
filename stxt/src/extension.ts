@@ -6,11 +6,13 @@ import { StxtHoverProvider } from './extension/HoverProvider';
 import { analysisDoc, analysisAllDocs } from './extension/AnalysisDoc';
 import { tokenLegend } from './extension/Tokens';
 import { registerSchemaLoader } from './extension/SchemaLoader';
+import { getLogChannel, log } from './extension/Log';
 
 export let diagnosticCollection: vscode.DiagnosticCollection;
 
 export async function activate(context: vscode.ExtensionContext) {
-	//console.log('STXT extension activated');
+	context.subscriptions.push(getLogChannel());
+	log.info('Extensión STXT activada.');
 
 	diagnosticCollection = vscode.languages.createDiagnosticCollection('stxt');
 
@@ -18,19 +20,21 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.workspace.onDidOpenTextDocument(doc => {
 			if (doc.languageId === 'stxt') {
-				//console.log("onDidOpenTextDocument");
+				log.trace(`onDidOpenTextDocument: ${doc.uri.toString()}`);
 				analysisDoc(doc, diagnosticCollection);
 			}
 		}),
 		vscode.workspace.onDidChangeTextDocument(e => {
 			const doc = e.document;
 			if (doc.languageId === 'stxt') {
-				//console.log("onDidChangeTextDocument");
+				log.trace(`onDidChangeTextDocument: ${doc.uri.toString()}`);
 				analysisDoc(doc, diagnosticCollection);
 			}
 		}),
 		vscode.workspace.onDidCloseTextDocument(doc => {
-			//console.log("onDidCloseTextDocument");
+			if (doc.languageId === 'stxt') {
+				log.trace(`onDidCloseTextDocument: ${doc.uri.toString()}`);
+			}
 			diagnosticCollection.delete(doc.uri);
 		})
 	);

@@ -1,11 +1,12 @@
 import { Node, StringUtils, Schema, NodeDefinition, ChildDefinition } from '@stxt-lang/core';
 import { getSchemas, SchemaLoaderExtension } from './SchemaLoader';
 import { CompletionItem, CompletionItemKind } from 'vscode';
+import { log } from './Log';
 
 let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();
 
 export function findSuggestionsByParent(parent: Node, prefix: string): CompletionItem[] {
-    console.log("Searching schema for " + parent.getQualifiedName());
+    log.trace(`Buscando schema para ${parent.getQualifiedName()}.`);
     let schema = schemaLoader.getSchema(parent.getNamespace());
 
     if (!schema) {
@@ -148,8 +149,9 @@ function isBlockText(childDef: ChildDefinition): boolean {
 }
 
 export function findEnumValues(node: Node, prefix: string): CompletionItem[] {
-    console.log(`Searching ENUM values for node: ${node.getQualifiedName()}`);
-    
+    log.trace(`Buscando valores ENUM del nodo ${node.getQualifiedName()}.`);
+
+
     const schema = schemaLoader.getSchema(node.getNamespace());
     if (!schema) {
         return [];
