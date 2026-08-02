@@ -56,17 +56,21 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "pretest": "npm run compile",
+    "test": "mocha"
   },
   "dependencies": {
     "@stxt-lang/core": "^0.5.3"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
     "@types/vscode": "^1.109.0",
     "@vscode/test-cli": "^0.0.15",
     "@vscode/test-electron": "^2.5.2",
     "eslint": "^10.8.0",
+    "mocha": "^11.7.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.54.0"
   }

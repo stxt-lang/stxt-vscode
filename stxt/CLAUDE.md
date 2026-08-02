@@ -36,16 +36,24 @@ No hay desajustes conocidos entre las specs y la implementación: el repaso comp
 npm run compile      # tsc -p ./  → out/
 npm run watch        # compilación incremental (es el default build task de VS Code)
 npm run lint         # eslint src (hoy: limpio, 0 errores y 0 warnings)
+npm test             # compila y pasa mocha (hoy: 380 tests, todos en verde)
 vsce package         # genera el .vsix
 ```
 
-Para probar a mano: **F5** abre una ventana de VS Code con la extensión cargada (ver `help.txt`).
+Para probar a mano: **F5** abre una ventana de VS Code con la extensión cargada (ver `help.txt`). Lo que se puede automatizar ya está en `npm test`; el F5 queda para lo que de verdad hay que mirar a ojo, que es el color.
 
 ### Tests
 
-**Aquí no hay tests ni script `npm test`.** Los tests de regresión del lenguaje (mocha contra el corpus real de `../../stxt-web`: cada schema y template de `.stxt/**` debe cargar, cada documento de `docs/`, `es/` y `en/` debe parsear y validar sin errores, y lo que escribe `NodeWriter` debe reparsear al mismo árbol) viven en `../../stxt-js/src/test/` — ahí `npm test` son 224 tests. Si se toca la conformidad, se ejecutan allí.
+```bash
+npm test            # pretest compila + mocha sobre out/test/**/*.test.js
+STXT_WEB=/ruta npm test   # si stxt-web no está donde se espera
+```
 
-Tampoco hay tests de la capa de VS Code: haría falta `vscode-test` (que arranca un Electron) y el `.vscode-test.mjs` se eliminó. `@vscode/test-cli` y `@vscode/test-electron` siguen en `devDependencies` **sin usarse**, aparcados por si algún día se prueba la capa del editor; hay que recrear la configuración con un script aparte.
+**Los tests de la capa de editor viven aquí** (`src/test/`, unos 380) y **corren en Node puro, sin Electron**. La clave es que solo cuatro ficheros de `src/` usan `vscode` en tiempo de ejecución: `src/test/stub/vscode.ts` reimplementa las clases que se usan de verdad y `src/test/register.ts` intercepta `require('vscode')` con un enganche a `Module._load` que mocha carga con `--require` (ver `.mocharc.json`). Por eso **no hace falta `vscode-test`**; `@vscode/test-cli` y `@vscode/test-electron` siguen en `devDependencies` **sin usarse**, aparcados por si algún día se quiere un smoke test de `activate()` y del `FileSystemWatcher`, que es lo único que el stub no alcanza.
+
+El grueso son **invariantes sobre el corpus real de `../../stxt-web`** (`corpus.test.ts`), sin fixtures propios: para cada documento de `docs/`, `es/` y `en/` se comprueba que los tokens caen dentro de su línea, que van en orden y no se solapan, que la codificación relativa de los semantic tokens no los mueve, que el formateo es idempotente y **conserva el árbol**, y que autocompletado y hover no lanzan en ninguna posición del cursor. Los schemas se cargan pasando por el `SchemaLoader` real. `providers.test.ts` añade casos dirigidos del observer, el formateador y la búsqueda de sugerencias. Si `../../stxt-web` no está, esos bloques se marcan como pendientes en vez de fallar.
+
+**Aquí no se prueba la conformidad del lenguaje**: eso son los 224 tests de `../../stxt-js/src/test/` (mocha contra el mismo corpus: cada schema y template de `.stxt/**` debe cargar, cada documento debe parsear y validar sin errores, y lo que escribe `NodeWriter` debe reparsear al mismo árbol). Si se toca la conformidad, se ejecutan allí; duplicarlo aquí solo crearía dos verdades.
 
 ## Arquitectura
 
@@ -102,3 +110,5 @@ Los errores de parseo se muestran como `Error`; los de validación de schema (`V
 - `language-configuration.json` está **vacío** (`{}`) y **es deliberado, no un olvido** (ver la regla de "todo sale del parseo" en Convenciones). No hay gramática TextMate ni reglas declarativas de comentarios, brackets o auto-indent.
 - El `parseLine()` de `CompletionProvider` se llama con `validate: false` a propósito, porque la línea que se está escribiendo suele estar incompleta.
 - `CLAUDE.md` está en `.vscodeignore` desde 0.5.3, así que ya no viaja dentro del `.vsix` (hasta 0.5.2 sí se publicó al Marketplace). Al añadir documentación interna nueva en la raíz, acordarse de excluirla también.
+- Los tests se compilan a `out/test/`, que es parte de la salida normal de `tsc`: van excluidos del `.vsix` por `.vscodeignore` (`out/test/**` y `.mocharc.json`). Si se añade otro directorio de apoyo bajo `src/`, excluir también su salida.
+- El stub de `vscode` **imita también los errores del API real** (por ejemplo, `lineAt()` lanza si la línea no existe). Si un test falla por ahí, el fallo es del código de la extensión, no del stub.

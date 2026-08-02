@@ -1,4 +1,5 @@
 import { getLastAnalysis } from './AnalysisDoc';
+import { AnalysisResult } from './AnalysisResult';
 import { StringUtils, type Node } from '@stxt-lang/core';
 import { DocumentFormattingEditProvider, Range, TextDocument, TextEdit } from 'vscode';
 
@@ -12,7 +13,7 @@ export class StxtFormattingProvider implements DocumentFormattingEditProvider {
 
         lines.forEach((line, index) => {
             const node = analysis?.nodeByLine.get(index);
-            const newLine = createLine(line, node);
+            const newLine = isFinalBlockBlank(line, index, lines.length, analysis) ? line : createLine(line, node);
             if (newLine !== line) {
                 edits.push(TextEdit.replace(new Range(index, 0, index, line.length), newLine));
             }
@@ -20,6 +21,19 @@ export class StxtFormattingProvider implements DocumentFormattingEditProvider {
 
         return edits;
     }
+}
+
+/**
+ * Última línea del documento, sin más contenido que su indentación y perteneciente a
+ * un bloque de texto. Es una línea vacía del contenido del bloque, y STXT-SPEC §10.3
+ * obliga a preservarla: recortarla la dejaría en «», que al final del fichero es
+ * indistinguible del salto de línea final, y el bloque perdería esa línea.
+ */
+function isFinalBlockBlank(line: string, index: number, lineCount: number, analysis: AnalysisResult | undefined): boolean {
+    return index === lineCount - 1
+        && line.trim() === ''
+        && line.length > 0
+        && (analysis?.textLineByLineNumber.has(index) ?? false);
 }
 
 // Placeholder para que compile:
@@ -43,11 +57,16 @@ function createLine(line: string, node: Node | undefined): string {
         const lineKey = line.substring(0, colonIndex);
         const namespaceIndex = lineKey.indexOf("(");
 
+        // Sin valor no se escribe el espacio de después de los dos puntos: los nodos
+        // contenedores acabarían con un espacio suelto al final de la línea.
+        const value = node.getValue();
+        const separator = value.length > 0 ? ": " + value : ":";
+
         if (namespaceIndex !== -1) {
-            result += node.getName() + " (" + node.getNamespace() + "): " + node.getValue();
+            result += node.getName() + " (" + node.getNamespace() + ")" + separator;
         }
         else {
-            result += node.getName() + ": " + node.getValue();
+            result += node.getName() + separator;
         }
     }
 

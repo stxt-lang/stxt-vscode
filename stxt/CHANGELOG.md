@@ -8,9 +8,31 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [0.5.4]
 
-An editor-layer release: the extension no longer writes to the shared developer console.
+An editor-layer release: the extension no longer writes to the shared developer console, it
+gets its own test suite, and that suite immediately found two bugs in the formatter.
 `@stxt-lang/core` stays at 0.5.3 — no parser, schema or template behaviour changed.
 
+- **`npm test` exists again in this repository**: mocha over the compiled output, like
+  `../../stxt-js`, but **without Electron**. Only four files of `src/` touch `vscode` at runtime,
+  so `src/test/stub/vscode.ts` reimplements the twenty-odd classes that are actually used and
+  `src/test/register.ts` intercepts `require('vscode')` to hand it over. The providers therefore
+  run in plain Node in under a second, and `@vscode/test-cli` / `@vscode/test-electron` stay
+  unused, reserved for a future smoke test of `activate()`.
+- **380 tests, most of them invariants over the real corpus of `../../stxt-web`** — the same idea
+  as the sibling repository, so there are no fixtures to keep in sync. For each of its 44
+  documents: every token falls inside its line, tokens are ordered and do not overlap, the
+  relative encoding of the semantic tokens round-trips, formatting is idempotent and preserves
+  the tree, and neither completion nor hover throws at any cursor position. The schemas are
+  loaded through the real `SchemaLoader`, which walks `.stxt/**` over a simulated file system,
+  so that layer is covered too.
+- **The formatter no longer deletes the last line of a text block.** When the last line of the
+  file held nothing but indentation it still belonged to the block, and right-trimming it left
+  `""`, which at the end of a file is indistinguishable from the final line break: the block lost
+  that line. STXT-SPEC §10.3 requires empty lines inside a block —including trailing ones— to be
+  preserved. Six of the corpus documents were affected.
+- **The formatter no longer adds a trailing space to nodes with no value.** `Metadata:` came back
+  as `Metadata: ` because the value was concatenated after `": "` without checking whether there
+  was one. It changed no content, which is why only a targeted test caught it.
 - **The 22 `console.log` calls are gone** — 15 of them active, the other 7 left commented out. The
   five in `CompletionProvider` and `CompletionProviderSearch` fired on every keystroke inside a
   `.stxt` file, and all of them wrote into the Extension Host console shared by every extension.

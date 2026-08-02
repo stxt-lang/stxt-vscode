@@ -1,0 +1,5 @@
+{
+	"spec": "out/test/**/*.test.js",
+	"require": "out/test/register.js",
+	"timeout": 10000
+}
