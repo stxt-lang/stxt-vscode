@@ -103,6 +103,7 @@ Los errores de parseo se muestran como `Error`; los de validación de schema (`V
 - Errores del núcleo: `ParseException` (sintaxis) y `ValidationException extends ParseException` (semántica), ambos con `line` y `code`.
 - El código fuente usa **tabuladores**, igual que los ficheros `.stxt`. `tsconfig` está en `strict: true`.
 - Al añadir un ítem al changelog, `CHANGELOG.md` va por versiones y la versión se sube en `package.json`. Si el cambio es del lenguaje, sube también la versión de `@stxt-lang/core` en `dependencies`.
+- **La versión de la extensión y la de `@stxt-lang/core` no se sincronizan, y no hay que intentarlo.** Hasta la 0.5.3 coincidieron por casualidad (mismo número en los dos repositorios), y eso invita a pensar que van emparejadas: no lo van. La 0.5.4 es la primera divergencia —extensión 0.5.4 sobre núcleo 0.5.3— y es lo normal, porque cada repositorio publica por sus propios motivos: aquí se publica por cosas del editor (resaltado, autocompletado, formateo, logs) y en `../../stxt-js` por cosas del lenguaje. Forzar que los números cuadren solo produce releases vacías en uno de los dos lados. **Lo que sí hay que mantener al día es la dependencia**: cuando `../../stxt-js` publique una versión nueva de `@stxt-lang/core`, subir cuanto antes el rango de `dependencies` aquí, comprobar que `npm test` sigue en verde y publicar; quedarse atrás significa dar por buenos en el editor comportamientos que la spec ya ha corregido.
 
 ## Trampas conocidas
 
