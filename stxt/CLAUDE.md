@@ -1,12 +1,12 @@
 # CLAUDE.md
 
-Guía para Claude Code (claude.ai/code) al trabajar en este repositorio.
+Guía para Claude Code (claude.ai/code) para trabajar en este repositorio.
 
 ## Qué es este repositorio
 
 Extensión de Visual Studio Code para el lenguaje **STXT (Semantic Text)** (`.stxt`), publicada en el Marketplace como `stxt-lang.stxt`. Contiene **solo la capa de integración con el editor**: diagnósticos, semantic tokens, hover, autocompletado y formateo. Todo `src/` son 11 ficheros: `extension.ts` y `extension/`.
 
-La **implementación del lenguaje** (parser, schemas, templates, tipos, writer) **ya no vive aquí**. Es el paquete npm **`@stxt-lang/core`**, que se desarrolla en el repositorio hermano `../../stxt-js` y que esta extensión consume como dependencia normal (`"@stxt-lang/core": "^0.6.0"`). El split se hizo en 0.5.1: las carpetas `src/core`, `src/schema`, `src/template`, `src/runtime`, `src/processors`, `src/exceptions` y `src/test` se borraron de este repositorio.
+La **implementación del lenguaje** (parser, schemas, templates, tipos, writer) **ya no vive aquí**. Es el paquete npm **`@stxt-lang/core`**, que se desarrolla en el repositorio hermano `../../stxt-js` y que esta extensión consume como dependencia normal (`"@stxt-lang/core": "^0.6.0"`). La separación se hizo en 0.5.1: las carpetas `src/core`, `src/schema`, `src/template`, `src/runtime`, `src/processors`, `src/exceptions` y `src/test` se borraron de este repositorio.
 
 **Regla que sustituye a la antigua separación de capas: si un cambio necesita tocar el parser, los schemas o la validación, se hace en `../../stxt-js`**, se publica una versión nueva de `@stxt-lang/core` y se sube el rango en `package.json` de aquí. No reintroducir copias de esas clases bajo `src/`.
 
