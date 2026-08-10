@@ -6,6 +6,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.6.1]
+
+Maintenance release updating `@stxt-lang/core` to **0.6.2**. The editor layer remains unchanged;
+it now consumes the core conformance corrections from the 2026-08-09 pseudocode audit:
+
+- Node-name validation accepts equivalent decomposed and precomposed Unicode spellings.
+- Schema `Node` and `Child` values enforce the STXT node-name grammar.
+- Template `Structure` lines reject the core BLOCK (`>>`) form and require `:`.
+- A same-level discovery conflict blocks fallback to a more distant definition.
+
 ## [0.6.0]
 
 A release about **where schemas come from**. Until now that answer was written here, in the editor,

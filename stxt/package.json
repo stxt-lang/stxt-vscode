@@ -2,7 +2,7 @@
   "name": "stxt",
   "displayName": "STXT - Semantic Text",
   "description": "Semantic Text syntax (.stxt)",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "publisher": "stxt-lang",
   "repository": {
     "type": "git",
@@ -61,7 +61,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "@stxt-lang/core": "^0.6.0"
+    "@stxt-lang/core": "^0.6.2"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
