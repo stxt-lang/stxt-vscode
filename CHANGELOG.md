@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- `@stxt-lang/core`: `SchemaProvider` contract — providers never throw "not found".
+  `SchemaProviderMeta` and `MetaTemplateSchemaProvider` return `null` for any namespace but their
+  own (they used to throw `RESOURCE_NOT_FOUND`), so a `SchemaValidator` over the default
+  `SchemaProviderMemory` (whose parent is the meta provider) now reports `SCHEMA_NOT_FOUND` as a
+  finding for an unknown namespace instead of throwing. Aligned with `stxt-impl` and `stxt-java`.
+
 - Tests: the `stxt-web` corpus is now mandatory, here and in `@stxt-lang/core`. `findStxtWeb()`
   throws when the sibling project (or `STXT_WEB`) cannot be found, so the corpus suites fail with
   an explicit message instead of being marked pending. Fixes the locator, which had been climbing
