@@ -9,16 +9,20 @@ import { AnalysisResult } from '../extension/AnalysisResult';
 import { registerSchemaLoader, getSchemas } from '../extension/SchemaLoader';
 
 /**
- * Utilidades para los tests contra el corpus real de `../../stxt-web`.
+ * Utilidades para los tests contra el corpus real de `../stxt-web`.
  *
- * El corpus no se copia aquí a propósito, igual que en `../../stxt-js`: stxt-web es la
+ * El corpus no se copia aquí a propósito, igual que en `../stxt-js`: stxt-web es la
  * fuente normativa del lenguaje y los tests tienen que fallar cuando la extensión se
  * desvía de los documentos reales, no de una copia congelada.
+ *
+ * The corpus is mandatory: if `stxt-web` cannot be located, the corpus suites fail
+ * (they are never skipped). A silently skipped corpus hid a broken locator in this very
+ * repository from 2026-08-10 to 2026-08-15, so "no corpus" is an error, not a pending run.
  */
 
 /**
  * Carpetas de stxt-web con los documentos que deben validar sin errores. Son las mismas
- * que mira `../../stxt-js` a propósito, para que los dos repositorios prueben el mismo
+ * que mira `../stxt-js` a propósito, para que los dos repositorios prueben el mismo
  * conjunto; `examples/` y `tutorial/` se quedan fuera por eso.
  *
  * Los schemas y templates no se listan aquí: los carga el `SchemaLoader` real, que ya
@@ -27,16 +31,17 @@ import { registerSchemaLoader, getSchemas } from '../extension/SchemaLoader';
 export const DOC_DIRS = ['docs', 'es', 'en'];
 
 /**
- * Localiza `stxt-web`. Se puede forzar con la variable de entorno STXT_WEB; por
- * defecto se busca como proyecto hermano.
+ * Locates `stxt-web`. It can be forced with the STXT_WEB environment variable; by
+ * default it is looked up as a sibling project (`../stxt-web` from this repo).
  *
- * @returns la raíz de stxt-web, o undefined si no está disponible.
+ * @returns the root of stxt-web.
+ * @throws Error if it cannot be found: the corpus is mandatory, never optional.
  */
-export function findStxtWeb(): string | undefined {
+export function findStxtWeb(): string {
 	const candidates = [
 		process.env.STXT_WEB,
-		// __dirname es <repo>/stxt/out/test
-		path.resolve(__dirname, '..', '..', '..', '..', 'stxt-web')
+		// __dirname is <repo>/out/test
+		path.resolve(__dirname, '..', '..', '..', 'stxt-web')
 	];
 
 	for (const candidate of candidates) {
@@ -45,7 +50,10 @@ export function findStxtWeb(): string | undefined {
 		}
 	}
 
-	return undefined;
+	throw new Error(
+		'The corpus of the sibling project stxt-web is required and was not found. Tried: '
+		+ candidates.filter(c => c).map(c => `"${c}"`).join(', ')
+		+ '. Clone stxt-lang/stxt-web next to this repository or set STXT_WEB=/path/to/stxt-web.');
 }
 
 // Todos los .stxt de un directorio, recursivamente y en orden estable.
@@ -75,18 +83,23 @@ export function corpusFiles(root: string, dirs: readonly string[]): string[] {
 }
 
 /**
- * `describe` que se salta el bloque entero (lo marca como pendiente) cuando stxt-web
- * no está disponible, para que no falle en un clon aislado de este repositorio.
+ * `describe` over the corpus. When stxt-web cannot be located the block is NOT
+ * skipped: it turns into a single failing test that explains what is missing, so
+ * that a broken locator or an isolated clone can never pass unnoticed.
  *
- * @param title título del bloque.
- * @param body cuerpo del bloque, que recibe la raíz de stxt-web.
+ * @param title title of the block.
+ * @param body body of the block, which gets the root of stxt-web.
  */
 export function describeCorpus(title: string, body: (root: string) => void): void {
-	const root = findStxtWeb();
-
-	if (root === undefined) {
+	let root: string;
+	try {
+		root = findStxtWeb();
+	}
+	catch (error) {
 		describe(title, () => {
-			it('necesita el proyecto hermano stxt-web (usa STXT_WEB=/ruta para apuntarlo)');
+			it('finds the mandatory corpus of the sibling project stxt-web', () => {
+				throw error;
+			});
 		});
 		return;
 	}

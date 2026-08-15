@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- Tests: the `stxt-web` corpus is now mandatory, here and in `@stxt-lang/core`. `findStxtWeb()`
+  throws when the sibling project (or `STXT_WEB`) cannot be found, so the corpus suites fail with
+  an explicit message instead of being marked pending. Fixes the locator, which had been climbing
+  one directory too many since the intermediate `stxt/` folder was removed from this repository
+  (2026-08-10) and had left the whole corpus suite silently skipped.
+
 ## [0.6.1]
 
 Maintenance release updating `@stxt-lang/core` to **0.6.2**. The editor layer remains unchanged;

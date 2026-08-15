@@ -16,7 +16,7 @@ import {
  * Invariantes de la capa de editor sobre el corpus real de stxt-web.
  *
  * Aquí no se comprueba la conformidad del lenguaje —de eso se encargan los tests de
- * `../../stxt-js` contra el mismo corpus— sino lo que la extensión hace con documentos
+ * `../stxt-js` contra el mismo corpus— sino lo que la extensión hace con documentos
  * que ya se saben válidos: que colorea dentro de la línea, que formatea sin cambiar lo
  * que el documento dice y que no revienta en ninguna posición del cursor.
  */
