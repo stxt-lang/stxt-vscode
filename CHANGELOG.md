@@ -6,6 +6,24 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- `@stxt-lang/core` **0.7.0 — breaking: a new node model**, mirroring `stxt-core` 0.7.0 (Java).
+  `Node` is now abstract with two forms, `InlineNode` (`Name: value`) and `TextNode` (`Name >>`),
+  each owning only what is its own: `InlineNode` has `getValue()`/`setValue()`, the children, the
+  lookups (`getChildren()`, `getChild()`, `getChildrenByName()`) and the factories
+  (`addInlineNode`, `addTextNode`); `TextNode` has `getTextLines()`, `setText()`,
+  `setTextLines()`, `addTextLine()`, `clearText()`. `Node` keeps name, canonical name
+  (`getCanonicalName()`; `getNormalizedName()` is deprecated), declared vs effective namespace
+  (`getDeclaredNamespace()`/`setNamespace()`/`getNamespace()`, resolved through the parent chain),
+  optional mutable line (`Node.NO_LINE`), derived `getLevel()`, `getParent()`, `detach()`,
+  `isTextNode()` and `getText()`. Parent links keep the tree's integrity (`addChild(node, index?)`,
+  `removeChild`, `NODE_ALREADY_ATTACHED`, `NODE_CYCLE`); the parser attaches each node when it
+  opens it, so `Observer.onCreate` already sees parent, namespace and level, and `onTextLine`
+  receives a `TextNode`. `NodeWriter` writes the namespace where declared. Removed: the `Node`
+  constructor (use `InlineNode`/`TextNode`), the `level` argument, and
+  `getValue()`/`getTextLines()`/`addTextLine()`/`getChildren()`/`getChild()`/`getChildrenByName()`
+  on the base class. Only the in-memory model changes: the language, STXT-TREE-SPEC and every
+  error code are the same. New `node.test.ts` (19 cases).
+
 - `@stxt-lang/core`: `SchemaProvider` contract — providers never throw "not found".
   `SchemaProviderMeta` and `MetaTemplateSchemaProvider` return `null` for any namespace but their
   own (they used to throw `RESOURCE_NOT_FOUND`), so a `SchemaValidator` over the default
