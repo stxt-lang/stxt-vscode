@@ -8,17 +8,17 @@ import { asPosition, asTextDocument, applyEdits } from './stub/TestDocument';
 import { analyze, describeCorpus, loadSchemas, parseTree } from './corpus';
 
 /**
- * Casos dirigidos de los dos ficheros con lógica propia de la extensión:
- * el observer que colorea y la búsqueda de sugerencias.
+ * Targeted cases for the two files with logic of the extension's own:
+ * the observer that colours and the suggestion lookup.
  *
- * Los del observer no necesitan schemas; los de autocompletado sí, y usan los del
- * corpus de stxt-web para no inventarse un schema de mentira que se desincronice.
+ * The observer ones need no schemas; the completion ones do, and they use those of the
+ * stxt-web corpus so as not to invent a fake schema that drifts out of sync.
  */
 
 const FORMATTING = new StxtFormattingProvider();
 const COMPLETION = new StxtCompletionProvider();
 
-// Representación compacta de un token, para comparar de un vistazo.
+// Compact representation of a token, to compare at a glance.
 function describeToken(token: StxtToken): string {
 	return `${token.line}:${token.startChar}+${token.length} ${token.type}`;
 }
@@ -28,19 +28,19 @@ function tokensOf(text: string): string[] {
 }
 
 function format(text: string): string {
-	const { document } = analyze('/tmp/formato.stxt', text);
+	const { document } = analyze('/tmp/format.stxt', text);
 	return applyEdits(text, FORMATTING.provideDocumentFormattingEdits(asTextDocument(document)));
 }
 
-// El `label` del API puede ser una cadena o un objeto con la etiqueta dentro.
+// The API `label` may be a string or an object with the label inside.
 function labelsOf(items: readonly { label: string | { label: string } }[]): string[] {
 	return items.map(item => typeof item.label === 'string' ? item.label : item.label.label).sort();
 }
 
 describe('TokenGeneratorObserver', () => {
 
-	it('colorea un nodo inline: nombre, dos puntos y valor', () => {
-		// «Nombre: valor» — los dos puntos están en la posición 6.
+	it('colours an inline node: name, colon and value', () => {
+		// "Nombre: valor" — the colon is at position 6.
 		assert.deepStrictEqual(tokensOf('Nombre: valor'), [
 			'0:0+6 property',
 			'0:6+1 property',
@@ -48,8 +48,8 @@ describe('TokenGeneratorObserver', () => {
 		]);
 	});
 
-	it('colorea el namespace de un nodo inline aparte del nombre', () => {
-		// «Nodo (ns.uno): v» — paréntesis en 5 y 12, dos puntos en 13.
+	it('colours the namespace of an inline node apart from the name', () => {
+		// "Nodo (ns.uno): v" — parentheses at 5 and 12, colon at 13.
 		assert.deepStrictEqual(tokensOf('Nodo (ns.uno): v'), [
 			'0:0+5 property',
 			'0:5+8 namespace',
@@ -58,24 +58,24 @@ describe('TokenGeneratorObserver', () => {
 		]);
 	});
 
-	it('colorea la cabecera de un nodo de texto', () => {
+	it('colours the header of a text node', () => {
 		assert.deepStrictEqual(tokensOf('Texto >>'), [
 			'0:0+6 macro',
 			'0:6+2 macro'
 		]);
 	});
 
-	it('colorea los comentarios y los registra como tales', () => {
-		const { analysis } = analyze('/tmp/comentario.stxt', '# un comentario\nNodo: v');
+	it('colours comments and records them as such', () => {
+		const { analysis } = analyze('/tmp/comment.stxt', '# un comentario\nNodo: v');
 
 		assert.deepStrictEqual(analysis.tokens[0], { line: 0, startChar: 0, length: 15, type: 'comment' });
-		assert.ok(analysis.commentLines.has(0), 'La línea 1 debería estar registrada como comentario.');
-		assert.ok(!analysis.commentLines.has(1), 'La línea 2 no es un comentario.');
+		assert.ok(analysis.commentLines.has(0), 'Line 1 should be recorded as a comment.');
+		assert.ok(!analysis.commentLines.has(1), 'Line 2 is not a comment.');
 	});
 
-	it('incluye la indentación en el token del nombre', () => {
-		// La indentación va dentro del primer token; al ser espacio en blanco no se
-		// nota al pintarlo, y así las columnas son absolutas sobre la línea real.
+	it('includes the indentation in the name token', () => {
+		// The indentation goes inside the first token; being whitespace it is not visible
+		// when painted, and this way the columns are absolute over the real line.
 		assert.deepStrictEqual(tokensOf('Padre:\n\tHijo: v'), [
 			'0:0+5 property',
 			'0:5+1 property',
@@ -85,7 +85,7 @@ describe('TokenGeneratorObserver', () => {
 		]);
 	});
 
-	it('colorea el STXT que hay dentro del bloque Structure de un template', () => {
+	it('colours the STXT inside the Structure block of a template', () => {
 		const text = [
 			'Template (@stxt.template): demo.tokens',
 			'\tStructure >>',
@@ -95,55 +95,55 @@ describe('TokenGeneratorObserver', () => {
 
 		const lines = analyze('/tmp/template.stxt', text).analysis.tokens.map(token => token.line);
 
-		assert.ok(lines.includes(2), 'La línea 3, dentro del bloque, debería tener tokens.');
-		assert.ok(lines.includes(3), 'La línea 4, dentro del bloque, debería tener tokens.');
+		assert.ok(lines.includes(2), 'Line 3, inside the block, should have tokens.');
+		assert.ok(lines.includes(3), 'Line 4, inside the block, should have tokens.');
 	});
 });
 
 describe('FormattingProvider', () => {
 
-	it('recorta los espacios sobrantes alrededor del valor', () => {
+	it('trims the extra spaces around the value', () => {
 		assert.strictEqual(format('Doc:    hola   '), 'Doc: hola');
 	});
 
-	it('reescribe la indentación con tabuladores según el nivel del nodo', () => {
+	it('rewrites the indentation with tabs according to the node level', () => {
 		assert.strictEqual(format('Padre: p\n    Hijo: v'), 'Padre: p\n\tHijo: v');
 	});
 
-	it('deja intacta una línea con indentación inválida', () => {
-		// Un salto de más de un nivel no produce nodo, así que el formateador no sabe
-		// a qué nivel colocarla: la deja como está en vez de inventarse una sangría.
+	it('leaves a line with invalid indentation untouched', () => {
+		// A jump of more than one level produces no node, so the formatter does not know
+		// which level to place it at: it leaves it as is instead of inventing an indent.
 		const text = 'Padre: p\n\t\t\tHijo: v';
 		assert.strictEqual(format(text), text);
 	});
 
-	it('no toca un documento ya formateado', () => {
+	it('does not touch an already formatted document', () => {
 		const text = 'Padre:\n\tHijo: v\n\tOtro: w';
 		assert.strictEqual(format(text), text);
 	});
 
-	it('no añade un espacio final a los nodos sin valor', () => {
+	it('does not add a trailing space to nodes without a value', () => {
 		assert.strictEqual(format('Contenedor:'), 'Contenedor:');
 		assert.strictEqual(format('Contenedor (ns.uno):'), 'Contenedor (ns.uno):');
 	});
 
-	it('conserva las líneas de un bloque de texto', () => {
+	it('preserves the lines of a text block', () => {
 		const text = 'Doc >>\n\tuna línea\n\totra línea';
 		assert.strictEqual(parseTree(format(text))[0].getText(), parseTree(text)[0].getText());
 	});
 
-	it('conserva la línea vacía final de un bloque de texto', () => {
-		// STXT-SPEC §10.3: las líneas vacías del bloque, también las finales, se
-		// preservan. Aquí la última línea del fichero es solo indentación.
+	it('preserves the trailing empty line of a text block', () => {
+		// STXT-SPEC §10.3: the empty lines of the block, trailing ones included, are
+		// preserved. Here the last line of the file is indentation only.
 		const text = 'Doc >>\n\tuna línea\n\t\t';
 		assert.strictEqual(parseTree(format(text))[0].getText(), parseTree(text)[0].getText());
 	});
 });
 
-describeCorpus('Autocompletado con los schemas del corpus', root => {
+describeCorpus('Completion with the corpus schemas', root => {
 
-	// El schema org.example.enum.test de stxt-web: Document tiene como hijos Priority
-	// (Max 1), Title (1,1) y Content (1,1, de tipo TEXT); Priority es un ENUM.
+	// The org.example.enum.test schema of stxt-web: Document has the children Priority
+	// (Max 1), Title (1,1) and Content (1,1, of type TEXT); Priority is an ENUM.
 	const NAMESPACE = 'org.example.enum.test';
 
 	before(async () => {
@@ -152,70 +152,70 @@ describeCorpus('Autocompletado con los schemas del corpus', root => {
 
 	function documentNode(text: string): InlineNode {
 		const node = parseTree(text)[0];
-		assert.ok(node instanceof InlineNode, 'El documento de prueba no ha producido ningún nodo inline.');
+		assert.ok(node instanceof InlineNode, 'The test document produced no inline node.');
 		return node;
 	}
 
-	it('sugiere los hijos que define el schema del padre', () => {
+	it('suggests the children defined by the parent schema', () => {
 		const parent = documentNode(`Document (${NAMESPACE}):\n\tTitle: hola`);
 		const labels = labelsOf(findSuggestionsByParent(parent, ''));
 
-		assert.ok(labels.includes('Priority'), `Faltaba Priority en ${labels.join(', ')}.`);
-		assert.ok(labels.includes('Content'), `Faltaba Content en ${labels.join(', ')}.`);
+		assert.ok(labels.includes('Priority'), `Priority was missing in ${labels.join(', ')}.`);
+		assert.ok(labels.includes('Content'), `Content was missing in ${labels.join(', ')}.`);
 	});
 
-	it('no sugiere un hijo que ya ha llegado a su Max', () => {
+	it('does not suggest a child that has already reached its Max', () => {
 		const parent = documentNode(`Document (${NAMESPACE}):\n\tTitle: hola`);
 		const labels = labelsOf(findSuggestionsByParent(parent, ''));
 
-		assert.ok(!labels.includes('Title'), 'Title tiene Max 1 y ya está puesto, no debería sugerirse.');
+		assert.ok(!labels.includes('Title'), 'Title has Max 1 and is already present, it should not be suggested.');
 	});
 
-	it('filtra las sugerencias por el prefijo que se está tecleando', () => {
+	it('filters the suggestions by the prefix being typed', () => {
 		const parent = documentNode(`Document (${NAMESPACE}):`);
 
 		assert.deepStrictEqual(labelsOf(findSuggestionsByParent(parent, 'pri')), ['Priority']);
 		assert.deepStrictEqual(labelsOf(findSuggestionsByParent(parent, 'zzz')), []);
 	});
 
-	it('propone el bloque «>>» para los hijos de tipo TEXT', () => {
+	it('proposes the ">>" block for children of type TEXT', () => {
 		const parent = documentNode(`Document (${NAMESPACE}):`);
 		const content = findSuggestionsByParent(parent, 'content')[0];
 
-		assert.ok(content, 'No se ha sugerido Content.');
+		assert.ok(content, 'Content was not suggested.');
 		assert.ok(content.insertText?.toString().includes('>>'),
-			`Content es TEXT, debería insertar un bloque: «${content.insertText}».`);
+			`Content is TEXT, it should insert a block: "${content.insertText}".`);
 	});
 
-	it('ofrece los valores de un ENUM y los filtra por prefijo', () => {
+	it('offers the values of an ENUM and filters them by prefix', () => {
 		const priority = documentNode(`Document (${NAMESPACE}):\n\tPriority: high`).getChildren()[0];
 
 		assert.deepStrictEqual(labelsOf(findEnumValues(priority, '')), ['high', 'low', 'medium']);
 		assert.deepStrictEqual(labelsOf(findEnumValues(priority, 'l')), ['low']);
 	});
 
-	it('sugiere nodos raíz de los schemas cargados', () => {
+	it('suggests root nodes of the loaded schemas', () => {
 		const labels = labelsOf(findRootLevelSuggestions('document'));
-		assert.ok(labels.includes('Document'), `Faltaba Document en ${labels.join(', ')}.`);
+		assert.ok(labels.includes('Document'), `Document was missing in ${labels.join(', ')}.`);
 	});
 
-	it('completa por el camino real del provider mientras se teclea', () => {
+	it('completes through the real provider path while typing', () => {
 		const text = `Document (${NAMESPACE}):\n\tPri`;
-		const { document } = analyze('/tmp/completado.stxt', text);
+		const { document } = analyze('/tmp/completion.stxt', text);
 
 		const items = COMPLETION.provideCompletionItems(asTextDocument(document), asPosition(1, 4));
 
-		assert.ok(Array.isArray(items), 'El provider debería devolver una lista de sugerencias.');
+		assert.ok(Array.isArray(items), 'The provider should return a list of suggestions.');
 		assert.deepStrictEqual(labelsOf(items), ['Priority']);
 	});
 
-	it('completa valores de ENUM después de los dos puntos', () => {
+	it('completes ENUM values after the colon', () => {
 		const text = `Document (${NAMESPACE}):\n\tPriority: `;
-		const { document } = analyze('/tmp/completado-enum.stxt', text);
+		const { document } = analyze('/tmp/completion-enum.stxt', text);
 
 		const items = COMPLETION.provideCompletionItems(asTextDocument(document), asPosition(1, 11));
 
-		assert.ok(Array.isArray(items), 'El provider debería devolver una lista de sugerencias.');
+		assert.ok(Array.isArray(items), 'The provider should return a list of suggestions.');
 		assert.deepStrictEqual(labelsOf(items), ['high', 'low', 'medium']);
 	});
 });

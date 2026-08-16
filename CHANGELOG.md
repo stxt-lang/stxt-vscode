@@ -4,6 +4,12 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [Unreleased]
+
+- Internal: every comment, JSDoc, test title and assertion message under `src/` is now in
+  English, in line with the rest of the ecosystem. No change in behaviour or in the messages
+  shown in the editor.
+
 ## [0.7.0]
 
 Release aligned with `@stxt-lang/core` **0.7.0**, whose version this extension now follows. Nothing

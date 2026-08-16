@@ -9,18 +9,18 @@ import { activate } from '../extension';
 import { StxtSemanticTokensProvider } from '../extension/SemanticTokensProvider';
 
 /**
- * Que un documento tenga color **desde el primer momento**.
+ * A document must have colour **from the very first moment**.
  *
- * Los providers leen el análisis del caché de `AnalysisDoc`, así que todo depende de que
- * el documento esté analizado cuando VS Code pide los tokens, que es nada más pintarlo.
- * Cuando no lo está, el editor recibe una lista vacía y el fichero se queda en blanco y
- * negro hasta que se toca —el editor no vuelve a preguntar por su cuenta—. Aquí se cubren
- * los tres caminos por los que un documento llega al provider.
+ * The providers read the analysis from the `AnalysisDoc` cache, so everything depends on
+ * the document being analyzed by the time VS Code asks for the tokens, which is as soon as
+ * it paints it. When it is not, the editor gets an empty list and the file stays black and
+ * white until it is edited —the editor never asks again on its own—. The three paths by
+ * which a document reaches the provider are covered here.
  */
 
 const TOKENS = new StxtSemanticTokensProvider();
 
-// Sin namespace a propósito: lo que se mira es el color, no la validación.
+// No namespace on purpose: what is checked is the colour, not the validation.
 const DOCUMENT = [
 	'Documento:',
 	'\tTitulo: Hola',
@@ -33,7 +33,7 @@ interface TokensProvider {
 	provideDocumentSemanticTokens(document: TextDocument): SemanticTokens;
 }
 
-// Cuántos enteros de semantic tokens devuelve un provider para el documento: 0 es «sin color».
+// How many semantic-token integers a provider returns for the document: 0 means "no colour".
 function tokensOf(provider: unknown, document: TestDocument): number {
 	return (provider as TokensProvider).provideDocumentSemanticTokens(asTextDocument(document)).data.length;
 }
@@ -43,15 +43,15 @@ function tokenCount(document: TestDocument): number {
 }
 
 /**
- * Si el provider ha tenido que analizar él mismo, `getAnalysis` lo deja dicho en el log.
- * Es la única forma de distinguir «el documento ya estaba analizado» de «lo ha salvado la
- * red de seguridad», porque por fuera las dos devuelven los mismos tokens.
+ * If the provider had to analyze on its own, `getAnalysis` says so in the log. It is the
+ * only way to tell "the document was already analyzed" from "the safety net rescued it",
+ * because from the outside both return the same tokens.
  */
 function analyzedOnTheSpot(document: TestDocument, from: number): boolean {
 	return logMessages.slice(from).some(message => message.includes('Cold analysis') && message.includes(document.uri.toString()));
 }
 
-describe('activate: el documento tiene color desde el primer momento', () => {
+describe('activate: the document has colour from the very first moment', () => {
 	let tempRoot: string;
 
 	before(async () => {
@@ -63,11 +63,11 @@ describe('activate: el documento tiene color desde el primer momento', () => {
 		fs.rmSync(tempRoot, { recursive: true, force: true });
 	});
 
-	it('analiza los documentos que ya estaban abiertos antes de registrar los providers', async () => {
-		// Un documento abierto antes de que arranque la extensión nunca recibe
-		// onDidOpenTextDocument: si activate() no lo analiza, no lo hace nadie. Y hay que
-		// analizarlo antes de registrar el provider, porque la carga de schemas que viene
-		// después es asíncrona y el editor no espera a que termine.
+	it('analyzes the documents that were already open before registering the providers', async () => {
+		// A document opened before the extension starts never receives
+		// onDidOpenTextDocument: if activate() does not analyze it, nobody does. And it must
+		// be analyzed before the provider is registered, because the schema load that comes
+		// afterwards is asynchronous and the editor does not wait for it to finish.
 		const document = new TestDocument(path.join(tempRoot, 'abierto.stxt'), DOCUMENT);
 		setOpenDocuments([asTextDocument(document)]);
 
@@ -86,32 +86,32 @@ describe('activate: el documento tiene color desde el primer momento', () => {
 			whenSemanticTokensProviderRegistered(undefined);
 		}
 
-		assert.ok(tokensAtRegistration > 0, 'El documento ya abierto no tenía tokens al registrarse el provider.');
-		assert.ok(!coldAtRegistration, 'Debería quedar analizado en activate(), sin recurrir a la red de seguridad.');
+		assert.ok(tokensAtRegistration > 0, 'The already-open document had no tokens when the provider was registered.');
+		assert.ok(!coldAtRegistration, 'It should be analyzed in activate(), without falling back to the safety net.');
 	});
 
-	it('analiza un documento que se abre con la extensión ya activa', async () => {
+	it('analyzes a document opened while the extension is already active', async () => {
 		const document = new TestDocument(path.join(tempRoot, 'nuevo.stxt'), DOCUMENT);
 
-		// Sin await a propósito: VS Code tampoco espera a que termine el oyente, así que
-		// esto es lo que el editor ve al pintar, con la parte síncrona del handler hecha
-		// y la búsqueda de schemas todavía en marcha.
+		// No await on purpose: VS Code does not wait for the listener to finish either, so
+		// this is what the editor sees when painting, with the synchronous part of the handler
+		// done and the schema lookup still in progress.
 		const pending = openDocument(asTextDocument(document));
 		const from = logMessages.length;
 
-		assert.ok(tokenCount(document) > 0, 'El documento recién abierto se ha quedado sin tokens.');
-		assert.ok(!analyzedOnTheSpot(document, from), 'onDidOpenTextDocument debería analizarlo antes de esperar a los schemas.');
+		assert.ok(tokenCount(document) > 0, 'The freshly opened document ended up without tokens.');
+		assert.ok(!analyzedOnTheSpot(document, from), 'onDidOpenTextDocument should analyze it before waiting for the schemas.');
 
 		await pending;
 	});
 
-	it('analiza en el momento si le preguntan por un documento que no ha visto', async () => {
-		// Red de seguridad: VS Code puede pedir los tokens antes del evento de apertura,
-		// o mientras la carga inicial de schemas —que es asíncrona— sigue en marcha.
+	it('analyzes on the spot when asked about a document it has never seen', async () => {
+		// Safety net: VS Code may ask for the tokens before the open event, or while the
+		// initial schema load —which is asynchronous— is still in progress.
 		const document = new TestDocument(path.join(tempRoot, 'nunca-abierto.stxt'), DOCUMENT);
 		const from = logMessages.length;
 
-		assert.ok(tokenCount(document) > 0, 'El caché estaba frío y el provider no ha analizado.');
-		assert.ok(analyzedOnTheSpot(document, from), 'Se esperaba justo el análisis en frío.');
+		assert.ok(tokenCount(document) > 0, 'The cache was cold and the provider did not analyze.');
+		assert.ok(analyzedOnTheSpot(document, from), 'The cold analysis was expected here.');
 	});
 });

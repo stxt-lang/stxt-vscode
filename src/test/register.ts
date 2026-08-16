@@ -2,11 +2,11 @@ import Module from 'module';
 import vscodeStub from './stub/vscode';
 
 /**
- * Enganche que mocha carga con `--require` antes que nada (ver `.mocharc.json`).
+ * Hook that mocha loads with `--require` before anything else (see `.mocharc.json`).
  *
- * El código de `src/` hace `require('vscode')`, un módulo que solo existe dentro del
- * proceso del editor. Aquí se intercepta esa resolución y se devuelve el stub, con lo
- * que los providers se pueden ejecutar en Node puro. Todo lo demás se resuelve normal.
+ * The code under `src/` does `require('vscode')`, a module that only exists inside the
+ * editor process. That resolution is intercepted here and the stub is returned, so the
+ * providers can run in plain Node. Everything else resolves normally.
  */
 
 type ModuleLoader = {

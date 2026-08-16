@@ -9,11 +9,11 @@ import { AnalysisResult } from '../extension/AnalysisResult';
 import { registerSchemaLoader, getSchemas } from '../extension/SchemaLoader';
 
 /**
- * Utilidades para los tests contra el corpus real de `../stxt-web`.
+ * Utilities for the tests against the real corpus of `../stxt-web`.
  *
- * El corpus no se copia aquí a propósito, igual que en `../stxt-js`: stxt-web es la
- * fuente normativa del lenguaje y los tests tienen que fallar cuando la extensión se
- * desvía de los documentos reales, no de una copia congelada.
+ * The corpus is deliberately not copied here, just like in `../stxt-js`: stxt-web is the
+ * normative source of the language and the tests must fail when the extension drifts
+ * from the real documents, not from a frozen copy.
  *
  * The corpus is mandatory: if `stxt-web` cannot be located, the corpus suites fail
  * (they are never skipped). A silently skipped corpus hid a broken locator in this very
@@ -21,12 +21,12 @@ import { registerSchemaLoader, getSchemas } from '../extension/SchemaLoader';
  */
 
 /**
- * Carpetas de stxt-web con los documentos que deben validar sin errores. Son las mismas
- * que mira `../stxt-js` a propósito, para que los dos repositorios prueben el mismo
- * conjunto; `examples/` y `tutorial/` se quedan fuera por eso.
+ * stxt-web folders whose documents must validate without errors. They are deliberately
+ * the same ones `../stxt-js` looks at, so that both repositories test the same set;
+ * `examples/` and `tutorial/` are left out for that reason.
  *
- * Los schemas y templates no se listan aquí: los carga el `SchemaLoader` real, que ya
- * recorre `<workspace>/.stxt/**` por su cuenta (ver `loadSchemas`).
+ * Schemas and templates are not listed here: the real `SchemaLoader` loads them, since it
+ * already walks `<workspace>/.stxt/**` on its own (see `loadSchemas`).
  */
 export const DOC_DIRS = ['docs', 'es', 'en'];
 
@@ -56,7 +56,7 @@ export function findStxtWeb(): string {
 		+ '. Clone stxt-lang/stxt-web next to this repository or set STXT_WEB=/path/to/stxt-web.');
 }
 
-// Todos los .stxt de un directorio, recursivamente y en orden estable.
+// Every .stxt in a directory, recursively and in stable order.
 export function findStxtFiles(dir: string): string[] {
 	if (!fs.existsSync(dir)) {
 		return [];
@@ -77,7 +77,7 @@ export function findStxtFiles(dir: string): string[] {
 	return result.sort();
 }
 
-// Los .stxt de las carpetas indicadas, a partir de la raíz de stxt-web.
+// The .stxt files of the given folders, relative to the stxt-web root.
 export function corpusFiles(root: string, dirs: readonly string[]): string[] {
 	return dirs.flatMap(dir => findStxtFiles(path.join(root, dir)));
 }
@@ -108,20 +108,20 @@ export function describeCorpus(title: string, body: (root: string) => void): voi
 }
 
 /**
- * Carga en el proveedor de schemas todo `<root>/.stxt/**`, pasando por el
- * `SchemaLoader` real: apunta el workspace del stub a stxt-web y deja que recorra el
- * directorio como haría en el editor.
+ * Loads all of `<root>/.stxt/**` into the schema provider, going through the real
+ * `SchemaLoader`: points the stub workspace at stxt-web and lets it walk the directory
+ * as it would in the editor.
  *
- * @param root raíz de stxt-web.
+ * @param root the stxt-web root.
  */
 export async function loadSchemas(root: string): Promise<void> {
 	setWorkspaceFolder(root);
 
 	const context = { subscriptions: [] } as unknown as ExtensionContext;
-	await registerSchemaLoader(context, async () => { /* sin documentos abiertos que revalidar */ });
+	await registerSchemaLoader(context, async () => { /* no open documents to revalidate */ });
 
 	if (getSchemas().length === 0) {
-		throw new Error(`No se ha cargado ningún schema desde ${path.join(root, '.stxt')}.`);
+		throw new Error(`No schema was loaded from ${path.join(root, '.stxt')}.`);
 	}
 }
 
@@ -132,12 +132,12 @@ export interface AnalyzedDocument {
 }
 
 /**
- * Analiza un texto igual que el editor en cada pulsación: un solo parseo que deja
- * tokens, mapas y diagnósticos, y que además siembra el caché que leen los providers.
+ * Analyzes a text just like the editor does on every keystroke: a single parse that
+ * yields tokens, maps and diagnostics, and also seeds the cache the providers read.
  *
- * @param filePath ruta que hace de URI del documento.
- * @param text contenido del documento.
- * @returns el documento, su análisis y los diagnósticos publicados.
+ * @param filePath the path that acts as the document URI.
+ * @param text the document content.
+ * @returns the document, its analysis and the published diagnostics.
  */
 export function analyze(filePath: string, text: string): AnalyzedDocument {
 	const document = new TestDocument(filePath, text);
@@ -147,32 +147,32 @@ export function analyze(filePath: string, text: string): AnalyzedDocument {
 	return { document, analysis, diagnostics: collection.get(document.uri) ?? [] };
 }
 
-// Analiza un fichero del corpus leyéndolo del disco.
+// Analyzes a corpus file, reading it from disk.
 export function analyzeFile(filePath: string): AnalyzedDocument {
 	return analyze(filePath, fs.readFileSync(filePath, 'utf-8'));
 }
 
-// Los diagnósticos de gravedad Error, que son los fallos de sintaxis.
+// The diagnostics with severity Error, which are the syntax failures.
 export function errorsOf(diagnostics: readonly Diagnostic[]): Diagnostic[] {
 	return diagnostics.filter(d => d.severity === DiagnosticSeverity.Error);
 }
 
-// Mensaje legible para el assert: `línea 12: [CODE] mensaje`.
+// Readable message for the assert: `line 12: [CODE] message`.
 export function describeDiagnostics(diagnostics: readonly Diagnostic[]): string {
-	return diagnostics.map(d => `\n\tlínea ${d.range.start.line + 1}: ${d.message}`).join('');
+	return diagnostics.map(d => `\n\tline ${d.range.start.line + 1}: ${d.message}`).join('');
 }
 
 export function describeErrors(errors: readonly ParseException[]): string {
-	return errors.map(e => `\n\t[${e.code}] línea ${e.line}: ${e.message}`).join('');
+	return errors.map(e => `\n\t[${e.code}] line ${e.line}: ${e.message}`).join('');
 }
 
 /**
- * Firma canónica del árbol de un documento: nombre cualificado, nivel y contenido de
- * cada nodo. Sirve para comprobar que el formateo no cambia lo que el documento dice,
- * solo cómo se escribe.
+ * Canonical signature of a document tree: qualified name, level and content of every
+ * node. Used to check that formatting does not change what the document says, only
+ * how it is written.
  *
- * @param nodes nodos raíz del documento.
- * @returns una cadena que representa el árbol entero.
+ * @param nodes the root nodes of the document.
+ * @returns a string representing the whole tree.
  */
 export function treeSignature(nodes: readonly Node[]): string {
 	const lines: string[] = [];
@@ -189,7 +189,7 @@ export function treeSignature(nodes: readonly Node[]): string {
 	return lines.join('\n');
 }
 
-// Parsea sin validar, para comparar árboles antes y después de formatear.
+// Parses without validating, to compare trees before and after formatting.
 export function parseTree(text: string): Node[] {
 	return new Parser().parseResult(text).getNodes();
 }

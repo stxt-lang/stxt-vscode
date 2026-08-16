@@ -9,13 +9,13 @@ export class TokenGeneratorObserver implements Observer {
     private templateNodeByLine = new Map<number, Line>();
 
     onTextLine(node: TextNode, lineNumber: number, lineString: string, line: Line): void {
-        // Guardar el nodo padre para las líneas de texto
-        const lineIndex = lineNumber - 1; // lineNumber es 1-indexed
+        // Remember the parent node of the text lines
+        const lineIndex = lineNumber - 1; // lineNumber is 1-indexed
         this.textLineByLineNumber.set(lineIndex, node);
         
-        // Guardar información de líneas dentro de nodos template
+        // Keep line information for lines inside template nodes
         if (this.isTemplateContentNode(node)) {
-            // lineNumber es 1-indexed y absoluto en el documento
+            // lineNumber is 1-indexed and absolute within the document
             this.templateNodeByLine.set(lineNumber, line);
         }
     }
@@ -23,23 +23,23 @@ export class TokenGeneratorObserver implements Observer {
     onCreate(node: Node, line: string): void {
         const lineIndex = node.getLine() - 1;
         
-        // Guardar nodo en el mapa
+        // Store the node in the map
         this.nodeByLine.set(lineIndex, node);
 
-        // Generar tokens para este nodo
+        // Generate the tokens for this node
         this.generateTokensForNode(node, lineIndex, line);
 
-        // Inicializar mapa para nodos template
+        // Reset the map for template nodes
         if (this.isTemplateContentNode(node)) {
             this.templateNodeByLine.clear();
         }
     }
 
     onFinish(node: Node): void {
-        // Si es un nodo especial de template, parsear su contenido para colorear
+        // If it is a special template node, parse its content to colour it
         if (this.isTemplateContentNode(node)) {
             this.parseTemplateContent(node);
-            // Limpiar el mapa después de procesar
+            // Clear the map after processing
             this.templateNodeByLine.clear();
         }
     }
@@ -59,28 +59,28 @@ export class TokenGeneratorObserver implements Observer {
                 return;
             }
 
-            // Crear parser sin validación de schemas
+            // Create a parser without schema validation
             const parser = new Parser();
             
-            // Crear observer interno para generar tokens
+            // Create an inner observer to generate the tokens
             const innerObserver = new TokenGeneratorObserver();
             parser.registerObserver(innerObserver);
 
-            // Parsear el contenido del nodo
+            // Parse the node content
             parser.parseResult(content);
 
-            // Obtener tokens generados y ajustar los números de línea y startChar
-            const lineOffset = node.getLine(); // Offset desde el inicio del nodo (1-indexed)
+            // Take the generated tokens and adjust their line numbers and startChar
+            const lineOffset = node.getLine(); // Offset from the start of the node (1-indexed)
             const innerTokens = innerObserver.getTokens();
 
             for (const token of innerTokens) {
-                // token.line es 0-indexed, necesitamos la línea absoluta del documento (1-indexed)
+                // token.line is 0-indexed; we need the absolute document line (1-indexed)
                 const absoluteLineNumber = lineOffset + token.line + 1;
                 
-                // Obtener la indentación de la línea original
+                // Get the indentation of the original line
                 const originalLine = this.templateNodeByLine.get(absoluteLineNumber);
-                // indentLength es el índice del último carácter de indentación,
-                // el contenido empieza en indentLength + 1
+                // indentLength is the index of the last indentation character;
+                // the content starts at indentLength + 1
                 const offset = originalLine ? originalLine.indentLength + 1 : 0;
 
                 this.tokens.push({
@@ -91,12 +91,12 @@ export class TokenGeneratorObserver implements Observer {
                 });
             }
         } catch (e) {
-            // Si hay error al parsear, simplemente no añadimos tokens para este nodo
+            // On a parse error, simply add no tokens for this node
         }
     }
 
     onComment(lineNumber: number, line: string): void {
-        // Generar token para comentario (líneas que empiezan con #)
+        // Generate the token for a comment (lines starting with #)
         const trimmedLine = line.trim();
         if (trimmedLine.startsWith('#')) {
             const lineIndex = lineNumber - 1;

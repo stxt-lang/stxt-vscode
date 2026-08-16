@@ -2,20 +2,20 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 /**
- * Stub del módulo «vscode» para los tests.
+ * Stub of the "vscode" module for the tests.
  *
- * La capa de editor de esta extensión apenas necesita valores en tiempo de ejecución
- * del API de VS Code (el resto de lo que importa de 'vscode' son tipos, que se borran
- * al compilar). Reimplementarlos aquí permite ejecutar los providers en Node puro,
- * sin arrancar el Electron que exige `@vscode/test-electron`.
+ * The editor layer of this extension barely needs runtime values from the VS Code API
+ * (everything else it imports from 'vscode' are types, erased at compile time).
+ * Reimplementing them here lets the providers run in plain Node, without starting the
+ * Electron that `@vscode/test-electron` requires.
  *
- * `register.ts` intercepta `require('vscode')` y devuelve el objeto exportado por
- * defecto de este fichero, así que lo que se añada al objeto `api` del final es lo
- * único que el código de producción puede ver.
+ * `register.ts` intercepts `require('vscode')` and returns the default export of this
+ * file, so whatever is added to the `api` object at the end is the only thing the
+ * production code can see.
  *
- * Regla: este stub imita el comportamiento real de VS Code, incluidos sus errores
- * (ver `TestDocument.lineAt`). Si un test falla por eso, el fallo es del código, no
- * del stub.
+ * Rule: this stub mimics the real behaviour of VS Code, its errors included (see
+ * `TestDocument.lineAt`). If a test fails because of that, the fault is in the code,
+ * not in the stub.
  */
 
 export class Position {
@@ -54,7 +54,7 @@ export class Diagnostic {
 		public readonly severity: DiagnosticSeverity = DiagnosticSeverity.Error) { }
 }
 
-/** Colección de diagnósticos indexada por URI, como la que devuelve `languages.createDiagnosticCollection`. */
+/** Diagnostic collection indexed by URI, like the one `languages.createDiagnosticCollection` returns. */
 export class DiagnosticCollection {
 	private readonly byUri = new Map<string, readonly Diagnostic[]>();
 
@@ -92,7 +92,7 @@ export class Uri {
 		return new Uri(path.join(base.fsPath, ...segments));
 	}
 
-	// El inverso de toString(), igual que en el API real.
+	// The inverse of toString(), just like in the real API.
 	static parse(value: string): Uri {
 		return new Uri(value.startsWith('file://') ? value.substring('file://'.length) : value);
 	}
@@ -106,7 +106,7 @@ export class Uri {
 	}
 }
 
-/** Patrón relativo a una carpeta, tal como lo pide `createFileSystemWatcher` fuera del workspace. */
+/** Pattern relative to a folder, as `createFileSystemWatcher` requires outside the workspace. */
 export class RelativePattern {
 	readonly baseUri: Uri;
 
@@ -122,7 +122,7 @@ export enum FileType {
 	SymbolicLink = 64
 }
 
-// Solo los valores que usa CompletionProviderSearch, con los números reales del API.
+// Only the values CompletionProviderSearch uses, with the real API numbers.
 export enum CompletionItemKind {
 	Text = 0,
 	Module = 8,
@@ -171,10 +171,10 @@ export class SemanticTokens {
 }
 
 /**
- * Constructor de semantic tokens con la misma codificación relativa que VS Code:
- * cada token son 5 enteros y las posiciones son deltas respecto del token anterior.
- * Al ser deltas sin signo, un `push` fuera de orden corrompe el resultado igual que
- * en el editor real, que es justo lo que interesa comprobar.
+ * Semantic tokens builder with the same relative encoding as VS Code: every token is
+ * 5 integers and the positions are deltas from the previous token. Since the deltas
+ * are unsigned, an out-of-order `push` corrupts the result just like in the real
+ * editor, which is exactly what is worth checking.
  */
 export class SemanticTokensBuilder {
 	private readonly data: number[] = [];
@@ -199,7 +199,7 @@ export class SemanticTokensBuilder {
 }
 
 // ****************
-// Espacios de nombres del API
+// API namespaces
 // ****************
 
 export interface WorkspaceFolder {
@@ -212,11 +212,11 @@ interface Disposable {
 	dispose(): void;
 }
 
-const NOOP_DISPOSABLE: Disposable = { dispose(): void { /* nada que liberar */ } };
+const NOOP_DISPOSABLE: Disposable = { dispose(): void { /* nothing to release */ } };
 
 const workspaceFs = {
 	async readDirectory(uri: Uri): Promise<[string, FileType][]> {
-		// readdirSync lanza si el directorio no existe, igual que el API real.
+		// readdirSync throws if the directory does not exist, just like the real API.
 		return fs.readdirSync(uri.fsPath, { withFileTypes: true })
 			.map(entry => [entry.name, entry.isDirectory() ? FileType.Directory : FileType.File]);
 	},
@@ -226,7 +226,7 @@ const workspaceFs = {
 	}
 };
 
-// Oyentes registrados por la extensión, para poder disparar los eventos desde un test.
+// Listeners registered by the extension, so the events can be fired from a test.
 const documentListeners = {
 	open: [] as ((document: unknown) => unknown)[],
 	change: [] as ((event: unknown) => unknown)[],
@@ -260,33 +260,33 @@ export const workspace = {
 		onDidChange(listener: () => void): Disposable;
 		onDidDelete(listener: () => void): Disposable;
 	} {
-		// Los tests cargan los schemas una vez; no hace falta emitir eventos.
+		// The tests load the schemas once; no need to emit events.
 		return {
 			onDidCreate: () => NOOP_DISPOSABLE,
 			onDidChange: () => NOOP_DISPOSABLE,
 			onDidDelete: () => NOOP_DISPOSABLE,
-			dispose: () => { /* nada que liberar */ }
+			dispose: () => { /* nothing to release */ }
 		};
 	}
 };
 
-/** Apunta el workspace del stub a un directorio real del disco. */
+/** Points the stub workspace at a real directory on disk. */
 export function setWorkspaceFolder(folderPath: string): void {
 	workspace.workspaceFolders = [{ uri: Uri.file(folderPath), name: path.basename(folderPath), index: 0 }];
 }
 
-/** Documentos que el editor ya tiene abiertos, los que ve `activate()` al arrancar. */
+/** Documents the editor already has open, the ones `activate()` sees at startup. */
 export function setOpenDocuments(documents: readonly unknown[]): void {
 	workspace.textDocuments = [...documents];
 }
 
-/** Dispara `onDidOpenTextDocument`, como al abrir un fichero con la extensión ya activa. */
+/** Fires `onDidOpenTextDocument`, as when opening a file with the extension already active. */
 export async function openDocument(document: unknown): Promise<void> {
 	workspace.textDocuments = [...workspace.textDocuments, document];
 	await Promise.all(documentListeners.open.map(listener => listener(document)));
 }
 
-/** Líneas registradas por el canal de log, para poder afirmar sobre ellas. */
+/** Lines recorded by the log channel, so they can be asserted on. */
 export const logMessages: string[] = [];
 
 export const window = {
@@ -303,15 +303,15 @@ export const window = {
 			warn: append('warn'),
 			error: append('error'),
 			appendLine: append('line'),
-			show: () => { /* sin UI */ },
-			dispose: () => { /* nada que liberar */ }
+			show: () => { /* no UI */ },
+			dispose: () => { /* nothing to release */ }
 		};
 	}
 };
 
 let onSemanticTokensProvider: ((provider: unknown) => void) | undefined;
 
-/** Se avisa en cuanto `activate()` registra el provider de semantic tokens. */
+/** Notified as soon as `activate()` registers the semantic tokens provider. */
 export function whenSemanticTokensProviderRegistered(listener: ((provider: unknown) => void) | undefined): void {
 	onSemanticTokensProvider = listener;
 }
@@ -321,11 +321,11 @@ export const languages = {
 		return new DiagnosticCollection(name);
 	},
 
-	// Los providers se registran en activate() y los tests los invocan directamente:
-	// aquí basta con aceptar el registro y devolver algo que se pueda liberar.
+	// The providers are registered in activate() and the tests invoke them directly:
+	// here it is enough to accept the registration and return something disposable.
 	registerDocumentSemanticTokensProvider: (_selector: unknown, provider: unknown) => {
-		// VS Code empieza a pedir tokens en cuanto el provider existe, sin esperar a que
-		// termine activate(): el enganche deja mirar el editor justo en ese instante.
+		// VS Code starts asking for tokens as soon as the provider exists, without waiting
+		// for activate() to finish: the hook lets the editor be inspected at that very instant.
 		onSemanticTokensProvider?.(provider);
 		return NOOP_DISPOSABLE;
 	},
@@ -335,9 +335,9 @@ export const languages = {
 };
 
 /**
- * Lo que `require('vscode')` devuelve. Se exporta por defecto para que funcionen a la
- * vez las tres formas de importar que usa el código: `import vscode from 'vscode'`,
- * `import * as vscode from 'vscode'` e `import { Range } from 'vscode'`.
+ * What `require('vscode')` returns. Exported as default so that the three import forms
+ * the code uses all work at once: `import vscode from 'vscode'`,
+ * `import * as vscode from 'vscode'` and `import { Range } from 'vscode'`.
  */
 const api = {
 	Position,

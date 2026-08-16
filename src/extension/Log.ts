@@ -3,10 +3,10 @@ import * as vscode from 'vscode';
 let channel: vscode.LogOutputChannel | undefined;
 
 /**
- * Canal «STXT» del panel Output. Es un LogOutputChannel, así que VS Code le pone
- * marca de tiempo y nivel a cada línea y respeta el nivel elegido con el comando
- * «Developer: Set Log Level…». Por defecto ese nivel es Info: lo que se registre
- * con trace() no llega al panel salvo que el usuario lo suba.
+ * The "STXT" channel of the Output panel. It is a LogOutputChannel, so VS Code stamps
+ * every line with a timestamp and a level and honours the level chosen with the
+ * "Developer: Set Log Level…" command. That level defaults to Info: whatever is
+ * logged with trace() does not reach the panel unless the user raises it.
  */
 export function getLogChannel(): vscode.LogOutputChannel {
 	if (!channel) {
@@ -16,10 +16,10 @@ export function getLogChannel(): vscode.LogOutputChannel {
 }
 
 /**
- * Registro de la extensión. Regla de uso:
- * - trace: mensajes por pulsación de tecla (análisis, autocompletado).
- * - info: hitos poco frecuentes (carga y recarga de schemas).
- * - warn/error: fallos que no se muestran al usuario de otra forma.
+ * The extension log. Rule of use:
+ * - trace: per-keystroke messages (analysis, completion).
+ * - info: infrequent milestones (schema load and reload).
+ * - warn/error: failures not shown to the user in any other way.
  */
 export const log = {
 	trace(message: string, ...args: unknown[]): void {

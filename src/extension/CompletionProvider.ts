@@ -13,13 +13,13 @@ export class StxtCompletionProvider implements CompletionItemProvider {
 
         log.trace(`Completion at line ${position.line}.`);
 
-        // Si no hay análisis no mostramos nada
+        // Without an analysis there is nothing to show
         let lastAnalysis: AnalysisResult | undefined = getAnalysis(document);
         if (!lastAnalysis) {
             return [];
         }
 
-        // Buscar el nodo anterior para obtener lastLevel y lastNodeBlock
+        // Find the previous node to obtain lastLevel and lastNodeBlock
         const lastNode = getLastNode(lastAnalysis, position.line);
         const lastLevel = lastNode ? lastNode.getLevel() : 0;
         const lastNodeBlock = lastNode ? lastNode.isTextNode() : false;
@@ -37,7 +37,7 @@ export class StxtCompletionProvider implements CompletionItemProvider {
             return [];
         }
 
-        // Buscamos nivel del cursor
+        // Find the cursor level
         let level = completionContext.level;
         log.trace(`Cursor level: ${level}.`);
 
@@ -45,7 +45,7 @@ export class StxtCompletionProvider implements CompletionItemProvider {
             return findRootLevelSuggestions(completionContext.prefix);
         }
 
-        // Buscamos parent
+        // Find the parent
         const parent = getParentNode(lastAnalysis, position.line, level);
         if (parent) {
             log.trace(`Parent node: ${parent.getQualifiedName()} (line ${parent.getLine()}).`);
@@ -57,7 +57,7 @@ export class StxtCompletionProvider implements CompletionItemProvider {
 }
 
 /**
- * Busca el primer nodo anterior a la línea dada.
+ * Finds the first node before the given line.
  */
 function getLastNode(analysis: AnalysisResult, currentLine: number) {
     let searchLine = currentLine;
@@ -72,7 +72,7 @@ function getLastNode(analysis: AnalysisResult, currentLine: number) {
 }
 
 /**
- * Busca el nodo padre (nivel-1) anterior a la línea dada.
+ * Finds the parent node (level-1) before the given line.
  *
  * Only an inline node can have children: if the closest node one level up is a text block,
  * the cursor is inside its text and there is nothing to suggest.
@@ -99,22 +99,22 @@ function getCompletionContext(linePrefix: string, lastNodeBlock: boolean, lastLe
     const level = line.level;
     const indentationLength = line.indentLength;
 
-    // Detectar si estamos completando un valor (después de ':' o '>>')
+    // Detect whether we are completing a value (after ':' or '>>')
     const sepIndex = trimmed.indexOf(Constants.SEP_NODE);
     const textSepIndex = trimmed.indexOf(Constants.SEP_TEXT_NODE);
     
     if (sepIndex !== -1) {
-        // Estamos después de ':', completando un valor inline
+        // We are after ':', completing an inline value
         const valuePrefix = trimmed.substring(sepIndex + 1).trimStart();
         return { level, prefix: valuePrefix, isValue: true };
     }
     
     if (textSepIndex !== -1) {
-        // Estamos después de '>>', esto es para nodos de texto, no ofrecemos completado
+        // We are after '>>': that is a text node, no completion offered
         return null;
     }
 
-    // Estamos completando un nombre de nodo
+    // We are completing a node name
     const rawNodePrefix = linePrefix.slice(indentationLength);
     const prefix = rawNodePrefix.replace(/\s*\(.*$/, '').trimEnd();
 

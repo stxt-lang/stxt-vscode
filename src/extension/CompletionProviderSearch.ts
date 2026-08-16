@@ -99,7 +99,7 @@ function getRootNodeDefinitions(schema: Schema): NodeDefinition[] {
         return roots;
     }
 
-    // Fallback si no podemos inferir raíces.
+    // Fallback when the roots cannot be inferred.
     return Array.from(schema.getNodes().values());
 }
 
@@ -162,7 +162,7 @@ export function findEnumValues(node: Node, prefix: string): CompletionItem[] {
         return [];
     }
 
-    // Solo ofrecer valores si el tipo es ENUM
+    // Offer values only if the type is ENUM
     if (nodeDef.getType() !== 'ENUM') {
         return [];
     }
@@ -172,7 +172,7 @@ export function findEnumValues(node: Node, prefix: string): CompletionItem[] {
     const normalizedPrefix = StringUtils.normalize(prefix);
 
     for (const value of values) {
-        // Filtrar los valores que comienzan con el prefijo
+        // Keep the values that start with the prefix
         if (normalizedPrefix.length > 0 && !StringUtils.normalize(value).startsWith(normalizedPrefix)) {
             continue;
         }

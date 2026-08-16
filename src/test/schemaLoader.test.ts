@@ -10,15 +10,15 @@ import { registerSchemaLoader, ensureSchemasForDocument, getSchema, getSchemas }
 import { analyze, describeDiagnostics } from './corpus';
 
 /**
- * Dónde busca los schemas el cargador, y qué se marca cuando no encuentra ninguno.
+ * Where the loader looks for schemas, and what gets flagged when it finds none.
  *
- * Es el único bloque que no usa el corpus de stxt-web: lo que se prueba es la búsqueda de
- * directorios (STXT-DISCOVERY-SPEC), así que necesita un árbol propio y desechable en vez
- * de documentos reales.
+ * It is the only block that does not use the stxt-web corpus: what is tested is the
+ * directory lookup (STXT-DISCOVERY-SPEC), so it needs its own disposable tree instead
+ * of real documents.
  *
- * Todos los registros inyectan un `DiscoveryEnvironment` aislado: sin él, el cargador
- * usaría el entorno real (`STXT_PATH`, `~/.stxt`, `/etc/stxt`) y el resultado dependería
- * de la máquina donde corran los tests.
+ * Every registration injects an isolated `DiscoveryEnvironment`: without it, the loader
+ * would use the real environment (`STXT_PATH`, `~/.stxt`, `/etc/stxt`) and the result
+ * would depend on the machine the tests run on.
  */
 
 const NAMESPACE = 'test.arriba';
@@ -39,8 +39,8 @@ const USER_TEMPLATE = [
 	''
 ].join('\n');
 
-// Dos versiones del mismo namespace para el test de precedencia: la lejana exige Titulo,
-// la cercana lo hace opcional.
+// Two versions of the same namespace for the precedence test: the far one requires
+// Titulo, the near one makes it optional.
 const NESTED_FAR = [
 	'Template (@stxt.template): test.anidado',
 	'\tStructure >>',
@@ -57,14 +57,14 @@ const DOCUMENT = [
 	''
 ].join('\n');
 
-// Un documento de un namespace que no declara ningún schema cargado.
+// A document of a namespace that no loaded schema declares.
 const OTHER_DOCUMENT = [
 	'Documento (test.desconocido):',
 	'\tTitulo: Hola',
 	''
 ].join('\n');
 
-// Un documento de test.anidado SIN Titulo: solo valida con la versión cercana del template.
+// A test.anidado document WITHOUT Titulo: it only validates with the near version of the template.
 const NESTED_DOCUMENT = [
 	'Documento (test.anidado):',
 	''
@@ -80,14 +80,14 @@ describe('SchemaLoader', () => {
 	let nestedWebDir: string;
 
 	/**
-	 * Árbol de prueba, que reproduce el caso real:
+	 * Test tree, reproducing the real case:
 	 *
-	 *     proyecto/.stxt/test.stxt      ← el template
-	 *     proyecto/sub/doc.stxt         ← lo que se abre, dos niveles por debajo
-	 *     vacio/                        ← una carpeta sin ningún .stxt por encima
-	 *     usuario/.stxt/personal.stxt   ← hace de nivel de usuario (inyectado)
-	 *     anidado/.stxt/                ← monorepo: nivel lejano…
-	 *     anidado/web/.stxt/            ← …y nivel cercano del mismo namespace
+	 *     proyecto/.stxt/test.stxt      ← the template
+	 *     proyecto/sub/doc.stxt         ← what gets opened, two levels below
+	 *     vacio/                        ← a folder with no .stxt above it
+	 *     usuario/.stxt/personal.stxt   ← acts as the user level (injected)
+	 *     anidado/.stxt/                ← monorepo: far level…
+	 *     anidado/web/.stxt/            ← …and near level of the same namespace
 	 */
 	before(() => {
 		tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'stxt-loader-'));
@@ -116,8 +116,8 @@ describe('SchemaLoader', () => {
 		fs.rmSync(tempRoot, { recursive: true, force: true });
 	});
 
-	// Entorno aislado: sin STXT_PATH y con los niveles de usuario/sistema apuntando solo
-	// a lo que se le indique, para que el entorno real no interfiera en los tests.
+	// Isolated environment: no STXT_PATH, and the user/system levels pointing only at
+	// what is given, so that the real environment does not interfere with the tests.
 	function isolatedEnvironment(userDir?: string, stxtPath?: string[]): DiscoveryEnvironment {
 		return {
 			getStxtPath: () => stxtPath === undefined ? null : stxtPath.map(dir => Uri.file(dir).toString()),
@@ -126,110 +126,110 @@ describe('SchemaLoader', () => {
 		};
 	}
 
-	// Activa el cargador con el workspace apuntando a una carpeta concreta.
+	// Activates the loader with the workspace pointing at a specific folder.
 	async function register(folder: string, environment: DiscoveryEnvironment = isolatedEnvironment()): Promise<void> {
 		setWorkspaceFolder(folder);
 
 		const context = { subscriptions: [] } as unknown as ExtensionContext;
-		await registerSchemaLoader(context, async () => { /* sin documentos abiertos que revalidar */ }, environment);
+		await registerSchemaLoader(context, async () => { /* no open documents to revalidate */ }, environment);
 	}
 
-	describe('dónde busca los schemas', () => {
+	describe('where it looks for schemas', () => {
 
-		it('encuentra el .stxt que está por encima de la raíz del workspace', async () => {
-			// El workspace es la subcarpeta: el .stxt está un nivel más arriba.
+		it('finds the .stxt above the workspace root', async () => {
+			// The workspace is the subfolder: the .stxt is one level up.
 			await register(subDir);
 
-			assert.ok(getSchema(NAMESPACE), `No se ha cargado el schema de ${NAMESPACE} desde ${subDir}.`);
+			assert.ok(getSchema(NAMESPACE), `The ${NAMESPACE} schema was not loaded from ${subDir}.`);
 		});
 
-		it('sigue cargando el .stxt de la propia raíz del workspace', async () => {
+		it('still loads the .stxt of the workspace root itself', async () => {
 			await register(projectDir);
 
-			assert.ok(getSchema(NAMESPACE), `No se ha cargado el schema de ${NAMESPACE} desde ${projectDir}.`);
+			assert.ok(getSchema(NAMESPACE), `The ${NAMESPACE} schema was not loaded from ${projectDir}.`);
 		});
 
-		it('no carga nada cuando no hay ningún .stxt por encima', async () => {
+		it('loads nothing when there is no .stxt above', async () => {
 			await register(emptyDir);
 
 			assert.deepStrictEqual(getSchemas().map(schema => schema.getNamespace()), []);
 		});
 
-		it('carga los schemas de un documento que se abre fuera del workspace', async () => {
+		it('loads the schemas of a document opened outside the workspace', async () => {
 			await register(emptyDir);
-			assert.strictEqual(getSchemas().length, 0, 'El workspace vacío no debería traer schemas.');
+			assert.strictEqual(getSchemas().length, 0, 'The empty workspace should bring no schemas.');
 
 			const document = new TestDocument(documentPath, DOCUMENT);
 			await ensureSchemasForDocument(asTextDocument(document));
 
-			assert.ok(getSchema(NAMESPACE), `Abrir ${documentPath} no ha cargado el schema de ${NAMESPACE}.`);
+			assert.ok(getSchema(NAMESPACE), `Opening ${documentPath} did not load the ${NAMESPACE} schema.`);
 		});
 	});
 
-	describe('niveles de la cadena (STXT-DISCOVERY-SPEC)', () => {
+	describe('levels of the chain (STXT-DISCOVERY-SPEC)', () => {
 
-		it('carga el nivel de usuario además del nivel de proyecto', async () => {
+		it('loads the user level in addition to the project level', async () => {
 			await register(projectDir, isolatedEnvironment(userStxtDir));
 
-			assert.ok(getSchema(NAMESPACE), 'El nivel de proyecto debería seguir cargándose.');
-			assert.ok(getSchema('test.usuario'), 'El nivel de usuario debería aportar sus definiciones.');
+			assert.ok(getSchema(NAMESPACE), 'The project level should still be loaded.');
+			assert.ok(getSchema('test.usuario'), 'The user level should contribute its definitions.');
 		});
 
-		it('STXT_PATH sustituye la cadena completa, incluido el nivel de proyecto', async () => {
+		it('STXT_PATH replaces the whole chain, project level included', async () => {
 			await register(projectDir, isolatedEnvironment(undefined, [userStxtDir]));
 
-			assert.ok(getSchema('test.usuario'), 'La entrada de STXT_PATH debería cargarse.');
-			assert.ok(!getSchema(NAMESPACE), `Con STXT_PATH definido, el .stxt del proyecto no participa.`);
+			assert.ok(getSchema('test.usuario'), 'The STXT_PATH entry should be loaded.');
+			assert.ok(!getSchema(NAMESPACE), `With STXT_PATH defined, the project .stxt does not take part.`);
 		});
 
-		it('acumula todos los .stxt ascendentes y valida con el más cercano', async () => {
-			// El workspace es anidado/web: su .stxt y el de anidado/ definen test.anidado.
+		it('accumulates every ancestor .stxt and validates with the nearest one', async () => {
+			// The workspace is anidado/web: its .stxt and the one in anidado/ both define test.anidado.
 			await register(nestedWebDir);
 
-			// El documento no tiene Titulo: el template cercano lo permite ((?)), el lejano
-			// no ((1)). Si validara con el lejano, habría un diagnóstico de cardinalidad.
+			// The document has no Titulo: the near template allows it ((?)), the far one
+			// does not ((1)). If it validated with the far one, there would be a cardinality diagnostic.
 			const { diagnostics } = analyze(path.join(nestedWebDir, 'fichero.stxt'), NESTED_DOCUMENT);
 
 			assert.strictEqual(diagnostics.length, 0,
-				`Debería validar contra el nivel más cercano:${describeDiagnostics(diagnostics)}`);
+				`It should validate against the nearest level:${describeDiagnostics(diagnostics)}`);
 		});
 	});
 
-	describe('validación cuando no hay schemas', () => {
+	describe('validation when there are no schemas', () => {
 
-		it('no marca nada en un documento con namespace si no hay ningún schema', async () => {
+		it('flags nothing in a document with a namespace if there is no schema at all', async () => {
 			await register(emptyDir);
 
-			// Sin el filtro habría un SCHEMA_NOT_FOUND por nodo, no uno por documento.
+			// Without the filter there would be one SCHEMA_NOT_FOUND per node, not one per document.
 			const { diagnostics } = analyze(documentPath, DOCUMENT);
 
-			assert.strictEqual(diagnostics.length, 0, `Se esperaba ningún diagnóstico:${describeDiagnostics(diagnostics)}`);
+			assert.strictEqual(diagnostics.length, 0, `No diagnostic was expected:${describeDiagnostics(diagnostics)}`);
 		});
 
-		it('sigue marcando los errores de sintaxis aunque no haya schemas', async () => {
+		it('still flags syntax errors even without schemas', async () => {
 			await register(emptyDir);
 
 			const { diagnostics } = analyze(documentPath, 'Documento (test.arriba):\n\t\t\tTitulo: salto de nivel\n');
 
-			assert.ok(diagnostics.length > 0, 'Un salto de indentación debería seguir siendo un error.');
+			assert.ok(diagnostics.length > 0, 'An indentation jump should still be an error.');
 		});
 
-		it('avisa del namespace desconocido en cuanto hay algún schema cargado', async () => {
+		it('warns about the unknown namespace as soon as some schema is loaded', async () => {
 			await register(projectDir);
 
 			const { diagnostics } = analyze(path.join(subDir, 'otro.stxt'), OTHER_DOCUMENT);
 
 			assert.ok(
 				diagnostics.some(diagnostic => diagnostic.message.includes('SCHEMA_NOT_FOUND')),
-				`Se esperaba un SCHEMA_NOT_FOUND:${describeDiagnostics(diagnostics)}`);
+				`A SCHEMA_NOT_FOUND was expected:${describeDiagnostics(diagnostics)}`);
 		});
 
-		it('no marca nada en un documento que sí valida contra su schema', async () => {
+		it('flags nothing in a document that does validate against its schema', async () => {
 			await register(projectDir);
 
 			const { diagnostics } = analyze(documentPath, DOCUMENT);
 
-			assert.strictEqual(diagnostics.length, 0, `Se esperaba ningún diagnóstico:${describeDiagnostics(diagnostics)}`);
+			assert.strictEqual(diagnostics.length, 0, `No diagnostic was expected:${describeDiagnostics(diagnostics)}`);
 		});
 	});
 });

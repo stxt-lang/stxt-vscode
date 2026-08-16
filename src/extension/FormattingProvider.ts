@@ -24,10 +24,10 @@ export class StxtFormattingProvider implements DocumentFormattingEditProvider {
 }
 
 /**
- * Última línea del documento, sin más contenido que su indentación y perteneciente a
- * un bloque de texto. Es una línea vacía del contenido del bloque, y STXT-SPEC §10.3
- * obliga a preservarla: recortarla la dejaría en «», que al final del fichero es
- * indistinguible del salto de línea final, y el bloque perdería esa línea.
+ * Last line of the document, with no content other than its indentation and belonging
+ * to a text block. It is an empty line of the block content, and STXT-SPEC §10.3
+ * requires preserving it: trimming it would leave "", which at the end of the file is
+ * indistinguishable from the trailing newline, and the block would lose that line.
  */
 function isFinalBlockBlank(line: string, index: number, lineCount: number, analysis: AnalysisResult | undefined): boolean {
     return index === lineCount - 1
@@ -36,7 +36,7 @@ function isFinalBlockBlank(line: string, index: number, lineCount: number, analy
         && (analysis?.textLineByLineNumber.has(index) ?? false);
 }
 
-// Placeholder para que compile:
+// Placeholder so that it compiles:
 function createLine(line: string, node: Node | undefined): string {
     if (!node) {
         return StringUtils.rightTrim(line);
@@ -57,8 +57,8 @@ function createLine(line: string, node: Node | undefined): string {
         const lineKey = line.substring(0, colonIndex);
         const namespaceIndex = lineKey.indexOf("(");
 
-        // Sin valor no se escribe el espacio de después de los dos puntos: los nodos
-        // contenedores acabarían con un espacio suelto al final de la línea.
+        // Without a value the space after the colon is not written: container nodes
+        // would end up with a stray trailing space.
         const value = node.getValue();
         const separator = value.length > 0 ? ": " + value : ":";
 

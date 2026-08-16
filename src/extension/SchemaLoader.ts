@@ -15,15 +15,15 @@ import {
 import { log } from './Log';
 
 /**
- * Resolución de schemas/templates según STXT-DISCOVERY-SPEC (stxt-web,
- * `stxt-discovery-ref.stxt`): la lógica normativa vive en `DiscoveryResolver`
- * (@stxt-lang/core) y aquí quedan solo los dos adaptadores del editor —
- * `vscode.workspace.fs` y el entorno del proceso— más el estado por documento.
+ * Schema/template resolution according to STXT-DISCOVERY-SPEC (stxt-web,
+ * `stxt-discovery-ref.stxt`): the normative logic lives in `DiscoveryResolver`
+ * (@stxt-lang/core) and only the two editor adapters remain here —
+ * `vscode.workspace.fs` and the process environment— plus the per-document state.
  *
- * La cadena de cada documento (todos los `.stxt/` ascendentes, nivel de usuario,
- * nivel de sistema, o `STXT_PATH`) se resuelve por su directorio y se cachea por
- * directorio; los niveles cargados se comparten entre documentos a través del
- * caché del propio resolver, que es la optimización que la spec permite.
+ * The chain of each document (every ancestor `.stxt/`, user level, system level,
+ * or `STXT_PATH`) is resolved by its directory and cached per directory; the loaded
+ * levels are shared between documents through the resolver's own cache, which is
+ * the optimization the spec allows.
  */
 
 const STXT_DIR = '.stxt';
@@ -35,30 +35,30 @@ const SCHEMA_DIR_GLOB = '**/*.stxt';
 // **********
 
 /**
- * Adaptador de `DiscoveryFileSystem` sobre `vscode.workspace.fs`.
+ * `DiscoveryFileSystem` adapter over `vscode.workspace.fs`.
  *
- * Las rutas que ve el resolver son `Uri.toString()`; el adaptador recuerda el `Uri`
- * de cada ruta que produce, así no tiene que reconstruirlo con `Uri.parse` y funciona
- * con cualquier esquema (file, remoto, virtual). El `Uri.parse` de `uriOf()` es solo
- * para las rutas que no ha producido él, que vienen de un entorno inyectado.
+ * The paths the resolver sees are `Uri.toString()`; the adapter remembers the `Uri`
+ * of every path it produces, so it never has to rebuild it with `Uri.parse` and it
+ * works with any URI scheme (file, remote, virtual). The `Uri.parse` in `uriOf()` is
+ * only for paths it did not produce itself, which come from an injected environment.
  */
 class VscodeDiscoveryFileSystem implements DiscoveryFileSystem {
     private readonly uris = new Map<string, vscode.Uri>();
 
-    /** Registra un Uri y devuelve la ruta (su forma textual) que verá el resolver. */
+    /** Registers a Uri and returns the path (its textual form) the resolver will see. */
     track(uri: vscode.Uri): string {
         const key = uri.toString();
         this.uris.set(key, uri);
         return key;
     }
 
-    /** El Uri de una ruta producida por este adaptador (o, si viene de fuera, de su texto). */
+    /** The Uri of a path produced by this adapter (or, if it comes from outside, parsed from its text). */
     uriOf(pathKey: string): vscode.Uri {
         let uri = this.uris.get(pathKey);
 
         if (!uri) {
-            // Las rutas nacen de track/join/parentOf, pero un entorno inyectado (tests,
-            // configuración) puede aportar las suyas: se recuperan de su forma textual.
+            // Paths are born in track/join/parentOf, but an injected environment (tests,
+            // configuration) may contribute its own: those are recovered from their text.
             uri = vscode.Uri.parse(pathKey);
             this.uris.set(pathKey, uri);
         }
@@ -71,7 +71,7 @@ class VscodeDiscoveryFileSystem implements DiscoveryFileSystem {
             await vscode.workspace.fs.readDirectory(this.uriOf(pathKey));
             return true;
         } catch {
-            // Lo normal es que el directorio no exista: no es un error.
+            // The usual case is that the directory does not exist: not an error.
             return false;
         }
     }
@@ -96,7 +96,7 @@ class VscodeDiscoveryFileSystem implements DiscoveryFileSystem {
         const parent = vscode.Uri.joinPath(this.uriOf(pathKey), '..');
         const parentKey = parent.toString();
 
-        // La raíz del sistema de ficheros es su propio padre.
+        // The file system root is its own parent.
         if (parentKey === pathKey) {
             return null;
         }
@@ -110,10 +110,10 @@ class VscodeDiscoveryFileSystem implements DiscoveryFileSystem {
 }
 
 /**
- * Adaptador de `DiscoveryEnvironment` sobre el entorno del proceso: `STXT_PATH`,
- * `$HOME/.stxt` y `/etc/stxt` (`%USERPROFILE%\.stxt` y `%ProgramData%\stxt` en
- * Windows). En un workspace remoto el extension host corre en la máquina remota,
- * así que estos valores son los correctos también ahí.
+ * `DiscoveryEnvironment` adapter over the process environment: `STXT_PATH`,
+ * `$HOME/.stxt` and `/etc/stxt` (`%USERPROFILE%\.stxt` and `%ProgramData%\stxt` on
+ * Windows). In a remote workspace the extension host runs on the remote machine,
+ * so these values are the right ones there too.
  */
 class VscodeDiscoveryEnvironment implements DiscoveryEnvironment {
     constructor(private readonly fileSystem: VscodeDiscoveryFileSystem) {}
@@ -146,31 +146,31 @@ class VscodeDiscoveryEnvironment implements DiscoveryEnvironment {
 }
 
 // **********
-// ESTADO
+// STATE
 // **********
 
 let fileSystem = new VscodeDiscoveryFileSystem();
 let resolver: DiscoveryResolver | undefined;
 
-/** Resultados de resolución por directorio de partida (el del documento o carpeta del workspace). */
+/** Resolution results by starting directory (the document's, or a workspace folder). */
 const RESULTS = new Map<string, DiscoveryResult>();
 
-/** Directorios de resolución (niveles) ya descubiertos, para watchers y para detectar novedades. */
+/** Resolution directories (levels) already discovered, for watchers and to detect new ones. */
 const KNOWN_LEVEL_DIRS = new Set<string>();
 
-/** Directorios que ya tienen watcher propio, para no duplicarlos. */
+/** Directories that already have their own watcher, so they are not duplicated. */
 const WATCHED_DIRS = new Set<string>();
 
-/** Sirve los meta-schemas de `@stxt.schema`/`@stxt.template` cuando aún no hay ningún resultado. */
+/** Serves the `@stxt.schema`/`@stxt.template` meta-schemas while there is no result yet. */
 const META_FALLBACK = new UnifiedSchemaProvider();
 
 let extensionContext: vscode.ExtensionContext | undefined;
-let notifySchemasChanged: () => void | Promise<void> = () => { /* aún no registrado */ };
+let notifySchemasChanged: () => void | Promise<void> = () => { /* not registered yet */ };
 
 /**
- * `SchemaProvider` de cara al validador. Con un Uri de documento resuelve contra la
- * cadena de ese documento (STXT-DISCOVERY-SPEC sección 7); sin él, contra la unión
- * de todo lo resuelto, que es el comportamiento de los consumidores sin documento.
+ * The `SchemaProvider` the validator sees. With a document Uri it resolves against
+ * that document's chain (STXT-DISCOVERY-SPEC section 7); without one, against the
+ * union of everything resolved, which is the behaviour for consumers without a document.
  */
 export class SchemaLoaderExtension implements SchemaProvider {
     constructor(private readonly documentUri?: vscode.Uri) {}
@@ -184,14 +184,14 @@ export class SchemaLoaderExtension implements SchemaProvider {
     }
 }
 
-/** El resultado de resolución que corresponde a un documento, si su directorio ya se resolvió. */
+/** The resolution result that corresponds to a document, if its directory was already resolved. */
 function resultForDocument(documentUri: vscode.Uri): DiscoveryResult | undefined {
     return RESULTS.get(vscode.Uri.joinPath(documentUri, '..').toString());
 }
 
 /**
- * Resuelve un namespace contra la cadena del documento; si el directorio del documento
- * aún no está resuelto, cae a la unión global.
+ * Resolves a namespace against the document's chain; if the document's directory is
+ * not resolved yet, falls back to the global union.
  */
 export function getSchemaForDocument(documentUri: vscode.Uri, namespace: string): Schema | null | undefined {
     const result = resultForDocument(documentUri);
@@ -207,13 +207,13 @@ export function getSchemaForDocument(documentUri: vscode.Uri, namespace: string)
     return getSchema(namespace);
 }
 
-/** Los schemas activos para un documento; si su directorio no está resuelto, la unión global. */
+/** The active schemas for a document; if its directory is not resolved, the global union. */
 export function getSchemasForDocument(documentUri: vscode.Uri): ReadonlyArray<Schema> {
     const result = resultForDocument(documentUri);
     return result ? result.getAllSchemas() : getSchemas();
 }
 
-/** Resuelve un namespace contra la unión de todos los resultados (primero que lo tenga). */
+/** Resolves a namespace against the union of all results (first one that has it wins). */
 export function getSchema(namespace: string): Schema | undefined | null {
     for (const result of RESULTS.values()) {
         const schema = result.getSchema(namespace);
@@ -223,11 +223,11 @@ export function getSchema(namespace: string): Schema | undefined | null {
         }
     }
 
-    // Sin resultados también hay que servir los meta-schemas de los namespaces reservados.
+    // Even without results, the meta-schemas of the reserved namespaces must be served.
     return META_FALLBACK.getSchema(namespace);
 }
 
-/** Todos los schemas activos conocidos, uno por namespace (gana el primer resultado que lo defina). */
+/** Every known active schema, one per namespace (the first result that defines it wins). */
 export function getSchemas(): ReadonlyArray<Schema> {
     const seen = new Set<string>();
     const result: Schema[] = [];
@@ -258,21 +258,21 @@ export async function registerSchemaLoader(
     extensionContext = context;
     notifySchemasChanged = onSchemasChanged;
 
-    // Registrar es empezar de cero: en el editor solo pasa una vez, al activar.
-    // El parámetro `environment` existe para los tests, que inyectan un entorno aislado
-    // (sin STXT_PATH ni niveles de usuario/sistema reales).
+    // Registering means starting from scratch: in the editor it happens once, on activation.
+    // The `environment` parameter exists for the tests, which inject an isolated environment
+    // (no STXT_PATH and no real user/system levels).
     fileSystem = new VscodeDiscoveryFileSystem();
     resolver = new DiscoveryResolver(fileSystem, environment ?? new VscodeDiscoveryEnvironment(fileSystem));
     RESULTS.clear();
     KNOWN_LEVEL_DIRS.clear();
     WATCHED_DIRS.clear();
 
-    // Watcher de cualquier fichero .stxt dentro de un directorio .stxt del workspace
+    // Watcher for any .stxt file inside a .stxt directory of the workspace
     watchPattern(STXT_FILES_GLOB);
 
-    // Puntos de partida iniciales: las carpetas del workspace y los documentos ya abiertos.
+    // Initial starting points: the workspace folders and the documents already open.
     for (const folder of vscode.workspace.workspaceFolders ?? []) {
-        log.trace(`Carpeta del workspace: ${folder.uri.toString()}`);
+        log.trace(`Workspace folder: ${folder.uri.toString()}`);
         await resolveLocation(folder.uri);
     }
 
@@ -290,13 +290,13 @@ export async function registerSchemaLoader(
 }
 
 /**
- * Resuelve la cadena de un documento antes de analizarlo.
+ * Resolves a document's chain before analyzing it.
  *
- * Es lo que salva el caso habitual de abrir un `.stxt` suelto, o una subcarpeta de un
- * proyecto, cuando el `.stxt/` está por encima de la raíz del workspace: sin esto no se
- * cargaría ningún schema.
+ * This is what rescues the common case of opening a loose `.stxt`, or a subfolder of a
+ * project, when the `.stxt/` sits above the workspace root: without it no schema would
+ * be loaded.
  *
- * @param document documento que se acaba de abrir.
+ * @param document the document that has just been opened.
  */
 export async function ensureSchemasForDocument(document: vscode.TextDocument): Promise<void> {
     if (await resolveLocationForDocument(document)) {
@@ -305,11 +305,11 @@ export async function ensureSchemasForDocument(document: vscode.TextDocument): P
     }
 }
 
-// El directorio del documento es el punto de partida de su cadena de resolución.
+// The document's directory is the starting point of its resolution chain.
 async function resolveLocationForDocument(document: vscode.TextDocument): Promise<boolean> {
     if (document.languageId !== 'stxt' || document.isUntitled) {
-        // Un documento sin ubicación no tiene nivel de proyecto (STXT-DISCOVERY-SPEC 4.1);
-        // sus niveles de usuario/sistema ya los cubre la carga inicial.
+        // A document without a location has no project level (STXT-DISCOVERY-SPEC 4.1);
+        // its user/system levels are already covered by the initial load.
         return false;
     }
 
@@ -317,11 +317,11 @@ async function resolveLocationForDocument(document: vscode.TextDocument): Promis
 }
 
 /**
- * Resuelve la cadena de un directorio y guarda el resultado. Vigila los directorios de
- * resolución que no conocía.
+ * Resolves a directory's chain and stores the result. Watches the resolution
+ * directories it did not know about.
  *
- * @param dirUri directorio de partida (el del documento, o una carpeta del workspace).
- * @returns true si ha descubierto algún directorio de resolución nuevo.
+ * @param dirUri the starting directory (the document's, or a workspace folder).
+ * @returns true if any new resolution directory was discovered.
  */
 async function resolveLocation(dirUri: vscode.Uri): Promise<boolean> {
     if (!resolver) {
@@ -344,8 +344,8 @@ async function resolveLocation(dirUri: vscode.Uri): Promise<boolean> {
     }
 
     if (discovered) {
-        // Los errores de resolución (STXT-DISCOVERY-SPEC sección 8) se reportan al log,
-        // una vez por descubrimiento para no repetirlos en cada resolve.
+        // Resolution errors (STXT-DISCOVERY-SPEC section 8) are reported to the log,
+        // once per discovery so they are not repeated on every resolve.
         for (const error of result.getErrors()) {
             log.error(`[${error.code}] ${error.message}`);
         }
@@ -354,7 +354,7 @@ async function resolveLocation(dirUri: vscode.Uri): Promise<boolean> {
     return discovered;
 }
 
-// Un cambio en disco invalida los niveles cargados: se re-resuelve todo lo conocido.
+// A change on disk invalidates the loaded levels: everything known is re-resolved.
 async function reloadAllSchemaData(reason: string): Promise<void> {
     if (!resolver) {
         return;
@@ -387,7 +387,7 @@ async function reloadAllSchemaData(reason: string): Promise<void> {
 // WATCHERS
 // *********
 
-// Un directorio de resolución fuera del workspace no lo cubre el watcher global, así que lleva el suyo.
+// A resolution directory outside the workspace is not covered by the global watcher, so it gets its own.
 function watchSchemaDir(levelDirKey: string): void {
     if (!WATCHED_DIRS.has(levelDirKey)) {
         WATCHED_DIRS.add(levelDirKey);

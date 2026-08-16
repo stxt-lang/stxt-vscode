@@ -2,8 +2,8 @@ import type { Position as VsPosition, TextDocument } from 'vscode';
 import { Position, Uri } from './vscode';
 
 /**
- * `TextDocument` de mentira, con lo poco que consultan los providers: el texto,
- * las líneas y el URI que hace de clave en el caché de `AnalysisDoc`.
+ * Fake `TextDocument`, with the little the providers consult: the text, the lines
+ * and the URI that acts as the key in the `AnalysisDoc` cache.
  */
 
 export interface TestTextLine {
@@ -33,15 +33,15 @@ export class TestDocument {
 	}
 
 	/**
-	 * Como el `lineAt` real: **lanza** si la línea se sale del documento. Se imita a
-	 * propósito, porque una excepción aquí es un fallo de verdad de la extensión.
+	 * Like the real `lineAt`: it **throws** if the line is outside the document. Mimicked
+	 * on purpose, because an exception here is a genuine failure of the extension.
 	 */
 	lineAt(lineOrPosition: number | Position): TestTextLine {
 		const lineNumber = typeof lineOrPosition === 'number' ? lineOrPosition : lineOrPosition.line;
 		const text = this.lines[lineNumber];
 
 		if (text === undefined) {
-			throw new RangeError(`Illegal value for line: ${lineNumber} (el documento tiene ${this.lines.length} líneas)`);
+			throw new RangeError(`Illegal value for line: ${lineNumber} (the document has ${this.lines.length} lines)`);
 		}
 
 		const firstNonWhitespace = text.search(/\S/);
@@ -56,20 +56,20 @@ export class TestDocument {
 }
 
 /**
- * Puente hacia el tipo real. El `TestDocument` solo implementa la parte del API que
- * consumen los providers, así que el cast se concentra aquí en vez de repetirse en
- * cada test.
+ * Bridge to the real type. `TestDocument` only implements the part of the API the
+ * providers consume, so the cast is concentrated here instead of being repeated in
+ * every test.
  */
 export function asTextDocument(document: TestDocument): TextDocument {
 	return document as unknown as TextDocument;
 }
 
-/** Posición para pasarle a los providers, que esperan la clase real del editor. */
+/** A position to hand to the providers, which expect the real editor class. */
 export function asPosition(line: number, character: number): VsPosition {
 	return new Position(line, character) as unknown as VsPosition;
 }
 
-/** Forma mínima de una edición: sirve tanto para el `TextEdit` real como para el stub. */
+/** Minimal shape of an edit: works for both the real `TextEdit` and the stub. */
 export interface LineEdit {
 	readonly range: {
 		readonly start: { readonly line: number; readonly character: number };
@@ -79,14 +79,14 @@ export interface LineEdit {
 }
 
 /**
- * Aplica las ediciones del formateador sobre el texto original.
+ * Applies the formatter's edits to the original text.
  *
- * `FormattingProvider` solo emite reemplazos de una línea completa, así que se afirma
- * esa forma en vez de implementar un aplicador genérico de rangos.
+ * `FormattingProvider` only emits whole-line replacements, so that shape is asserted
+ * instead of implementing a generic range applier.
  *
- * @param text texto original.
- * @param edits ediciones devueltas por el provider.
- * @returns el texto ya formateado.
+ * @param text the original text.
+ * @param edits the edits returned by the provider.
+ * @returns the formatted text.
  */
 export function applyEdits(text: string, edits: readonly LineEdit[]): string {
 	const lines = text.split(/\r?\n/);
@@ -95,7 +95,7 @@ export function applyEdits(text: string, edits: readonly LineEdit[]): string {
 		const { start, end } = edit.range;
 
 		if (start.line !== end.line) {
-			throw new Error(`Se esperaba una edición de una sola línea, y va de la ${start.line} a la ${end.line}.`);
+			throw new Error(`A single-line edit was expected, but it spans lines ${start.line} to ${end.line}.`);
 		}
 
 		const line = lines[start.line];

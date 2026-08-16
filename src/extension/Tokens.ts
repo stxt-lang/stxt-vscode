@@ -8,13 +8,13 @@ const STXT_TOKEN_TYPES = [
 	'string'
 ] as const;
 
-// Tipo literal derivado automáticamente del array
+// Literal type derived automatically from the array
 export type StxtTokenType = typeof STXT_TOKEN_TYPES[number];
 
-// Legend derivado del mismo sitio
+// Legend derived from the same place
 export const tokenLegend = new SemanticTokensLegend([...STXT_TOKEN_TYPES]);
 
-// Mapping type -> index derivado del mismo sitio
+// Mapping type -> index derived from the same place
 export const tokenTypeIndex: Record<StxtTokenType, number> =
 	Object.fromEntries(STXT_TOKEN_TYPES.map((t, i) => [t, i])) as Record<StxtTokenType, number>;
 

@@ -11,7 +11,7 @@ export class StxtHoverProvider implements HoverProvider {
 			return;
 		}
 
-		// Verificar si es un comentario
+		// Check whether it is a comment
 		if (analysis.commentLines.has(position.line)) {
 			const markdown = new MarkdownString();
 			const commentText = document.lineAt(position.line).text;
@@ -23,7 +23,7 @@ export class StxtHoverProvider implements HoverProvider {
 
 		const node = analysis.nodeByLine.get(position.line);
 		
-		// Verificar si es una línea de texto dentro de un nodo TEXT BLOCK
+		// Check whether it is a text line inside a TEXT BLOCK node
 		if (!node) {
 			/*
 			const parentNode = analysis.textLineByLineNumber.get(position.line);
@@ -52,17 +52,17 @@ export class StxtHoverProvider implements HoverProvider {
 		}
 
 		if (node.getNamespace()) {
-			// La cadena de resolución es por documento (STXT-DISCOVERY-SPEC sección 7).
+			// The resolution chain is per document (STXT-DISCOVERY-SPEC section 7).
 			const schema = getSchemaForDocument(document.uri, node.getNamespace());
 			if (schema) {
 				const nodeDef = schema.getNodeDefinition(node.getName());
 				if (nodeDef) {
-					// Mostrar el tipo
+					// Show the type
 					const type = nodeDef.getType();
 					markdown.appendMarkdown(`\n---\n`);
 					markdown.appendMarkdown(`### 📋 Schema\n- **Type**: \`${type}\`\n`);
 
-					// Si es ENUM, mostrar los valores permitidos
+					// If it is an ENUM, show the allowed values
 					if (type === 'ENUM') {
 						const values = nodeDef.getValues();
 						if (values.size > 0) {
@@ -71,7 +71,7 @@ export class StxtHoverProvider implements HoverProvider {
 						}
 					}
 
-					// Mostrar la descripción si existe
+					// Show the description if there is one
 					const description = nodeDef.getDescription();
 					if (description) {
 						markdown.appendMarkdown(`\n---\n`);
@@ -89,12 +89,12 @@ export class StxtHoverProvider implements HoverProvider {
 			markdown.appendCodeblock(text, 'stxt');
 		}
 
-		markdown.isTrusted = false; // por seguridad, no permitir links/HTML
+		markdown.isTrusted = false; // for safety, allow no links/HTML
 		return new Hover(markdown);
 	}
 }
 
-// Escape mínimo para evitar que backticks rompan el markdown inline
+// Minimal escaping so backticks do not break the inline markdown
 function escapeMd(s: string): string {
 	if (s === "") {
 		return "<EMPTY>";

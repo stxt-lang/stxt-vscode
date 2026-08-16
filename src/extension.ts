@@ -21,12 +21,12 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.workspace.onDidOpenTextDocument(async doc => {
 			if (doc.languageId === 'stxt') {
 				log.trace(`onDidOpenTextDocument: ${doc.uri.toString()}`);
-				// Analizar primero, sin esperar a nada: VS Code pide los tokens nada más
-				// abrir y los providers leen del caché.
+				// Analyze first, without waiting for anything: VS Code asks for the tokens
+				// as soon as the document opens, and the providers read from the cache.
 				analysisDoc(doc, diagnosticCollection);
-				// El documento puede estar fuera del workspace, o en una subcarpeta del
-				// proyecto: sus schemas pueden estar por encima y no haberse cargado aún.
-				// Si encuentra alguno nuevo, vuelve a analizarlo todo por su cuenta.
+				// The document may live outside the workspace, or in a subfolder of the
+				// project: its schemas may sit above and not be loaded yet. If it finds any
+				// new one, it re-analyzes everything on its own.
 				await ensureSchemasForDocument(doc);
 			}
 		}),
@@ -45,9 +45,9 @@ export async function activate(context: vscode.ExtensionContext) {
 		})
 	);
 
-	// Los documentos ya abiertos al activar no disparan onDidOpenTextDocument: se analizan
-	// aquí, antes de registrar los providers, para que el primero que pregunte ya tenga
-	// tokens que devolver.
+	// Documents already open at activation do not fire onDidOpenTextDocument: they are
+	// analyzed here, before the providers are registered, so that the first one asked
+	// already has tokens to return.
 	analysisAllDocs();
 
 	context.subscriptions.push(
@@ -67,7 +67,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.languages.registerCompletionItemProvider(
 			'stxt',
 			new StxtCompletionProvider(),
-			'@' // carácter que dispara sugerencias
+			'@' // trigger character for suggestions
 		));
 
 	context.subscriptions.push(
