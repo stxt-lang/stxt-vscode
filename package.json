@@ -2,7 +2,7 @@
   "name": "stxt",
   "displayName": "STXT - Semantic Text",
   "description": "Language support for STXT (Semantic Text): highlighting, validation against schemas and templates, completion, hover and formatting.",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "publisher": "stxt-lang",
   "repository": {
     "type": "git",

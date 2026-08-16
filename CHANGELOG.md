@@ -4,7 +4,9 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [0.7.1]
+
+Editor-only release; the language, the diagnostics and `@stxt-lang/core` `^0.7.0` are unchanged.
 
 - **Go to definition** (F12 / Ctrl+click) on a node: opens the schema or template that defines
   its namespace, on the `Node: Name` line of a schema or on the node's own line inside the
