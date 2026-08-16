@@ -1,12 +1,12 @@
-import { Node, StringUtils, Schema, NodeDefinition, ChildDefinition } from '@stxt-lang/core';
+import { InlineNode, Node, StringUtils, Schema, NodeDefinition, ChildDefinition } from '@stxt-lang/core';
 import { getSchemas, SchemaLoaderExtension } from './SchemaLoader';
 import { CompletionItem, CompletionItemKind } from 'vscode';
 import { log } from './Log';
 
 let schemaLoader: SchemaLoaderExtension = new SchemaLoaderExtension();
 
-export function findSuggestionsByParent(parent: Node, prefix: string): CompletionItem[] {
-    log.trace(`Buscando schema para ${parent.getQualifiedName()}.`);
+export function findSuggestionsByParent(parent: InlineNode, prefix: string): CompletionItem[] {
+    log.trace(`Looking up the schema for ${parent.getQualifiedName()}.`);
     let schema = schemaLoader.getSchema(parent.getNamespace());
 
     if (!schema) {
@@ -60,11 +60,11 @@ export function findRootLevelSuggestions(prefix: string): CompletionItem[] {
 
     for (const schema of getSchemas()) {
         for (const nodeDef of getRootNodeDefinitions(schema)) {
-            if (normalizedPrefix.length > 0 && !nodeDef.getNormalizedName().startsWith(normalizedPrefix)) {
+            if (normalizedPrefix.length > 0 && !nodeDef.getCanonicalName().startsWith(normalizedPrefix)) {
                 continue;
             }
 
-            const key = `${schema.getNamespace()}:${nodeDef.getNormalizedName()}`;
+            const key = `${schema.getNamespace()}:${nodeDef.getCanonicalName()}`;
             if (seen.has(key)) {
                 continue;
             }
@@ -83,14 +83,14 @@ function getRootNodeDefinitions(schema: Schema): NodeDefinition[] {
     for (const nodeDef of schema.getNodes().values()) {
         for (const childDef of nodeDef.getChildren().values()) {
             if (childDef.getNamespace() === schema.getNamespace()) {
-                referencedLocalChildren.add(childDef.getNormalizedName());
+                referencedLocalChildren.add(childDef.getCanonicalName());
             }
         }
     }
 
     const roots: NodeDefinition[] = [];
     for (const nodeDef of schema.getNodes().values()) {
-        if (!referencedLocalChildren.has(nodeDef.getNormalizedName())) {
+        if (!referencedLocalChildren.has(nodeDef.getCanonicalName())) {
             roots.push(nodeDef);
         }
     }
@@ -149,7 +149,7 @@ function isBlockText(childDef: ChildDefinition): boolean {
 }
 
 export function findEnumValues(node: Node, prefix: string): CompletionItem[] {
-    log.trace(`Buscando valores ENUM del nodo ${node.getQualifiedName()}.`);
+    log.trace(`Looking up the ENUM values of ${node.getQualifiedName()}.`);
 
 
     const schema = schemaLoader.getSchema(node.getNamespace());

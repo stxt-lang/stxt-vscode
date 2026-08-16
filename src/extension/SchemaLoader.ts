@@ -283,9 +283,9 @@ export async function registerSchemaLoader(
     await notifySchemasChanged();
 
     if (getSchemas().length === 0) {
-        log.info(`Sin schemas cargados: la cadena de resolución no aporta ninguna definición. Los documentos no se validan.`);
+        log.info(`No schemas loaded: the resolution chain provides no definition. Documents are not validated.`);
     } else {
-        log.info(`Carga inicial: ${getSchemas().length} schemas, ${KNOWN_LEVEL_DIRS.size} directorios de resolución.`);
+        log.info(`Initial load: ${getSchemas().length} schemas, ${KNOWN_LEVEL_DIRS.size} resolution directories.`);
     }
 }
 
@@ -300,7 +300,7 @@ export async function registerSchemaLoader(
  */
 export async function ensureSchemasForDocument(document: vscode.TextDocument): Promise<void> {
     if (await resolveLocationForDocument(document)) {
-        log.info(`Directorios de resolución nuevos por ${document.uri.toString()}: revalidando.`);
+        log.info(`New resolution directories for ${document.uri.toString()}: revalidating.`);
         await notifySchemasChanged();
     }
 }
@@ -338,7 +338,7 @@ async function resolveLocation(dirUri: vscode.Uri): Promise<boolean> {
         if (!KNOWN_LEVEL_DIRS.has(levelDir)) {
             KNOWN_LEVEL_DIRS.add(levelDir);
             watchSchemaDir(levelDir);
-            log.info(`Directorio de resolución encontrado: ${levelDir}`);
+            log.info(`Resolution directory found: ${levelDir}`);
             discovered = true;
         }
     }
@@ -361,7 +361,7 @@ async function reloadAllSchemaData(reason: string): Promise<void> {
     }
 
     try {
-        log.info(`Recargando schemas (${reason})...`);
+        log.info(`Reloading schemas (${reason})...`);
         resolver.clearCache();
 
         for (const key of RESULTS.keys()) {
@@ -377,9 +377,9 @@ async function reloadAllSchemaData(reason: string): Promise<void> {
         }
 
         await notifySchemasChanged();
-        log.info(`Schemas recargados (${reason}): ${getSchemas().length}.`);
+        log.info(`Schemas reloaded (${reason}): ${getSchemas().length}.`);
     } catch (e) {
-        log.error(`Error recargando schemas (${reason}): ${String(e)}`);
+        log.error(`Error reloading schemas (${reason}): ${String(e)}`);
     }
 }
 

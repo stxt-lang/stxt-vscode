@@ -4,25 +4,27 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [0.7.0]
 
-- `@stxt-lang/core` **0.7.0 — breaking: a new node model**, mirroring `stxt-core` 0.7.0 (Java).
-  `Node` is now abstract with two forms, `InlineNode` (`Name: value`) and `TextNode` (`Name >>`),
-  each owning only what is its own: `InlineNode` has `getValue()`/`setValue()`, the children, the
-  lookups (`getChildren()`, `getChild()`, `getChildrenByName()`) and the factories
-  (`addInlineNode`, `addTextNode`); `TextNode` has `getTextLines()`, `setText()`,
-  `setTextLines()`, `addTextLine()`, `clearText()`. `Node` keeps name, canonical name
-  (`getCanonicalName()`; `getNormalizedName()` is deprecated), declared vs effective namespace
-  (`getDeclaredNamespace()`/`setNamespace()`/`getNamespace()`, resolved through the parent chain),
-  optional mutable line (`Node.NO_LINE`), derived `getLevel()`, `getParent()`, `detach()`,
-  `isTextNode()` and `getText()`. Parent links keep the tree's integrity (`addChild(node, index?)`,
-  `removeChild`, `NODE_ALREADY_ATTACHED`, `NODE_CYCLE`); the parser attaches each node when it
-  opens it, so `Observer.onCreate` already sees parent, namespace and level, and `onTextLine`
-  receives a `TextNode`. `NodeWriter` writes the namespace where declared. Removed: the `Node`
-  constructor (use `InlineNode`/`TextNode`), the `level` argument, and
-  `getValue()`/`getTextLines()`/`addTextLine()`/`getChildren()`/`getChild()`/`getChildrenByName()`
-  on the base class. Only the in-memory model changes: the language, STXT-TREE-SPEC and every
-  error code are the same. New `node.test.ts` (19 cases).
+Release aligned with `@stxt-lang/core` **0.7.0**, whose version this extension now follows. Nothing
+changes in the language, in the diagnostics or in the error codes; the update is the parser's
+in-memory model and a round of housekeeping before publishing.
+
+- `@stxt-lang/core` `^0.7.0` (was `^0.6.2`), which brings the **new node model** of `stxt-core`
+  0.7.0 (Java): `Node` is abstract with two forms, `InlineNode` (`Name: value`) and `TextNode`
+  (`Name >>`), parent links, declared vs effective namespace and a derived level. The extension's
+  formatting, hover, completion and token observer ask for the node's form with
+  `instanceof InlineNode` / `TextNode`; `findSuggestionsByParent()` takes an `InlineNode` (a text
+  block cannot have children, so nothing is suggested under one); `AnalysisResult.
+  textLineByLineNumber` maps to `TextNode`; `getNormalizedName()` (deprecated in the core) replaced
+  by `getCanonicalName()`, and the hover now labels it *Canonical name*. The full description of
+  the model is in the changelog of `@stxt-lang/core`.
+
+- The messages of the **STXT** output channel are now in English (they were in Spanish).
+
+- Packaging: the Eclipse project files (`.project`, `.settings/`) no longer ship in the `.vsix`;
+  `package.json` gains `homepage`, `bugs` and a fuller description; README documents completion,
+  the output channel and the shared parser.
 
 - `@stxt-lang/core`: `SchemaProvider` contract — providers never throw "not found".
   `SchemaProviderMeta` and `MetaTemplateSchemaProvider` return `null` for any namespace but their

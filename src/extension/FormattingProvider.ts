@@ -1,6 +1,6 @@
 import { getAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
-import { StringUtils, type Node } from '@stxt-lang/core';
+import { InlineNode, StringUtils, type Node } from '@stxt-lang/core';
 import { DocumentFormattingEditProvider, Range, TextDocument, TextEdit } from 'vscode';
 
 export class StxtFormattingProvider implements DocumentFormattingEditProvider {
@@ -44,7 +44,7 @@ function createLine(line: string, node: Node | undefined): string {
 
     let result = "\t".repeat(node.getLevel());
 
-    if (node.isTextNode()) {
+    if (!(node instanceof InlineNode)) {
         const namespaceIndex = line.indexOf("(");
         if (namespaceIndex !== -1) {
             result += node.getName() + " (" + node.getNamespace() + ") >>";

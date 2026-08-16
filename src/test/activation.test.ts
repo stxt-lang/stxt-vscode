@@ -48,7 +48,7 @@ function tokenCount(document: TestDocument): number {
  * red de seguridad», porque por fuera las dos devuelven los mismos tokens.
  */
 function analyzedOnTheSpot(document: TestDocument, from: number): boolean {
-	return logMessages.slice(from).some(message => message.includes('en frío') && message.includes(document.uri.toString()));
+	return logMessages.slice(from).some(message => message.includes('Cold analysis') && message.includes(document.uri.toString()));
 }
 
 describe('activate: el documento tiene color desde el primer momento', () => {

@@ -1,4 +1,5 @@
 import { Hover, HoverProvider, MarkdownString, Position, ProviderResult, TextDocument } from 'vscode';
+import { InlineNode } from '@stxt-lang/core';
 import { getAnalysis } from './AnalysisDoc';
 import { getSchemaForDocument } from './SchemaLoader';
 
@@ -43,10 +44,10 @@ export class StxtHoverProvider implements HoverProvider {
 		markdown.appendMarkdown(node.isTextNode() ? "### 📄 TEXT BLOCK " : "### 📌 INLINE");
 		markdown.appendMarkdown(` (Level ${node.getLevel()})\n`);
 		markdown.appendMarkdown(`- **🏷️ Name:** \`${escapeMd(node.getName())}\`\n`);
-		markdown.appendMarkdown(`- **🔤 Normalized name:** \`${escapeMd(node.getNormalizedName())}\`\n`);
+		markdown.appendMarkdown(`- **🔤 Canonical name:** \`${escapeMd(node.getCanonicalName())}\`\n`);
 		markdown.appendMarkdown(`- **🎯 Qualified name:** \`${escapeMd(node.getQualifiedName())}\`\n`);
 
-		if (!node.isTextNode()) {
+		if (node instanceof InlineNode) {
 			markdown.appendMarkdown(`- **💎 Value:** \`${escapeMd(node.getValue())}\`\n`);
 		}
 

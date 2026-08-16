@@ -16,3 +16,6 @@ help.txt
 demo.stxt
 TODO.md
 CLAUDE.md
+.project
+.settings/**
+*.vsix

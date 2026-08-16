@@ -1,14 +1,18 @@
 {
   "name": "stxt",
   "displayName": "STXT - Semantic Text",
-  "description": "Semantic Text syntax (.stxt)",
-  "version": "0.6.1",
+  "description": "Language support for STXT (Semantic Text): highlighting, validation against schemas and templates, completion, hover and formatting.",
+  "version": "0.7.0",
   "publisher": "stxt-lang",
   "repository": {
     "type": "git",
     "url": "https://github.com/stxt-lang/stxt-vscode"
   },
   "license": "MIT",
+  "homepage": "https://stxt.dev",
+  "bugs": {
+    "url": "https://github.com/stxt-lang/stxt-vscode/issues"
+  },
   "engines": {
     "vscode": "^1.109.0"
   },
@@ -19,7 +23,10 @@
     "stxt",
     "semantic text",
     "language",
-    "syntax"
+    "syntax",
+    "schema",
+    "validation",
+    "structured text"
   ],
   "icon": "images/icon.png",
   "main": "./out/extension.js",
@@ -61,7 +68,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "@stxt-lang/core": "^0.6.2"
+    "@stxt-lang/core": "^0.7.0"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

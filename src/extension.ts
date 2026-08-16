@@ -12,7 +12,7 @@ export let diagnosticCollection: vscode.DiagnosticCollection;
 
 export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(getLogChannel());
-	log.info('Extensión STXT activada.');
+	log.info('STXT extension activated.');
 
 	diagnosticCollection = vscode.languages.createDiagnosticCollection('stxt');
 

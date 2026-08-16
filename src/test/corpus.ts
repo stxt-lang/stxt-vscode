@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { ExtensionContext } from 'vscode';
-import { Node, Parser, ParseException } from '@stxt-lang/core';
+import { InlineNode, Node, Parser, ParseException } from '@stxt-lang/core';
 import { languages, setWorkspaceFolder, Diagnostic, DiagnosticSeverity } from './stub/vscode';
 import { TestDocument, asTextDocument } from './stub/TestDocument';
 import { analysisDoc } from '../extension/AnalysisDoc';
@@ -178,9 +178,11 @@ export function treeSignature(nodes: readonly Node[]): string {
 	const lines: string[] = [];
 
 	const walk = (node: Node): void => {
-		const content = node.isTextNode() ? `>>${node.getText()}` : `:${node.getValue()}`;
+		const content = node instanceof InlineNode ? `:${node.getValue()}` : `>>${node.getText()}`;
 		lines.push(`${'\t'.repeat(node.getLevel())}${node.getQualifiedName()}${content}`);
-		node.getChildren().forEach(walk);
+		if (node instanceof InlineNode) {
+			node.getChildren().forEach(walk);
+		}
 	};
 
 	nodes.forEach(walk);

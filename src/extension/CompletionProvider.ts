@@ -1,6 +1,6 @@
 import { getAnalysis } from './AnalysisDoc';
 import { AnalysisResult } from './AnalysisResult';
-import { Constants, parseLine } from '@stxt-lang/core';
+import { Constants, InlineNode, parseLine } from '@stxt-lang/core';
 import { findSuggestionsByParent, findRootLevelSuggestions, findEnumValues } from './CompletionProviderSearch';
 import { CompletionItem, CompletionItemProvider, Position, ProviderResult, TextDocument } from 'vscode';
 import { log } from './Log';
@@ -11,7 +11,7 @@ export class StxtCompletionProvider implements CompletionItemProvider {
 
         const linePrefix = document.lineAt(position).text.slice(0, position.character);
 
-        log.trace(`Completado en la línea ${position.line}.`);
+        log.trace(`Completion at line ${position.line}.`);
 
         // Si no hay análisis no mostramos nada
         let lastAnalysis: AnalysisResult | undefined = getAnalysis(document);
@@ -39,7 +39,7 @@ export class StxtCompletionProvider implements CompletionItemProvider {
 
         // Buscamos nivel del cursor
         let level = completionContext.level;
-        log.trace(`Nivel del cursor: ${level}.`);
+        log.trace(`Cursor level: ${level}.`);
 
         if (level === 0) {
             return findRootLevelSuggestions(completionContext.prefix);
@@ -48,7 +48,7 @@ export class StxtCompletionProvider implements CompletionItemProvider {
         // Buscamos parent
         const parent = getParentNode(lastAnalysis, position.line, level);
         if (parent) {
-            log.trace(`Nodo padre: ${parent.getQualifiedName()} (línea ${parent.getLine()}).`);
+            log.trace(`Parent node: ${parent.getQualifiedName()} (line ${parent.getLine()}).`);
             return findSuggestionsByParent(parent, completionContext.prefix);
         }
 
@@ -73,14 +73,17 @@ function getLastNode(analysis: AnalysisResult, currentLine: number) {
 
 /**
  * Busca el nodo padre (nivel-1) anterior a la línea dada.
+ *
+ * Only an inline node can have children: if the closest node one level up is a text block,
+ * the cursor is inside its text and there is nothing to suggest.
  */
-function getParentNode(analysis: AnalysisResult, currentLine: number, level: number) {
+function getParentNode(analysis: AnalysisResult, currentLine: number, level: number): InlineNode | null {
     let parentLine = currentLine;
     while (parentLine > 0) {
         parentLine = parentLine - 1;
         const nodeAtLine = analysis.nodeByLine.get(parentLine);
         if (nodeAtLine?.getLevel() === level - 1) {
-            return nodeAtLine;
+            return nodeAtLine instanceof InlineNode ? nodeAtLine : null;
         }
     }
     return null;

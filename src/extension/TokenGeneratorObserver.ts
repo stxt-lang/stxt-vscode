@@ -1,14 +1,14 @@
-import { Observer, Node, Parser, Line } from '@stxt-lang/core';
+import { Observer, Node, Parser, Line, TextNode } from '@stxt-lang/core';
 import { StxtToken } from './Tokens';
 
 export class TokenGeneratorObserver implements Observer {
     private tokens: StxtToken[] = [];
     private nodeByLine = new Map<number, Node>();
     private commentLines = new Set<number>();
-    private textLineByLineNumber = new Map<number, Node>();
+    private textLineByLineNumber = new Map<number, TextNode>();
     private templateNodeByLine = new Map<number, Line>();
 
-    onTextLine(node: Node, lineNumber: number, lineString: string, line: Line): void {
+    onTextLine(node: TextNode, lineNumber: number, lineString: string, line: Line): void {
         // Guardar el nodo padre para las líneas de texto
         const lineIndex = lineNumber - 1; // lineNumber es 1-indexed
         this.textLineByLineNumber.set(lineIndex, node);
@@ -48,7 +48,7 @@ export class TokenGeneratorObserver implements Observer {
         if (node.getNamespace() !== '@stxt.template') {
             return false;
         }
-        const normalizedName = node.getNormalizedName();
+        const normalizedName = node.getCanonicalName();
         return normalizedName === 'structure' || normalizedName === 'description';
     }
 
@@ -122,7 +122,7 @@ export class TokenGeneratorObserver implements Observer {
         return this.commentLines;
     }
 
-    getTextLineByLineNumber(): Map<number, Node> {
+    getTextLineByLineNumber(): Map<number, TextNode> {
         return this.textLineByLineNumber;
     }
 

@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import { InlineNode } from '@stxt-lang/core';
 import { StxtToken } from '../extension/Tokens';
 import { StxtFormattingProvider } from '../extension/FormattingProvider';
 import { StxtCompletionProvider } from '../extension/CompletionProvider';
@@ -149,9 +150,9 @@ describeCorpus('Autocompletado con los schemas del corpus', root => {
 		await loadSchemas(root);
 	});
 
-	function documentNode(text: string) {
+	function documentNode(text: string): InlineNode {
 		const node = parseTree(text)[0];
-		assert.ok(node, 'El documento de prueba no ha producido ningún nodo.');
+		assert.ok(node instanceof InlineNode, 'El documento de prueba no ha producido ningún nodo inline.');
 		return node;
 	}
 

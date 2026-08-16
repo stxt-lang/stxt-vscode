@@ -31,14 +31,14 @@ export function getAnalysis(document: vscode.TextDocument): AnalysisResult | und
         return cached;
     }
 
-    log.trace(`Análisis en frío, el caché no lo tenía: ${document.uri.toString()}`);
+    log.trace(`Cold analysis, not in cache: ${document.uri.toString()}`);
     return analysisDoc(document, diagnosticCollection);
 }
 
 export function analysisAllDocs(): void{
 	for (const doc of vscode.workspace.textDocuments) {
 		if (doc.languageId === 'stxt') {
-			log.trace(`Reanalizando documento abierto: ${doc.uri.toString()}`);
+			log.trace(`Re-analyzing open document: ${doc.uri.toString()}`);
 			analysisDoc(doc, diagnosticCollection);
 		}
 	}
@@ -95,7 +95,7 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
     const result: AnalysisResult = { tokens, nodeByLine, commentLines, textLineByLineNumber };
     LAST_ANALYSIS_BY_URI.set(document.uri.toString(), result);
 
-    log.trace(`Análisis de ${document.uri.toString()}: ${tokens.length} tokens, ${diagnostics.length} diagnósticos.`);
+    log.trace(`Analysis of ${document.uri.toString()}: ${tokens.length} tokens, ${diagnostics.length} diagnostics.`);
     return result;
 }
 
