@@ -3,6 +3,7 @@ import { StxtSemanticTokensProvider } from './extension/SemanticTokensProvider';
 import { StxtFormattingProvider } from './extension/FormattingProvider';
 import { StxtCompletionProvider } from './extension/CompletionProvider';
 import { StxtHoverProvider } from './extension/HoverProvider';
+import { StxtDefinitionProvider } from './extension/DefinitionProvider';
 import { analysisDoc, analysisAllDocs } from './extension/AnalysisDoc';
 import { tokenLegend } from './extension/Tokens';
 import { registerSchemaLoader, ensureSchemasForDocument } from './extension/SchemaLoader';
@@ -74,6 +75,13 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.languages.registerDocumentFormattingEditProvider(
 			'stxt',
 			new StxtFormattingProvider()
+		)
+	);
+
+	context.subscriptions.push(
+		vscode.languages.registerDefinitionProvider(
+			'stxt',
+			new StxtDefinitionProvider()
 		)
 	);
 

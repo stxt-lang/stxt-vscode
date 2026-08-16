@@ -2,6 +2,7 @@ import vscode from 'vscode';
 import * as os from 'os';
 import * as path from 'path';
 import {
+    DiscoveryDefinition,
     DiscoveryEntry,
     DiscoveryEnvironment,
     DiscoveryFileSystem,
@@ -225,6 +226,38 @@ export function getSchema(namespace: string): Schema | undefined | null {
 
     // Even without results, the meta-schemas of the reserved namespaces must be served.
     return META_FALLBACK.getSchema(namespace);
+}
+
+/** Where the active definition of a namespace lives: the file, as the editor can open it, and its provenance. */
+export interface DefinitionLocation {
+    /** The definition file (schema or template), as a Uri the editor can open. */
+    readonly uri: vscode.Uri;
+    /** The active definition, with the namespace, compiled schema and level directory. */
+    readonly definition: DiscoveryDefinition;
+}
+
+/**
+ * Locates the definition of a namespace for a document, following the same rule as
+ * `getSchemaForDocument`: the document's chain first, then the global union. The reserved
+ * namespaces (`@stxt.schema`, `@stxt.template`) have no file: their meta-schemas are built in.
+ *
+ * @param documentUri the document the namespace is used in.
+ * @param namespace the namespace whose definition file is wanted.
+ * @returns the definition and its file, or undefined if no loaded level defines the namespace.
+ */
+export function getDefinitionForDocument(documentUri: vscode.Uri, namespace: string): DefinitionLocation | undefined {
+    const own = resultForDocument(documentUri);
+    const results = own ? [own, ...RESULTS.values()] : [...RESULTS.values()];
+
+    for (const result of results) {
+        const definition = result.getDefinition(namespace);
+
+        if (definition) {
+            return { uri: fileSystem.uriOf(definition.file), definition };
+        }
+    }
+
+    return undefined;
 }
 
 /** Every known active schema, one per namespace (the first result that defines it wins). */

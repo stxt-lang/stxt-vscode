@@ -5,6 +5,7 @@ import { StxtToken } from '../extension/Tokens';
 import { StxtFormattingProvider } from '../extension/FormattingProvider';
 import { StxtCompletionProvider } from '../extension/CompletionProvider';
 import { StxtHoverProvider } from '../extension/HoverProvider';
+import { StxtDefinitionProvider } from '../extension/DefinitionProvider';
 import { StxtSemanticTokensProvider } from '../extension/SemanticTokensProvider';
 import { asPosition, asTextDocument, applyEdits } from './stub/TestDocument';
 import {
@@ -24,6 +25,7 @@ import {
 const FORMATTING = new StxtFormattingProvider();
 const COMPLETION = new StxtCompletionProvider();
 const HOVER = new StxtHoverProvider();
+const DEFINITION = new StxtDefinitionProvider();
 const SEMANTIC_TOKENS = new StxtSemanticTokensProvider();
 
 // Formats the document through the provider, seeding the analysis cache first.
@@ -168,6 +170,18 @@ describeCorpus('stxt-web corpus', root => {
 						HOVER.provideHover(asTextDocument(document), asPosition(line, 0));
 					} catch (e) {
 						assert.fail(`Hover broken on line ${line + 1} — ${String(e)}`);
+					}
+				}
+			});
+
+			it('go to definition does not throw on any line', async () => {
+				const document = analyzed.document;
+
+				for (let line = 0; line < document.lineCount; line++) {
+					try {
+						await DEFINITION.provideDefinition(asTextDocument(document), asPosition(line, 0));
+					} catch (e) {
+						assert.fail(`Go to definition broken on line ${line + 1} — ${String(e)}`);
 					}
 				}
 			});

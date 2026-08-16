@@ -160,6 +160,17 @@ export class Hover {
 	constructor(public readonly contents: MarkdownString | MarkdownString[]) { }
 }
 
+/** Target of "go to definition": a file and a position (or range) inside it, as in the real API. */
+export class Location {
+	readonly range: Range;
+
+	constructor(public readonly uri: Uri, rangeOrPosition: Range | Position) {
+		this.range = rangeOrPosition instanceof Range
+			? rangeOrPosition
+			: new Range(rangeOrPosition.line, rangeOrPosition.character, rangeOrPosition.line, rangeOrPosition.character);
+	}
+}
+
 export class SemanticTokensLegend {
 	constructor(
 		public readonly tokenTypes: readonly string[],
@@ -331,7 +342,8 @@ export const languages = {
 	},
 	registerHoverProvider: () => NOOP_DISPOSABLE,
 	registerCompletionItemProvider: () => NOOP_DISPOSABLE,
-	registerDocumentFormattingEditProvider: () => NOOP_DISPOSABLE
+	registerDocumentFormattingEditProvider: () => NOOP_DISPOSABLE,
+	registerDefinitionProvider: () => NOOP_DISPOSABLE
 };
 
 /**
@@ -353,6 +365,7 @@ const api = {
 	CompletionItemKind,
 	MarkdownString,
 	Hover,
+	Location,
 	SemanticTokens,
 	SemanticTokensLegend,
 	SemanticTokensBuilder,

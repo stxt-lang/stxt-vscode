@@ -1,8 +1,10 @@
 import * as assert from 'assert';
+import * as path from 'path';
 import { InlineNode } from '@stxt-lang/core';
 import { StxtToken } from '../extension/Tokens';
 import { StxtFormattingProvider } from '../extension/FormattingProvider';
 import { StxtCompletionProvider } from '../extension/CompletionProvider';
+import { StxtDefinitionProvider } from '../extension/DefinitionProvider';
 import { findEnumValues, findRootLevelSuggestions, findSuggestionsByParent } from '../extension/CompletionProviderSearch';
 import { asPosition, asTextDocument, applyEdits } from './stub/TestDocument';
 import { analyze, describeCorpus, loadSchemas, parseTree } from './corpus';
@@ -17,6 +19,7 @@ import { analyze, describeCorpus, loadSchemas, parseTree } from './corpus';
 
 const FORMATTING = new StxtFormattingProvider();
 const COMPLETION = new StxtCompletionProvider();
+const DEFINITION = new StxtDefinitionProvider();
 
 // Compact representation of a token, to compare at a glance.
 function describeToken(token: StxtToken): string {
@@ -217,5 +220,57 @@ describeCorpus('Completion with the corpus schemas', root => {
 
 		assert.ok(Array.isArray(items), 'The provider should return a list of suggestions.');
 		assert.deepStrictEqual(labelsOf(items), ['high', 'low', 'medium']);
+	});
+});
+
+describeCorpus('Go to definition with the corpus definitions', root => {
+
+	// Two definitions of stxt-web: org.example.enum.test is a schema (`Node: Document` on
+	// line 2, `Node: Priority` on line 12) and org.example.tomcat a template (`Server` on
+	// line 3 of the file, its child `Port` on line 4).
+	const SCHEMA_NAMESPACE = 'org.example.enum.test';
+	const TEMPLATE_NAMESPACE = 'org.example.tomcat';
+
+	before(async () => {
+		await loadSchemas(root);
+	});
+
+	async function definitionOf(text: string, line: number, character: number): Promise<{ file: string, line: number } | undefined> {
+		const { document } = analyze('/tmp/definition.stxt', text);
+		const location = await DEFINITION.provideDefinition(asTextDocument(document), asPosition(line, character));
+
+		return location ? { file: path.relative(root, location.uri.fsPath), line: location.range.start.line } : undefined;
+	}
+
+	it('jumps to the `Node:` line of the schema from the node name', async () => {
+		const target = await definitionOf(`Document (${SCHEMA_NAMESPACE}):\n\tTitle: hola`, 0, 2);
+		assert.deepStrictEqual(target, { file: path.join('.stxt', 'schemas', 'org.example.enum.test.stxt'), line: 1 });
+	});
+
+	it('jumps to the `Node:` line of a child that inherits the namespace', async () => {
+		const target = await definitionOf(`Document (${SCHEMA_NAMESPACE}):\n\tPriority: high`, 1, 3);
+		assert.deepStrictEqual(target, { file: path.join('.stxt', 'schemas', 'org.example.enum.test.stxt'), line: 11 });
+	});
+
+	it('jumps to the root of the definition from the namespace itself', async () => {
+		const target = await definitionOf(`Document (${SCHEMA_NAMESPACE}):`, 0, 12);
+		assert.deepStrictEqual(target, { file: path.join('.stxt', 'schemas', 'org.example.enum.test.stxt'), line: 0 });
+	});
+
+	it('jumps inside the Structure block of a template', async () => {
+		const text = `Server (${TEMPLATE_NAMESPACE}):\n\tPort: 8080`;
+		assert.deepStrictEqual(await definitionOf(text, 0, 2), { file: path.join('.stxt', 'templates', 'org.example.tomcat.stxt'), line: 2 });
+		assert.deepStrictEqual(await definitionOf(text, 1, 3), { file: path.join('.stxt', 'templates', 'org.example.tomcat.stxt'), line: 3 });
+	});
+
+	it('offers nothing over the value, without namespace, or for an unknown namespace', async () => {
+		assert.strictEqual(await definitionOf(`Document (${SCHEMA_NAMESPACE}):\n\tTitle: hola`, 1, 9), undefined);
+		assert.strictEqual(await definitionOf('Document:\n\tTitle: hola', 0, 2), undefined);
+		assert.strictEqual(await definitionOf('Document (no.such.namespace):', 0, 2), undefined);
+	});
+
+	it('offers nothing on a comment or an empty line', async () => {
+		assert.strictEqual(await definitionOf(`# comment\nDocument (${SCHEMA_NAMESPACE}):\n`, 0, 2), undefined);
+		assert.strictEqual(await definitionOf(`# comment\nDocument (${SCHEMA_NAMESPACE}):\n`, 2, 0), undefined);
 	});
 });

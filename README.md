@@ -15,6 +15,9 @@ Ready-to-use examples: [https://github.com/stxt-lang/stxt-web](https://github.co
 * 🎨 Semantic syntax highlighting, driven by the parser (no hand-written grammar)
 * 💡 Schema-aware completion: the child nodes a schema allows, and the values of an `ENUM`
 * 🧠 Context-aware hover information: node, canonical name, type, allowed values, description
+* 🔎 Go to definition (F12 / Ctrl+click): from a node to the `Node:` that declares it in its
+  schema, or to its line inside the `Structure` of its template; from a namespace to the
+  definition document itself
 * ✍️ Document formatting
 * 🔧 Custom schema (`@stxt.schema`) and template (`@stxt.template`) support, resolved from the
   `.stxt` directories of the project, the user and the system.
@@ -66,7 +69,9 @@ The nearest level that defines a namespace wins; levels further out still provid
 nobody nearer defines. Setting the `STXT_PATH` environment variable replaces the whole chain with
 its entries.
 
-Schemas and templates are loaded automatically and refreshed when changes are detected. The
+Schemas and templates are loaded automatically and refreshed when changes are detected. **Go to
+definition** on a node name opens the schema or template that defines it, so the resolution chain
+can be inspected from any document. The
 **STXT** output channel (View → Output) shows which resolution directories were found and which
 schemas were loaded — the first place to look when a document is not being validated.
 

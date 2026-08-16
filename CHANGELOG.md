@@ -6,6 +6,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- **Go to definition** (F12 / Ctrl+click) on a node: opens the schema or template that defines
+  its namespace, on the `Node: Name` line of a schema or on the node's own line inside the
+  `Structure >>` block of a template; on the namespace itself it opens the root of the
+  definition document. Which file defines the namespace follows the document's discovery chain,
+  like validation. Nothing is offered over a value, over a comment, without a namespace, or when
+  no loaded level defines the namespace.
+
 - Internal: every comment, JSDoc, test title and assertion message under `src/` is now in
   English, in line with the rest of the ecosystem. No change in behaviour or in the messages
   shown in the editor.
