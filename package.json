@@ -44,6 +44,16 @@
         "configuration": "./language-configuration.json"
       }
     ],
+    "configuration": {
+      "title": "STXT",
+      "properties": {
+        "stxt.developerMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show the technical details of the node under the cursor in the hover: form and level, canonical and qualified names, value, schema type and allowed values, text content, and comments. When off, the hover shows only the description the schema or template gives for the node, if there is one."
+        }
+      }
+    },
     "configurationDefaults": {
       "[stxt]": {
         "editor.tabSize": 4,

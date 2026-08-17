@@ -249,10 +249,32 @@ function subscribe<T>(listeners: ((arg: T) => unknown)[], listener: (arg: T) => 
 	return { dispose: () => { listeners.splice(listeners.indexOf(listener), 1); } };
 }
 
+/** Settings the stub `getConfiguration` answers with, by full key (`section.key`). */
+const configurationValues = new Map<string, unknown>();
+
+/** Sets a setting for the tests, e.g. `setConfiguration('stxt.developerMode', true)`; `undefined` clears it. */
+export function setConfiguration(fullKey: string, value: unknown): void {
+	if (value === undefined) {
+		configurationValues.delete(fullKey);
+	} else {
+		configurationValues.set(fullKey, value);
+	}
+}
+
 export const workspace = {
 	workspaceFolders: [] as WorkspaceFolder[],
 	textDocuments: [] as unknown[],
 	fs: workspaceFs,
+
+	/** Like the real one for what the extension uses: `get(key, default)` under a section; the scope is ignored. */
+	getConfiguration(section?: string, _scope?: unknown): { get<T>(key: string, defaultValue: T): T } {
+		return {
+			get<T>(key: string, defaultValue: T): T {
+				const fullKey = section ? `${section}.${key}` : key;
+				return configurationValues.has(fullKey) ? configurationValues.get(fullKey) as T : defaultValue;
+			}
+		};
+	},
 
 	onDidOpenTextDocument(listener: (document: unknown) => unknown): Disposable {
 		return subscribe(documentListeners.open, listener);

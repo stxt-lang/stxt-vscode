@@ -8,6 +8,7 @@ import { StxtHoverProvider } from '../extension/HoverProvider';
 import { StxtDefinitionProvider } from '../extension/DefinitionProvider';
 import { StxtSemanticTokensProvider } from '../extension/SemanticTokensProvider';
 import { asPosition, asTextDocument, applyEdits } from './stub/TestDocument';
+import { setConfiguration } from './stub/vscode';
 import {
 	AnalyzedDocument, DOC_DIRS, analyze, analyzeFile, corpusFiles, describeCorpus,
 	describeDiagnostics, errorsOf, loadSchemas, parseTree, treeSignature
@@ -191,14 +192,21 @@ describeCorpus('stxt-web corpus', root => {
 				}
 			});
 
-			it('hover does not throw on any line', () => {
+			it('hover does not throw on any line, in either mode', () => {
 				const document = analyzed.document;
 
-				for (let line = 0; line < document.lineCount; line++) {
+				for (const developerMode of [false, true]) {
+					setConfiguration('stxt.developerMode', developerMode);
 					try {
-						HOVER.provideHover(asTextDocument(document), asPosition(line, 0));
-					} catch (e) {
-						assert.fail(`Hover broken on line ${line + 1} — ${String(e)}`);
+						for (let line = 0; line < document.lineCount; line++) {
+							try {
+								HOVER.provideHover(asTextDocument(document), asPosition(line, 0));
+							} catch (e) {
+								assert.fail(`Hover broken on line ${line + 1} (developer mode ${developerMode}) — ${String(e)}`);
+							}
+						}
+					} finally {
+						setConfiguration('stxt.developerMode', undefined);
 					}
 				}
 			});

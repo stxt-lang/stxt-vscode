@@ -1,8 +1,17 @@
-import { Hover, HoverProvider, MarkdownString, Position, ProviderResult, TextDocument } from 'vscode';
+import { Hover, HoverProvider, MarkdownString, Position, ProviderResult, TextDocument, workspace } from 'vscode';
 import { InlineNode } from '@stxt-lang/core';
 import { getAnalysis } from './AnalysisDoc';
 import { getSchemaForDocument } from './SchemaLoader';
 
+/**
+ * Hover over a node. Two modes, chosen by the `stxt.developerMode` setting:
+ *
+ * - **Normal** (the default): what the schema or template of the namespace says about the node
+ *   — its `Description`, its type and, for an `ENUM`, the allowed values — the documentation of
+ *   the grammar, meant for whoever writes the document. Node not declared, no hover.
+ * - **Developer**: the technical card — form and level, names, value, schema type and allowed
+ *   values, the description, the content of a text block — and a card for comments too.
+ */
 export class StxtHoverProvider implements HoverProvider {
 	provideHover(document: TextDocument, position: Position): ProviderResult<Hover> {
 
@@ -11,8 +20,13 @@ export class StxtHoverProvider implements HoverProvider {
 			return;
 		}
 
-		// Check whether it is a comment
+		const developerMode = workspace.getConfiguration('stxt', document).get<boolean>('developerMode', false);
+
+		// A comment: only the developer card shows it
 		if (analysis.commentLines.has(position.line)) {
+			if (!developerMode) {
+				return;
+			}
 			const markdown = new MarkdownString();
 			const commentText = document.lineAt(position.line).text;
 			markdown.appendMarkdown("### 💬 Comment\n\n");
@@ -21,23 +35,30 @@ export class StxtHoverProvider implements HoverProvider {
 			return new Hover(markdown);
 		}
 
+		// Nothing over the text lines of a block, nor over lines that open no node
 		const node = analysis.nodeByLine.get(position.line);
-		
-		// Check whether it is a text line inside a TEXT BLOCK node
 		if (!node) {
-			/*
-			const parentNode = analysis.textLineByLineNumber.get(position.line);
-			const currentLine = document.lineAt(position.line);
-			if (parentNode && !currentLine.isEmptyOrWhitespace && position.character >= currentLine.firstNonWhitespaceCharacterIndex) {
-				const markdown = new MarkdownString();
-				markdown.appendMarkdown("### 📝 Text Line\n");
-				markdown.appendMarkdown(`Part of text block: \`${escapeMd(parentNode.getQualifiedName())}\`\n\n`);
-				markdown.appendMarkdown(`Defined at line ${parentNode.getLine()}.`);
-				markdown.isTrusted = false;
-				return new Hover(markdown);
-			}
-			*/
 			return;
+		}
+
+		// What the grammar of the namespace declares for the node, if anything: the resolution
+		// chain is per document (STXT-DISCOVERY-SPEC section 7).
+		const nodeDef = node.getNamespace()
+			? getSchemaForDocument(document.uri, node.getNamespace())?.getNodeDefinition(node.getName())
+			: undefined;
+		const description = nodeDef?.getDescription();
+
+		if (!developerMode) {
+			if (!nodeDef) {
+				return;
+			}
+			const markdown = new MarkdownString();
+			if (description) {
+				markdown.appendMarkdown(description + "\n\n---\n");
+			}
+			markdown.appendMarkdown(`**Type:** \`${nodeDef.getType()}\`${allowedValues(nodeDef.getValues())}\n`);
+			markdown.isTrusted = false;
+			return new Hover(markdown);
 		}
 
 		const markdown = new MarkdownString();
@@ -51,47 +72,43 @@ export class StxtHoverProvider implements HoverProvider {
 			markdown.appendMarkdown(`- **💎 Value:** \`${escapeMd(node.getValue())}\`\n`);
 		}
 
-		if (node.getNamespace()) {
-			// The resolution chain is per document (STXT-DISCOVERY-SPEC section 7).
-			const schema = getSchemaForDocument(document.uri, node.getNamespace());
-			if (schema) {
-				const nodeDef = schema.getNodeDefinition(node.getName());
-				if (nodeDef) {
-					// Show the type
-					const type = nodeDef.getType();
-					markdown.appendMarkdown(`\n---\n`);
-					markdown.appendMarkdown(`### 📋 Schema\n- **Type**: \`${type}\`\n`);
+		if (nodeDef) {
+			// Show the type
+			const type = nodeDef.getType();
+			markdown.appendMarkdown(`\n---\n`);
+			markdown.appendMarkdown(`### 📋 Schema\n- **Type**: \`${type}\`\n`);
 
-					// If it is an ENUM, show the allowed values
-					if (type === 'ENUM') {
-						const values = nodeDef.getValues();
-						if (values.size > 0) {
-							const valueList = Array.from(values).map(v => `\`${escapeMd(v)}\``).join(', ');
-							markdown.appendMarkdown(`- **✅ Allowed values**: ${valueList}\n`);
-						}
-					}
+			// If it is an ENUM, show the allowed values
+			if (type === 'ENUM' && nodeDef.getValues().size > 0) {
+				markdown.appendMarkdown(`- **✅ Allowed values**: ${valueList(nodeDef.getValues())}\n`);
+			}
 
-					// Show the description if there is one
-					const description = nodeDef.getDescription();
-					if (description) {
-						markdown.appendMarkdown(`\n---\n`);
-						markdown.appendMarkdown(description + "\n");
-					}
-				}
+			// Show the description if there is one
+			if (description) {
+				markdown.appendMarkdown(`\n---\n`);
+				markdown.appendMarkdown(description + "\n");
 			}
 		}
 
 		if (node.isTextNode()) {
-			const text = node.getText();
-
 			markdown.appendMarkdown(`\n---\n`);
 			markdown.appendMarkdown(`### 📄 Text Content\n\n`);
-			markdown.appendCodeblock(text, 'stxt');
+			markdown.appendCodeblock(node.getText(), 'stxt');
 		}
 
 		markdown.isTrusted = false; // for safety, allow no links/HTML
 		return new Hover(markdown);
 	}
+}
+
+/** The allowed values of an ENUM as inline code, comma-separated. */
+function valueList(values: ReadonlySet<string>): string {
+	return Array.from(values).map(v => `\`${escapeMd(v)}\``).join(', ');
+}
+
+/** ` — a, b, c` after the type when there are allowed values (an ENUM); nothing otherwise. */
+function allowedValues(values: ReadonlySet<string>): string {
+	return values.size > 0 ? ` — ${valueList(values)}` : '';
 }
 
 // Minimal escaping so backticks do not break the inline markdown

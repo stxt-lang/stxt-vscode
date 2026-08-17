@@ -14,7 +14,8 @@ Ready-to-use examples: [https://github.com/stxt-lang/stxt-web](https://github.co
 * ✅ Real-time validation: syntax errors as you type, and schema errors when a schema applies
 * 🎨 Semantic syntax highlighting, driven by the parser (no hand-written grammar)
 * 💡 Schema-aware completion: the child nodes a schema allows, and the values of an `ENUM`
-* 🧠 Context-aware hover information: node, canonical name, type, allowed values, description
+* 🧠 Hover: what the schema or template says about the node — description, type, allowed values;
+  with `stxt.developerMode`, the full technical card
 * 🔎 Go to definition (F12 / Ctrl+click): from a node to the `Node:` that declares it in its
   schema, or to its line inside the `Structure` of its template; from a namespace to the
   definition document itself
@@ -58,6 +59,15 @@ The indentation follows the editor: tabs by default for `.stxt` files, or spaces
 `editor.tabSize` says, because that is what the STXT specification allows.
 
 ---
+
+## Settings
+
+| Setting | Default | What it does |
+|---|---|---|
+| `stxt.developerMode` | `false` | Off: hovering a node shows what its schema or template declares for it — the description, the type and, for an `ENUM`, the allowed values (nothing if no grammar declares the node). On: the technical card — inline/block form and level, name, canonical and qualified names, value, the schema type and allowed values, the content of a text block — and a card over comments too. |
+
+The editor defaults for `.stxt` files (tabs, tab size 4, no indentation detection, suggestions on)
+come with the extension and can be overridden per user or workspace as usual.
 
 ## Schemas and Templates
 

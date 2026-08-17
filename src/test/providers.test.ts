@@ -5,6 +5,8 @@ import { StxtToken } from '../extension/Tokens';
 import { StxtFormattingProvider } from '../extension/FormattingProvider';
 import { StxtCompletionProvider } from '../extension/CompletionProvider';
 import { StxtDefinitionProvider } from '../extension/DefinitionProvider';
+import { StxtHoverProvider } from '../extension/HoverProvider';
+import { Hover, MarkdownString, setConfiguration } from './stub/vscode';
 import { findEnumValues, findRootLevelSuggestions, findSuggestionsByParent } from '../extension/CompletionProviderSearch';
 import { asPosition, asTextDocument, applyEdits } from './stub/TestDocument';
 import { analyze, describeCorpus, loadSchemas, parseTree } from './corpus';
@@ -259,6 +261,96 @@ describeCorpus('Completion with the corpus schemas', root => {
 
 		assert.ok(Array.isArray(items), 'The provider should return a list of suggestions.');
 		assert.deepStrictEqual(labelsOf(items), ['high', 'low', 'medium']);
+	});
+});
+
+describe('HoverProvider', () => {
+	const HOVER = new StxtHoverProvider();
+
+	afterEach(() => setConfiguration('stxt.developerMode', undefined));
+
+	function hoverText(text: string, line: number, developerMode: boolean): string | undefined {
+		setConfiguration('stxt.developerMode', developerMode);
+		const { document } = analyze('/tmp/hover.stxt', text);
+		const hover = HOVER.provideHover(asTextDocument(document), asPosition(line, 0)) as Hover | undefined;
+		if (!hover) {
+			return undefined;
+		}
+		const contents = Array.isArray(hover.contents) ? hover.contents : [hover.contents];
+		return contents.map(c => (c as MarkdownString).value).join('\n');
+	}
+
+	it('shows nothing in normal mode when no grammar declares the node', () => {
+		assert.strictEqual(hoverText('Doc: hola\n\tHijo: v', 1, false), undefined);
+	});
+
+	it('shows the technical card in developer mode, grammar or not', () => {
+		const text = hoverText('Doc: hola\n\tHijo: v', 1, true);
+		assert.ok(text?.includes('INLINE (Level 1)'), 'the form and level');
+		assert.ok(text?.includes('**🏷️ Name:** `Hijo`'), 'the name');
+		assert.ok(text?.includes('**💎 Value:** `v`'), 'the value');
+	});
+
+	it('shows the content of a text block only in developer mode', () => {
+		const text = 'Doc >>\n\tuna línea';
+		assert.strictEqual(hoverText(text, 0, false), undefined);
+		assert.ok(hoverText(text, 0, true)?.includes('una línea'));
+	});
+
+	it('shows comments only in developer mode', () => {
+		const text = '# nota\nDoc: v';
+		assert.strictEqual(hoverText(text, 0, false), undefined);
+		assert.ok(hoverText(text, 0, true)?.includes('Comment'));
+	});
+
+	it('shows nothing over the text lines of a block, in either mode', () => {
+		const text = 'Doc >>\n\tuna línea';
+		assert.strictEqual(hoverText(text, 1, false), undefined);
+		assert.strictEqual(hoverText(text, 1, true), undefined);
+	});
+});
+
+describeCorpus('Hover with the corpus definitions', root => {
+	const HOVER = new StxtHoverProvider();
+
+	// The dev.stxt.website template of stxt-web describes its nodes in a Description block
+	// ("Document: Un documento es bla, bla, bla"); Priority of org.example.enum.test is an ENUM
+	// with no description.
+	before(async () => {
+		await loadSchemas(root);
+	});
+
+	afterEach(() => setConfiguration('stxt.developerMode', undefined));
+
+	function hoverText(text: string, line: number, developerMode: boolean): string | undefined {
+		setConfiguration('stxt.developerMode', developerMode);
+		const { document } = analyze('/tmp/hover-corpus.stxt', text);
+		const hover = HOVER.provideHover(asTextDocument(document), asPosition(line, 0)) as Hover | undefined;
+		return hover ? (hover.contents as MarkdownString).value : undefined;
+	}
+
+	it('in normal mode shows the description and the type of the grammar, and nothing technical', () => {
+		const text = hoverText('Document (dev.stxt.website): Título', 0, false);
+		assert.strictEqual(text?.trim(), 'Un documento es bla, bla, bla\n\n---\n**Type:** `INLINE`');
+	});
+
+	it('in normal mode shows the type and the allowed values of an ENUM without a description', () => {
+		const text = hoverText('Document (org.example.enum.test):\n\tPriority: high', 1, false);
+		assert.strictEqual(text?.trim(), '**Type:** `ENUM` — `high`, `medium`, `low`');
+	});
+
+	it('in normal mode shows nothing for a namespace with no grammar loaded', () => {
+		assert.strictEqual(hoverText('Doc (no.grammar.here): v', 0, false), undefined);
+	});
+
+	it('in developer mode shows the type, the allowed values and the description', () => {
+		const enumText = hoverText('Document (org.example.enum.test):\n\tPriority: high', 1, true);
+		assert.ok(enumText?.includes('**Type**: `ENUM`'), 'the type');
+		assert.ok(enumText?.includes('`high`, `medium`, `low`'), 'the allowed values');
+
+		const described = hoverText('Document (dev.stxt.website): Título', 0, true);
+		assert.ok(described?.includes('INLINE (Level 0)'), 'the technical card');
+		assert.ok(described?.includes('Un documento es bla, bla, bla'), 'and the description');
 	});
 });
 

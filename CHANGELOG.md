@@ -14,6 +14,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   indentation of their own beyond it — the same thing `stxt format` of the CLI does. Blank lines
   inside a block stay empty (STXT-SPEC §10.3), comments and blank lines outside blocks are kept
   as written, and lines the parse tree does not describe are left untouched.
+- **New setting `stxt.developerMode`** (default off). Hovering a node now shows what its
+  schema or template declares for it — the description, the type and, for an `ENUM`, the
+  allowed values — the documentation of the grammar, meant for whoever writes the document;
+  nothing when no grammar declares the node. Turning the setting on
+  brings back the technical card (form and level, names, value, schema type and allowed
+  values, text content) and the card over comments.
 - `@stxt-lang/core` `^0.7.1`: the `EMAIL` type accepts a display name before the address
   (`Joan Costa <joan@example.com>`), as STXT-SCHEMA-SPEC 9.4 defines since 2026-08-17.
 
