@@ -4,6 +4,19 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.7.3]
+
+Editor-only release; the language and `@stxt-lang/core` `^0.7.1` are unchanged.
+
+- **Markdown highlighting inside `MARKDOWN` blocks.** When the schema or template of a
+  document declares a node as `MARKDOWN` (STXT-SCHEMA-SPEC 9.7), the lines of its `>>` block
+  are coloured as Markdown: ATX headings, fenced code, list and block-quote markers, inline
+  code, bold, italic, links and images. `TEXT` blocks, and blocks of namespaces with no
+  grammar, stay as they were. The tokens are semantic, mapped to the standard `markup.*`
+  TextMate scopes, so every theme paints them the way it paints a `.md` file, and no
+  hand-written grammar is involved: the type comes from the grammar the document resolves
+  to, not from the text.
+
 ## [0.7.2]
 
 - **Formatting follows the editor's indentation setting.** *Format Document* now indents with

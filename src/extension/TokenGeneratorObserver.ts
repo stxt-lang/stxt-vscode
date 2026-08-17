@@ -1,5 +1,12 @@
 import { Observer, Node, Parser, Line, TextNode } from '@stxt-lang/core';
 import { StxtToken } from './Tokens';
+import { MarkdownState, newMarkdownState, tokenizeMarkdownLine } from './MarkdownTokenizer';
+
+/** Schema type declared for a node by the grammar of its namespace, or undefined if none declares it. */
+export type SchemaTypeResolver = (node: Node) => string | undefined;
+
+/** Schema type whose block content is coloured as Markdown (STXT-SCHEMA-SPEC 9.7). */
+const MARKDOWN = 'MARKDOWN';
 
 export class TokenGeneratorObserver implements Observer {
     private tokens: StxtToken[] = [];
@@ -8,6 +15,18 @@ export class TokenGeneratorObserver implements Observer {
     private textLineByLineNumber = new Map<number, TextNode>();
     private textContentByLineNumber = new Map<number, string>();
     private templateNodeByLine = new Map<number, Line>();
+
+    // The block whose text lines are being received, and whether it is MARKDOWN: the type is
+    // resolved once per block, and the tokenizer state (open code fence) lives with it.
+    private currentTextNode: TextNode | null = null;
+    private markdownState: MarkdownState | null = null;
+
+    /**
+     * @param schemaTypeOf how to know the schema type of a node; without it no block is coloured
+     *        as Markdown (the inner observer of template contents, for instance, needs none).
+     */
+    constructor(private readonly schemaTypeOf?: SchemaTypeResolver) {
+    }
 
     onTextLine(node: TextNode, lineNumber: number, lineString: string, line: Line): void {
         // Remember the parent node of the text lines
@@ -19,6 +38,31 @@ export class TokenGeneratorObserver implements Observer {
         if (this.isTemplateContentNode(node)) {
             // lineNumber is 1-indexed and absolute within the document
             this.templateNodeByLine.set(lineNumber, line);
+        }
+
+        // Colour the content of MARKDOWN blocks. The tokens are emitted here, line by line, so
+        // that they stay in document order with the comments that may interleave the block.
+        if (node !== this.currentTextNode) {
+            this.currentTextNode = node;
+            this.markdownState = this.isMarkdown(node) ? newMarkdownState() : null;
+        }
+        if (this.markdownState) {
+            // The content starts right after the character that completed the block indentation
+            const offset = line.indentLength + 1;
+            for (const span of tokenizeMarkdownLine(line.content, this.markdownState)) {
+                this.tokens.push({ line: lineIndex, startChar: offset + span.startChar, length: span.length, type: span.type });
+            }
+        }
+    }
+
+    private isMarkdown(node: TextNode): boolean {
+        if (!this.schemaTypeOf) {
+            return false;
+        }
+        try {
+            return this.schemaTypeOf(node) === MARKDOWN;
+        } catch {
+            return false;
         }
     }
 

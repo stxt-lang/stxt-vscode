@@ -10,6 +10,7 @@ import { Hover, MarkdownString, setConfiguration } from './stub/vscode';
 import { findEnumValues, findRootLevelSuggestions, findSuggestionsByParent } from '../extension/CompletionProviderSearch';
 import { asPosition, asTextDocument, applyEdits } from './stub/TestDocument';
 import { analyze, describeCorpus, loadSchemas, parseTree } from './corpus';
+import { MarkdownSpan, newMarkdownState, tokenizeMarkdownLine } from '../extension/MarkdownTokenizer';
 
 /**
  * Targeted cases for the two files with logic of the extension's own:
@@ -307,6 +308,100 @@ describe('HoverProvider', () => {
 		const text = 'Doc >>\n\tuna línea';
 		assert.strictEqual(hoverText(text, 1, false), undefined);
 		assert.strictEqual(hoverText(text, 1, true), undefined);
+	});
+});
+
+describe('MarkdownTokenizer', () => {
+
+	// Compact representation of a span: its type without the prefix and the text it covers.
+	function spansOf(line: string, state = newMarkdownState()): string[] {
+		return tokenizeMarkdownLine(line, state)
+			.map((span: MarkdownSpan) => `${span.type.replace('markdown', '').toLowerCase()}[${line.substring(span.startChar, span.startChar + span.length)}]`);
+	}
+
+	it('colours a heading line as a whole', () => {
+		assert.deepStrictEqual(spansOf('# Título'), ['heading[# Título]']);
+		assert.deepStrictEqual(spansOf('###### h6 con **negrita**'), ['heading[###### h6 con **negrita**]']);
+		assert.deepStrictEqual(spansOf('#sin espacio'), [], 'a # without whitespace is not a heading');
+	});
+
+	it('colours the inline constructs: bold, italic, code and links', () => {
+		assert.deepStrictEqual(spansOf('Texto con **negrita**, *cursiva*, `código` y [enlace](https://x.y).'), [
+			'bold[**negrita**]', 'italic[*cursiva*]', 'code[`código`]', 'link[[enlace](https://x.y)]'
+		]);
+		assert.deepStrictEqual(spansOf('__bold__ _it_ ***fuerte*** ![img](p.png) <https://a.b>'), [
+			'bold[__bold__]', 'italic[_it_]', 'bold[***fuerte***]', 'link[![img](p.png)]', 'link[<https://a.b>]'
+		]);
+	});
+
+	it('does not take underscores inside words or escaped markers as emphasis', () => {
+		assert.deepStrictEqual(spansOf('snake_case_name y otro_nombre_así'), []);
+		assert.deepStrictEqual(spansOf('\\*no\\* es cursiva'), []);
+		assert.deepStrictEqual(spansOf('un * suelto y otro *'), []);
+	});
+
+	it('colours list and quote markers and keeps parsing the rest of the line', () => {
+		assert.deepStrictEqual(spansOf('- item con **x**'), ['list[-]', 'bold[**x**]']);
+		assert.deepStrictEqual(spansOf('  1. ordenado'), ['list[1.]']);
+		assert.deepStrictEqual(spansOf('> cita con *x*'), ['quote[>]', 'italic[*x*]']);
+		assert.deepStrictEqual(spansOf('> > # título citado'), ['quote[> >]', 'heading[# título citado]']);
+		assert.deepStrictEqual(spansOf('-x'), [], 'a marker needs whitespace after it');
+	});
+
+	it('colours a fenced code block as code, from fence to fence, ignoring the markup inside', () => {
+		const state = newMarkdownState();
+		assert.deepStrictEqual(spansOf('```js', state), ['code[```js]']);
+		assert.deepStrictEqual(spansOf('const a = **1**; // # no heading', state), ['code[const a = **1**; // # no heading]']);
+		assert.deepStrictEqual(spansOf('', state), []);
+		assert.deepStrictEqual(spansOf('```', state), ['code[```]']);
+		assert.deepStrictEqual(spansOf('ya fuera **x**', state), ['bold[**x**]']);
+	});
+
+	it('does not close a fence with a shorter one or with a different character', () => {
+		const state = newMarkdownState();
+		spansOf('````', state);
+		spansOf('```', state);
+		spansOf('~~~~', state);
+		assert.deepStrictEqual(spansOf('**x**', state), ['code[**x**]'], 'still inside the fence');
+		spansOf('`````', state);
+		assert.deepStrictEqual(spansOf('**x**', state), ['bold[**x**]'], 'closed by a longer fence of the same character');
+	});
+});
+
+describeCorpus('MARKDOWN blocks with the corpus grammars', root => {
+
+	// dev.stxt.website of stxt-web declares `Content: MARKDOWN` and `CODE: TEXT`.
+	before(async () => {
+		await loadSchemas(root);
+	});
+
+	function blockTokens(name: string, namespace: string): string[] {
+		const text = `${name} (${namespace}) >>\n\t# Título\n\tCon **negrita** y \`código\`.\n\t\t- indentado`;
+		return analyze('/tmp/markdown.stxt', text).analysis.tokens.filter(token => token.line > 0).map(describeToken);
+	}
+
+	it('colours the content of a MARKDOWN block, at the position of each line', () => {
+		assert.deepStrictEqual(blockTokens('Content', 'dev.stxt.website'), [
+			'1:1+8 markdownHeading',
+			'2:5+11 markdownBold',
+			'2:19+8 markdownCode',
+			'3:2+1 markdownList'
+		]);
+	});
+
+	it('leaves the content of a TEXT block, and of a block without grammar, uncoloured', () => {
+		assert.deepStrictEqual(blockTokens('CODE', 'dev.stxt.website'), []);
+		assert.deepStrictEqual(blockTokens('Content', 'no.grammar.here'), []);
+	});
+
+	it('keeps the tokens in document order when a comment interrupts the block', () => {
+		const text = 'Content (dev.stxt.website) >>\n\t**a**\n# comentario\n\t**b**';
+		assert.deepStrictEqual(analyze('/tmp/markdown-comment.stxt', text).analysis.tokens.map(describeToken), [
+			'0:0+8 macro', '0:8+18 namespace', '0:26+3 macro',
+			'1:1+5 markdownBold',
+			'2:0+12 comment',
+			'3:1+5 markdownBold'
+		]);
 	});
 });
 

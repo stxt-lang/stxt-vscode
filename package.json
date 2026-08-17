@@ -2,7 +2,7 @@
   "name": "stxt",
   "displayName": "STXT - Semantic Text",
   "description": "Language support for STXT (Semantic Text): highlighting, validation against schemas and templates, completion, hover and formatting.",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "publisher": "stxt-lang",
   "repository": {
     "type": "git",
@@ -42,6 +42,71 @@
           ".stxt"
         ],
         "configuration": "./language-configuration.json"
+      }
+    ],
+    "semanticTokenTypes": [
+      {
+        "id": "markdownHeading",
+        "superType": "keyword",
+        "description": "Heading line inside a MARKDOWN block"
+      },
+      {
+        "id": "markdownBold",
+        "description": "Bold text inside a MARKDOWN block"
+      },
+      {
+        "id": "markdownItalic",
+        "description": "Italic text inside a MARKDOWN block"
+      },
+      {
+        "id": "markdownCode",
+        "superType": "string",
+        "description": "Inline code or fenced code inside a MARKDOWN block"
+      },
+      {
+        "id": "markdownList",
+        "superType": "keyword",
+        "description": "List item marker inside a MARKDOWN block"
+      },
+      {
+        "id": "markdownQuote",
+        "superType": "comment",
+        "description": "Block quote marker inside a MARKDOWN block"
+      },
+      {
+        "id": "markdownLink",
+        "description": "Link or image inside a MARKDOWN block"
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "language": "stxt",
+        "scopes": {
+          "markdownHeading": [
+            "markup.heading.markdown",
+            "entity.name.section.markdown"
+          ],
+          "markdownBold": [
+            "markup.bold.markdown"
+          ],
+          "markdownItalic": [
+            "markup.italic.markdown"
+          ],
+          "markdownCode": [
+            "markup.inline.raw.string.markdown"
+          ],
+          "markdownList": [
+            "markup.list.markdown",
+            "punctuation.definition.list.begin.markdown"
+          ],
+          "markdownQuote": [
+            "markup.quote.markdown",
+            "punctuation.definition.quote.begin.markdown"
+          ],
+          "markdownLink": [
+            "markup.underline.link.markdown"
+          ]
+        }
       }
     ],
     "configuration": {

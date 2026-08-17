@@ -12,7 +12,9 @@ Ready-to-use examples: [https://github.com/stxt-lang/stxt-web](https://github.co
 ## Features
 
 * ✅ Real-time validation: syntax errors as you type, and schema errors when a schema applies
-* 🎨 Semantic syntax highlighting, driven by the parser (no hand-written grammar)
+* 🎨 Semantic syntax highlighting, driven by the parser (no hand-written grammar); the content
+  of blocks whose schema type is `MARKDOWN` is highlighted as Markdown (headings, emphasis,
+  code, lists, quotes, links) with the colours of your theme
 * 💡 Schema-aware completion: the child nodes a schema allows, and the values of an `ENUM`
 * 🧠 Hover: what the schema or template says about the node — description, type, allowed values;
   with `stxt.developerMode`, the full technical card

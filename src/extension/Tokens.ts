@@ -1,11 +1,16 @@
 import { SemanticTokensLegend } from "vscode";
+import { MARKDOWN_TOKEN_TYPES } from "./MarkdownTokenizer";
 
+// The types of the language itself, plus those of the content of MARKDOWN blocks. The markdown
+// ones must also be declared in `contributes.semanticTokenTypes` of package.json, and mapped to
+// TextMate scopes in `contributes.semanticTokenScopes`, for the themes to colour them.
 const STXT_TOKEN_TYPES = [
 	'comment',
 	'namespace',
 	'property',
 	'macro',
-	'string'
+	'string',
+	...MARKDOWN_TOKEN_TYPES
 ] as const;
 
 // Literal type derived automatically from the array

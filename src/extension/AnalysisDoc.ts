@@ -1,7 +1,7 @@
 import vscode from 'vscode';
 import { Node, Parser, ParseException, ParseResult, Schema, SchemaValidator, ConditionalValidator, ValidationException, transformNodeToSchema, transformTemplateNodeToSchema } from '@stxt-lang/core';
 import { AnalysisResult } from './AnalysisResult';
-import { SchemaLoaderExtension, getSchemasForDocument } from './SchemaLoader';
+import { SchemaLoaderExtension, getSchemaForDocument, getSchemasForDocument } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';
 import { TokenGeneratorObserver } from './TokenGeneratorObserver';
 import { log } from './Log';
@@ -47,8 +47,12 @@ export function analysisAllDocs(): void{
 export function analysisDoc(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection): AnalysisResult {
     const diagnostics: vscode.Diagnostic[] = [];
 
-    // Create the observer that generates tokens and nodeByLine during parsing
-    const tokenObserver = new TokenGeneratorObserver();
+    // Create the observer that generates tokens and nodeByLine during parsing. It asks the
+    // grammar of each block's namespace for its type, to colour MARKDOWN blocks as Markdown;
+    // the resolution chain is the document's own (STXT-DISCOVERY-SPEC section 7).
+    const tokenObserver = new TokenGeneratorObserver(node => node.getNamespace()
+        ? getSchemaForDocument(document.uri, node.getNamespace())?.getNodeDefinition(node.getName())?.getType()
+        : undefined);
 
     // Parse the document with schema validation. The provider is created with the
     // document's Uri: each document validates against its own resolution chain
