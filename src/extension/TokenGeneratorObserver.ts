@@ -6,12 +6,14 @@ export class TokenGeneratorObserver implements Observer {
     private nodeByLine = new Map<number, Node>();
     private commentLines = new Set<number>();
     private textLineByLineNumber = new Map<number, TextNode>();
+    private textContentByLineNumber = new Map<number, string>();
     private templateNodeByLine = new Map<number, Line>();
 
     onTextLine(node: TextNode, lineNumber: number, lineString: string, line: Line): void {
         // Remember the parent node of the text lines
         const lineIndex = lineNumber - 1; // lineNumber is 1-indexed
         this.textLineByLineNumber.set(lineIndex, node);
+        this.textContentByLineNumber.set(lineIndex, line.content);
         
         // Keep line information for lines inside template nodes
         if (this.isTemplateContentNode(node)) {
@@ -124,6 +126,10 @@ export class TokenGeneratorObserver implements Observer {
 
     getTextLineByLineNumber(): Map<number, TextNode> {
         return this.textLineByLineNumber;
+    }
+
+    getTextContentByLineNumber(): Map<number, string> {
+        return this.textContentByLineNumber;
     }
 
     private generateTokensForNode(node: Node, lineIndex: number, line: string): void {

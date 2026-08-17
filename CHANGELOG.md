@@ -4,6 +4,19 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.7.2]
+
+- **Formatting follows the editor's indentation setting.** *Format Document* now indents with
+  tabs or with spaces according to `editor.insertSpaces` for the document (the extension's
+  default for `.stxt` is still tabs); it used to write tabs regardless. With spaces a level is
+  always **four** spaces, whatever `editor.tabSize` says, because that is what STXT-SPEC allows.
+- **The lines of a `>>` block are re-indented too**, to the level of their block, keeping any
+  indentation of their own beyond it — the same thing `stxt format` of the CLI does. Blank lines
+  inside a block stay empty (STXT-SPEC §10.3), comments and blank lines outside blocks are kept
+  as written, and lines the parse tree does not describe are left untouched.
+- `@stxt-lang/core` `^0.7.1`: the `EMAIL` type accepts a display name before the address
+  (`Joan Costa <joan@example.com>`), as STXT-SCHEMA-SPEC 9.4 defines since 2026-08-17.
+
 ## [0.7.1]
 
 Editor-only release; the language, the diagnostics and `@stxt-lang/core` `^0.7.0` are unchanged.

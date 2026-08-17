@@ -30,9 +30,9 @@ function tokensOf(text: string): string[] {
 	return analyze('/tmp/tokens.stxt', text).analysis.tokens.map(describeToken);
 }
 
-function format(text: string): string {
+function format(text: string, insertSpaces = false): string {
 	const { document } = analyze('/tmp/format.stxt', text);
-	return applyEdits(text, FORMATTING.provideDocumentFormattingEdits(asTextDocument(document)));
+	return applyEdits(text, FORMATTING.provideDocumentFormattingEdits(asTextDocument(document), { insertSpaces, tabSize: 4 }));
 }
 
 // The API `label` may be a string or an object with the label inside.
@@ -140,6 +140,45 @@ describe('FormattingProvider', () => {
 		// preserved. Here the last line of the file is indentation only.
 		const text = 'Doc >>\n\tuna línea\n\t\t';
 		assert.strictEqual(parseTree(format(text))[0].getText(), parseTree(text)[0].getText());
+	});
+
+	it('re-indents the lines of a text block to the level of the block', () => {
+		// Like `stxt format` of the CLI: the block level is rewritten, the extra indentation
+		// of a line beyond it is content and stays.
+		assert.strictEqual(format('Doc >>\n    una línea\n        sangrada'), 'Doc >>\n\tuna línea\n\t    sangrada');
+	});
+
+	it('leaves the blank lines inside a text block empty', () => {
+		// STXT-SPEC §10.3: a blank line of a block is "" whatever its indentation, so writing it
+		// empty changes nothing and is what the CLI does too.
+		assert.strictEqual(format('Doc >>\n\tuna\n\t\n\totra'), 'Doc >>\n\tuna\n\n\totra');
+		assert.strictEqual(format('Doc >>\n\tuna\n\n\totra'), 'Doc >>\n\tuna\n\n\totra');
+	});
+
+	describe('when the editor inserts spaces', () => {
+		it('indents with four spaces per level, nodes and block lines alike', () => {
+			assert.strictEqual(format('Padre: p\n\tHijo: v\n\t\tTexto >>\n\t\t\tlínea', true),
+				'Padre: p\n    Hijo: v\n        Texto >>\n            línea');
+		});
+
+		it('uses four spaces whatever the tab size, so the result is valid STXT', () => {
+			// STXT-SPEC: an indentation of spaces is a multiple of four; two would be an error.
+			const { document } = analyze('/tmp/format.stxt', 'Padre: p\n\tHijo: v');
+			const edits = FORMATTING.provideDocumentFormattingEdits(asTextDocument(document), { insertSpaces: true, tabSize: 2 });
+			assert.strictEqual(applyEdits('Padre: p\n\tHijo: v', edits), 'Padre: p\n    Hijo: v');
+		});
+
+		it('converts a document written with tabs, and tabs converts it back', () => {
+			const tabs = 'Padre: p\n\tHijo: v\n\tTexto >>\n\t\tuna\n\n\t\t\tsangrada';
+			const spaces = 'Padre: p\n    Hijo: v\n    Texto >>\n        una\n\n        \tsangrada';
+			assert.strictEqual(format(tabs, true), spaces);
+			assert.strictEqual(format(spaces, false), tabs);
+		});
+
+		it('does not touch a document already indented with spaces', () => {
+			const text = 'Padre:\n    Hijo: v\n    Texto >>\n        línea';
+			assert.strictEqual(format(text, true), text);
+		});
 	});
 });
 

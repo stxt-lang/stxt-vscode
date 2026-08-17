@@ -28,10 +28,14 @@ const HOVER = new StxtHoverProvider();
 const DEFINITION = new StxtDefinitionProvider();
 const SEMANTIC_TOKENS = new StxtSemanticTokensProvider();
 
+// The two indentation styles the editor can ask for.
+const WITH_TABS = { insertSpaces: false, tabSize: 4 };
+const WITH_SPACES = { insertSpaces: true, tabSize: 4 };
+
 // Formats the document through the provider, seeding the analysis cache first.
-function format(filePath: string, text: string): string {
+function format(filePath: string, text: string, options = WITH_TABS): string {
 	const { document } = analyze(filePath, text);
-	const edits = FORMATTING.provideDocumentFormattingEdits(asTextDocument(document));
+	const edits = FORMATTING.provideDocumentFormattingEdits(asTextDocument(document), options);
 
 	return applyEdits(text, edits);
 }
@@ -132,20 +136,45 @@ describeCorpus('stxt-web corpus', root => {
 				});
 			});
 
-			it('formatting is idempotent', () => {
-				const original = fs.readFileSync(file, 'utf-8');
-				const once = format(file, original);
-				const twice = format(file, once);
+			for (const [style, options] of [['tabs', WITH_TABS], ['spaces', WITH_SPACES]] as const) {
+				it(`formatting with ${style} is idempotent`, () => {
+					const original = fs.readFileSync(file, 'utf-8');
+					const once = format(file, original, options);
+					const twice = format(file, once, options);
 
-				assert.strictEqual(twice, once, 'Formatting twice does not give the same result.');
+					assert.strictEqual(twice, once, 'Formatting twice does not give the same result.');
+				});
+
+				it(`formatting with ${style} preserves the tree`, () => {
+					const original = fs.readFileSync(file, 'utf-8');
+					const formatted = format(file, original, options);
+
+					assert.strictEqual(treeSignature(parseTree(formatted)), treeSignature(parseTree(original)),
+						'Formatting changed the document content, not only how it is written.');
+				});
+			}
+
+			it('formatting with spaces leaves no tab in the indentation of nodes and block lines', () => {
+				// The corpus is written with tabs: converting it is the real test of the spaces style.
+				// Comment lines are kept as written (their indentation is not part of the language),
+				// and the extra indentation of a block line beyond its level is content, so it may
+				// still hold a tab after the spaces of the level: what must not remain is a line
+				// whose indentation starts with a tab. A whitespace-only last line of a block is
+				// kept as written too (STXT-SPEC §10.3), so blank lines do not count either.
+				const original = fs.readFileSync(file, 'utf-8');
+				const formatted = format(file, original, WITH_SPACES);
+				const offenders = formatted.split(/\r?\n/)
+					.filter(line => line.startsWith('\t') && line.trim() !== '' && !line.trim().startsWith('#'));
+
+				assert.deepStrictEqual(offenders, [], 'A tab survived in the indentation of some line.');
 			});
 
-			it('formatting preserves the tree', () => {
+			it('formatting with tabs and then with spaces and back gives the tabs result again', () => {
 				const original = fs.readFileSync(file, 'utf-8');
-				const formatted = format(file, original);
+				const tabs = format(file, original, WITH_TABS);
+				const spaces = format(file, tabs, WITH_SPACES);
 
-				assert.strictEqual(treeSignature(parseTree(formatted)), treeSignature(parseTree(original)),
-					'Formatting changed the document content, not only how it is written.');
+				assert.strictEqual(format(file, spaces, WITH_TABS), tabs, 'The two styles are not inverse of each other.');
 			});
 
 			it('completion does not throw at any position', () => {
@@ -208,7 +237,8 @@ describe('Degenerate documents', () => {
 
 			const { document } = analyze(filePath, text);
 
-			assert.doesNotThrow(() => FORMATTING.provideDocumentFormattingEdits(asTextDocument(document)));
+			assert.doesNotThrow(() => FORMATTING.provideDocumentFormattingEdits(asTextDocument(document), WITH_TABS));
+			assert.doesNotThrow(() => FORMATTING.provideDocumentFormattingEdits(asTextDocument(document), WITH_SPACES));
 
 			for (let line = 0; line < document.lineCount; line++) {
 				for (const column of columnsOf(document.lineAt(line).text)) {
