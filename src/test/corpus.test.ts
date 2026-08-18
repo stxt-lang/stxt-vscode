@@ -155,17 +155,17 @@ describeCorpus('stxt-web corpus', root => {
 				});
 			}
 
-			it('formatting with spaces leaves no tab in the indentation of nodes and block lines', () => {
+			it('formatting with spaces leaves no tab in the indentation of nodes, block lines and comments', () => {
 				// The corpus is written with tabs: converting it is the real test of the spaces style.
-				// Comment lines are kept as written (their indentation is not part of the language),
-				// and the extra indentation of a block line beyond its level is content, so it may
-				// still hold a tab after the spaces of the level: what must not remain is a line
-				// whose indentation starts with a tab. A whitespace-only last line of a block is
-				// kept as written too (STXT-SPEC §10.3), so blank lines do not count either.
+				// The extra indentation of a block line beyond its level is content, so it may still
+				// hold a tab after the spaces of the level, and the whole units of a comment are
+				// converted too: what must not remain is a line whose indentation starts with a
+				// tab. A whitespace-only last line of a block is kept as written (STXT-SPEC §10.3),
+				// so blank lines do not count.
 				const original = fs.readFileSync(file, 'utf-8');
 				const formatted = format(file, original, WITH_SPACES);
 				const offenders = formatted.split(/\r?\n/)
-					.filter(line => line.startsWith('\t') && line.trim() !== '' && !line.trim().startsWith('#'));
+					.filter(line => line.startsWith('\t') && line.trim() !== '');
 
 				assert.deepStrictEqual(offenders, [], 'A tab survived in the indentation of some line.');
 			});

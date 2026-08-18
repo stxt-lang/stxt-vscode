@@ -4,6 +4,24 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.7.4]
+
+Editor-only release; the language and `@stxt-lang/core` `^0.7.1` are unchanged.
+
+- **Formatting converts the indentation of comments too.** A comment has no level of its own
+  (STXT-SPEC does not validate its indentation), so *Format Document* used to leave it as
+  written, and a document converted between tabs and spaces kept its comments in the old style.
+  Now the whole indentation units of a comment — tabs or groups of four spaces — are converted
+  to the editor's style, one for one, and whatever follows them (the comment's own extra
+  spacing and its text) is kept exactly as it is. Same rule as `stxt format` 0.7.3 of the CLI
+  and the playground's re-indentation.
+- **The blank lines of a `>>` block are indented like the block.** They used to be written
+  empty; now they get the indentation of the block's lines (a blank line of a block is `""` in
+  the content whatever it looks like, STXT-SPEC §10.3, so the document means the same), which
+  keeps the block in one piece when editing, and a whitespace-only last line of the file is
+  normalised the same way instead of being left as written. Blank lines outside a block still
+  stay empty. Same as `stxt format` 0.7.3.
+
 ## [0.7.3]
 
 Editor-only release; the language and `@stxt-lang/core` `^0.7.1` are unchanged.

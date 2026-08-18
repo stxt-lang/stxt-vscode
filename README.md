@@ -52,9 +52,11 @@ Title: Home
 
 Use **Format Document** to normalize the document: every line that opens a node is re-rendered in
 its canonical form (one space after the colon, no trailing whitespace), the lines of a `>>` block
-are re-indented to the level of their block (any indentation of their own beyond it is content and
-stays), and everything else — comments, blank lines — is kept as it is, with only trailing
-whitespace removed. It is the same formatting `stxt format` applies from the command line.
+— blank ones included — are re-indented to the level of their block (any indentation of their own
+beyond it is content and stays), the whole indentation units of a comment (tabs or groups of four spaces) are converted to
+the editor's style, one for one, and everything else — the text of the comments, blank lines — is
+kept as it is, with only trailing whitespace removed. It is the same formatting `stxt format`
+applies from the command line.
 
 The indentation follows the editor: tabs by default for `.stxt` files, or spaces when
 `editor.insertSpaces` is on for the document. With spaces a level is always four spaces, whatever

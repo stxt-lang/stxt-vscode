@@ -151,11 +151,42 @@ describe('FormattingProvider', () => {
 		assert.strictEqual(format('Doc >>\n    una línea\n        sangrada'), 'Doc >>\n\tuna línea\n\t    sangrada');
 	});
 
-	it('leaves the blank lines inside a text block empty', () => {
+	it('indents the blank lines inside a text block to the level of the block', () => {
 		// STXT-SPEC §10.3: a blank line of a block is "" whatever its indentation, so writing it
-		// empty changes nothing and is what the CLI does too.
-		assert.strictEqual(format('Doc >>\n\tuna\n\t\n\totra'), 'Doc >>\n\tuna\n\n\totra');
-		assert.strictEqual(format('Doc >>\n\tuna\n\n\totra'), 'Doc >>\n\tuna\n\n\totra');
+		// with the indentation of the block changes nothing, keeps the block in one piece, and
+		// is what the CLI does too. Blank lines outside a block have no level and stay empty.
+		assert.strictEqual(format('Doc >>\n\tuna\n\n\t\t\t\n\totra'), 'Doc >>\n\tuna\n\t\n\t\n\totra');
+		assert.strictEqual(format('Doc >>\n\tuna\n\t\n\totra'), 'Doc >>\n\tuna\n\t\n\totra');
+		assert.strictEqual(format('Doc >>\n\tuna\n\n\totra', true), 'Doc >>\n    una\n    \n    otra');
+		assert.strictEqual(format('Padre:\n\tHijo: v\n\t\n\tOtro: w'), 'Padre:\n\tHijo: v\n\n\tOtro: w');
+	});
+
+	it('normalises a whitespace-only last line of a text block to the level of the block', () => {
+		// The trailing blank line of the block stays a line (an empty last line would be the
+		// final line ending), with the indentation of the block.
+		assert.strictEqual(format('Doc >>\n\tuna\n\t\t\t'), 'Doc >>\n\tuna\n\t');
+	});
+
+	describe('comment lines', () => {
+		// A comment has no level of its own (STXT-SPEC does not validate its indentation), so the
+		// formatter converts as many whole indentation units as it has, one for one, and keeps
+		// whatever follows them: the comment does not stay in the old style, and its own extra
+		// spacing is not touched. Same rule as `stxt format` of the CLI and the playground.
+		const MIXED = 'Padre: p\n\t# tab comment\n    # spaces comment\n\t\t  # two units and two spaces\n  # two spaces only\n\tHijo: v';
+
+		it('converts their whole indentation units to tabs, keeping the remainder', () => {
+			assert.strictEqual(format(MIXED),
+				'Padre: p\n\t# tab comment\n\t# spaces comment\n\t\t  # two units and two spaces\n  # two spaces only\n\tHijo: v');
+		});
+
+		it('converts their whole indentation units to spaces, keeping the remainder', () => {
+			assert.strictEqual(format(MIXED, true),
+				'Padre: p\n    # tab comment\n    # spaces comment\n          # two units and two spaces\n  # two spaces only\n    Hijo: v');
+		});
+
+		it('leaves a comment at the margin alone', () => {
+			assert.strictEqual(format('# nada más\nDoc: v', true), '# nada más\nDoc: v');
+		});
 	});
 
 	describe('when the editor inserts spaces', () => {
@@ -172,8 +203,9 @@ describe('FormattingProvider', () => {
 		});
 
 		it('converts a document written with tabs, and tabs converts it back', () => {
-			const tabs = 'Padre: p\n\tHijo: v\n\tTexto >>\n\t\tuna\n\n\t\t\tsangrada';
-			const spaces = 'Padre: p\n    Hijo: v\n    Texto >>\n        una\n\n        \tsangrada';
+			// The blank line of the block takes the indentation of the block in both styles.
+			const tabs = 'Padre: p\n\tHijo: v\n\tTexto >>\n\t\tuna\n\t\t\n\t\t\tsangrada';
+			const spaces = 'Padre: p\n    Hijo: v\n    Texto >>\n        una\n        \n        \tsangrada';
 			assert.strictEqual(format(tabs, true), spaces);
 			assert.strictEqual(format(spaces, false), tabs);
 		});
