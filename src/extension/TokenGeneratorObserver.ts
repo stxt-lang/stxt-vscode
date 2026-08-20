@@ -41,7 +41,7 @@ export class TokenGeneratorObserver implements Observer {
         }
 
         // Colour the content of MARKDOWN blocks. The tokens are emitted here, line by line, so
-        // that they stay in document order with the comments that may interleave the block.
+        // that they stay in document order with the rest of the tokens.
         if (node !== this.currentTextNode) {
             this.currentTextNode = node;
             this.markdownState = this.isMarkdown(node) ? newMarkdownState() : null;

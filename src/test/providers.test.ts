@@ -426,13 +426,16 @@ describeCorpus('MARKDOWN blocks with the corpus grammars', root => {
 		assert.deepStrictEqual(blockTokens('Content', 'no.grammar.here'), []);
 	});
 
-	it('keeps the tokens in document order when a comment interrupts the block', () => {
-		const text = 'Content (dev.stxt.website) >>\n\t**a**\n# comentario\n\t**b**';
+	it('keeps the tokens in document order when a comment closes the block (STXT-SPEC 9.1)', () => {
+		// Since core 0.8.0 a comment at the level of the block node ends the block: the next
+		// block is a new node, and its lines are coloured on their own.
+		const text = 'Content (dev.stxt.website) >>\n\t**a**\n# comentario\nContent (dev.stxt.website) >>\n\t**b**';
 		assert.deepStrictEqual(analyze('/tmp/markdown-comment.stxt', text).analysis.tokens.map(describeToken), [
 			'0:0+8 macro', '0:8+18 namespace', '0:26+3 macro',
 			'1:1+5 markdownBold',
 			'2:0+12 comment',
-			'3:1+5 markdownBold'
+			'3:0+8 macro', '3:8+18 namespace', '3:26+3 macro',
+			'4:1+5 markdownBold'
 		]);
 	});
 });

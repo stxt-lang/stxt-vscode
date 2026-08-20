@@ -4,6 +4,26 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.8.0]
+
+Language release: `@stxt-lang/core` `^0.8.0`, which carries the three changes of the
+specifications dated 2026-08-20. No editor-only changes.
+
+- **A comment closes a `>>` block** (STXT-SPEC 6.1, 9.1). Any non-empty line with indentation
+  less than or equal to the block node ends the block, comments included; before, a comment was
+  transparent and the block stayed open across it. A block is a literal and cannot be commented
+  from inside: a `#` line deeper than the node is text, as always, and one at the node's level
+  or shallower ends it. Blank lines after such a comment are no longer block content, and a
+  text line after it is reported as an error instead of being silently lost. Diagnostics,
+  tokens, hover and formatting follow the tree, so they all reflect the new rule.
+- **The empty namespace is never validated** (STXT-SCHEMA-SPEC 5). The core's `SchemaValidator`
+  no longer reports `SCHEMA_NOT_FOUND` for a node without a namespace, which is what the
+  extension already did through `ConditionalValidator`; nothing changes on screen.
+- **Combining marks in node names** (STXT-SPEC 4.2). Names accept the Unicode categories `Mn`
+  and `Mc` besides letters and digits — Devanagari, Bengali, Tamil or Thai vowel signs, and
+  combining accents with no precomposed form — so `हिंदी: x` is no longer `INVALID_NODE_NAME`.
+  Enclosing marks (`Me`) are not allowed, and a name still needs at least one letter or digit.
+
 ## [0.7.4]
 
 Editor-only release; the language and `@stxt-lang/core` `^0.7.1` are unchanged.
