@@ -4,6 +4,15 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.11.0]
+
+Moves to `@stxt-lang/core` `^0.11.0`, the preview of the 1.0 core. No visible change.
+
+- `ConditionalValidator` is gone from the core; the extension registers `SchemaValidator`
+  directly (it already skipped the nodes without a namespace, STXT-SCHEMA-SPEC 5).
+- `Line.indentLength` became `Line.contentStart` in the core, which fixes an off-by-one in the
+  text lines of a block; the `+ 1` the token generator added to compensate is gone with it.
+
 ## [0.10.1]
 
 Editor-only release, same `@stxt-lang/core` `^0.10.0`.

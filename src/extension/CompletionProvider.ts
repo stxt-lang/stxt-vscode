@@ -97,7 +97,7 @@ function getCompletionContext(linePrefix: string, lastNodeBlock: boolean, lastLe
 
     const line = parseLine(linePrefix, lastNodeBlock, lastLevel, 0, false);
     const level = line.level;
-    const indentationLength = line.indentLength;
+    const indentationLength = line.contentStart;
 
     // Detect whether we are completing a value (after ':' or '>>')
     const sepIndex = trimmed.indexOf(Constants.SEP_NODE);

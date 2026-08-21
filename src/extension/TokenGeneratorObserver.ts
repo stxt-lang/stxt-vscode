@@ -47,8 +47,8 @@ export class TokenGeneratorObserver implements Observer {
             this.markdownState = this.isMarkdown(node) ? newMarkdownState() : null;
         }
         if (this.markdownState) {
-            // The content starts right after the character that completed the block indentation
-            const offset = line.indentLength + 1;
+            // The content starts where the indentation ends
+            const offset = line.contentStart;
             for (const span of tokenizeMarkdownLine(line.content, this.markdownState)) {
                 this.tokens.push({ line: lineIndex, startChar: offset + span.startChar, length: span.length, type: span.type });
             }
@@ -125,9 +125,8 @@ export class TokenGeneratorObserver implements Observer {
                 
                 // Get the indentation of the original line
                 const originalLine = this.templateNodeByLine.get(absoluteLineNumber);
-                // indentLength is the index of the last indentation character;
-                // the content starts at indentLength + 1
-                const offset = originalLine ? originalLine.indentLength + 1 : 0;
+                // The content starts where the indentation ends
+                const offset = originalLine ? originalLine.contentStart : 0;
 
                 this.tokens.push({
                     line: token.line + lineOffset,

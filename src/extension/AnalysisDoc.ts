@@ -1,5 +1,5 @@
 import vscode from 'vscode';
-import { Node, Parser, ParseException, ParseResult, Schema, SchemaValidator, ConditionalValidator, ValidationException, transformNodeToSchema, transformTemplateNodeToSchema } from '@stxt-lang/core';
+import { Node, Parser, ParseException, ParseResult, Schema, SchemaValidator, ValidationException, transformNodeToSchema, transformTemplateNodeToSchema } from '@stxt-lang/core';
 import { AnalysisResult } from './AnalysisResult';
 import { SchemaLoaderExtension, getSchemaForDocument } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';
@@ -71,7 +71,7 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
     const parser = new Parser();
     parser.registerObserver(tokenObserver);
     if (schemaValidation) {
-        parser.registerValidator(new ConditionalValidator(new SchemaValidator(new SchemaLoaderExtension(document.uri))));
+        parser.registerValidator(new SchemaValidator(new SchemaLoaderExtension(document.uri)));
     }
     const parseResult: ParseResult = parser.parseResult(document.getText());
 
