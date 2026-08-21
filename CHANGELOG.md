@@ -4,6 +4,24 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.9.1]
+
+Language release: `@stxt-lang/core` `^0.9.1`. No editor-only changes.
+
+- **Error codes renamed** (STXT-SPEC 11.1, STXT-SCHEMA-SPEC 13.1, STXT-TEMPLATE-SPEC 14.1, the new
+  normative annexes; frozen from 1.0). Diagnostics show the new codes: `INDENTATION_MIXED` (was
+  `MIXED_INDENTATION`), `INDENTATION_SPACES_NOT_VALID` (was `INVALID_NUMBER_SPACES`),
+  `BLOCK_VALUE_NOT_ALLOWED` (was `INLINE_VALUE_NOT_VALID`), `TOO_FEW_CHILDREN` / `TOO_MANY_CHILDREN`
+  (was `INVALID_NUMBER`), `BLOCK_FORM_NOT_ALLOWED` (was `NOT_ALLOWED_TEXT`), `CHILDREN_NOT_ALLOWED`
+  (was `NOT_ALLOWED_CHILDREN_TEXT`), `VALUE_NOT_ALLOWED` (a value on a `GROUP`, was `INVALID_VALUE`),
+  `NODE_NOT_DEFINED_IN_SCHEMA` (was `NODE_NOT_EXIST_IN_SCHEMA`), `UNEXPECTED_ERROR` (was
+  `VALIDATION_ERROR`), and the schema- and template-loading families (`SCHEMA_*`, `TEMPLATE_*`,
+  `*_DUPLICATED`, `DESCRIPTION_*`, `REFERENCE_*`). The `SCHEMA_NOT_FOUND` filter is unchanged.
+- **Value types by grammar** (STXT-SCHEMA-SPEC 9.3–9.5): `URL` is an absolute URL with scheme and
+  host by the specification's own grammar; `DATE`, `TIME` and `TIMESTAMP` check calendar and clock
+  ranges (`2026-02-30` and `24:00:00` are errors now); the `TIMESTAMP` fraction takes one or more
+  digits; `NUMBER` is documented as not the JSON number.
+
 ## [0.9.0]
 
 Language release: `@stxt-lang/core` `^0.9.0`, which carries the one change of STXT-SPEC dated

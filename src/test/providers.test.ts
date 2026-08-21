@@ -187,7 +187,7 @@ describe('FormattingProvider', () => {
 		it('reports a comment with invalid indentation as a syntax error, like a node', () => {
 			const { diagnostics } = analyze('/tmp/format.stxt', 'Padre: p\n\t\t  # mixed\n  # two spaces\n\t\t# level 2 after level 0');
 			assert.deepStrictEqual(diagnostics.map((d) => `${d.range.start.line + 1}:${d.message.split(']')[0]}]`),
-				['2:[MIXED_INDENTATION]', '3:[INVALID_NUMBER_SPACES]', '4:[INDENTATION_LEVEL_NOT_VALID]']);
+				['2:[INDENTATION_MIXED]', '3:[INDENTATION_SPACES_NOT_VALID]', '4:[INDENTATION_LEVEL_NOT_VALID]']);
 		});
 
 		it('leaves a comment at the margin alone', () => {
