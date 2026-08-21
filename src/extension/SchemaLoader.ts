@@ -316,7 +316,7 @@ export async function registerSchemaLoader(
     await notifySchemasChanged();
 
     if (getSchemas().length === 0) {
-        log.info(`No schemas loaded: the resolution chain provides no definition. Documents are not validated.`);
+        log.info(`No schemas loaded: the resolution chain provides no definition. Namespaced documents will report SCHEMA_NOT_FOUND (unless stxt.schemaValidation is off).`);
     } else {
         log.info(`Initial load: ${getSchemas().length} schemas, ${KNOWN_LEVEL_DIRS.size} resolution directories.`);
     }

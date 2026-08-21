@@ -2,7 +2,7 @@
   "name": "stxt",
   "displayName": "STXT - Semantic Text",
   "description": "Language support for STXT (Semantic Text): highlighting, validation against schemas and templates, completion, hover and formatting.",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "publisher": "stxt-lang",
   "repository": {
     "type": "git",
@@ -112,6 +112,11 @@
     "configuration": {
       "title": "STXT",
       "properties": {
+        "stxt.schemaValidation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Validate documents against the schemas and templates found through the resolution chain (STXT-DISCOVERY-SPEC). A namespace no definition covers is reported as SCHEMA_NOT_FOUND, also when the chain has no definition at all. Off: only the syntax is checked."
+        },
         "stxt.developerMode": {
           "type": "boolean",
           "default": false,

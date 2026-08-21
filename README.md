@@ -11,7 +11,7 @@ Ready-to-use examples: [https://github.com/stxt-lang/stxt-web](https://github.co
 
 ## Features
 
-* ✅ Real-time validation: syntax errors as you type, and schema errors when a schema applies
+* ✅ Real-time validation: syntax errors as you type, and schema errors against the resolution chain (switchable with `stxt.schemaValidation`)
 * 🎨 Semantic syntax highlighting, driven by the parser (no hand-written grammar); the content
   of blocks whose schema type is `MARKDOWN` is highlighted as Markdown (headings, emphasis,
   code, lists, quotes, links) with the colours of your theme
@@ -68,6 +68,7 @@ The indentation follows the editor: tabs by default for `.stxt` files, or spaces
 
 | Setting | Default | What it does |
 |---|---|---|
+| `stxt.schemaValidation` | `true` | Validate every document against the schemas and templates found through its resolution chain. A namespace that no definition covers is a `SCHEMA_NOT_FOUND` warning — also when the chain has no definition at all: the setting decides whether a document is validated, not whether unrelated definitions happen to be installed. Off: only the syntax is checked (definition documents are not checked against their meta-schema either), like `stxt validate --no-schema`. |
 | `stxt.developerMode` | `false` | Off: hovering a node shows what its schema or template declares for it — the description, the type and, for an `ENUM`, the allowed values (nothing if no grammar declares the node). On: the technical card — inline/block form and level, name, canonical and qualified names, value, the schema type and allowed values, the content of a text block — and a card over comments too. |
 
 The editor defaults for `.stxt` files (tabs, tab size 4, no indentation detection, suggestions on)

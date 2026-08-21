@@ -288,6 +288,10 @@ export const workspace = {
 		return subscribe(documentListeners.close, listener);
 	},
 
+	onDidChangeConfiguration(_listener: (event: unknown) => unknown): Disposable {
+		return { dispose() { /* the tests set configuration directly */ } };
+	},
+
 	createFileSystemWatcher(_pattern?: unknown): Disposable & {
 		onDidCreate(listener: () => void): Disposable;
 		onDidChange(listener: () => void): Disposable;

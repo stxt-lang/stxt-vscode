@@ -43,6 +43,12 @@ export async function activate(context: vscode.ExtensionContext) {
 				log.trace(`onDidCloseTextDocument: ${doc.uri.toString()}`);
 			}
 			diagnosticCollection.delete(doc.uri);
+		}),
+		vscode.workspace.onDidChangeConfiguration(e => {
+			if (e.affectsConfiguration('stxt.schemaValidation')) {
+				log.info('stxt.schemaValidation changed: re-analyzing every open document.');
+				analysisAllDocs();
+			}
 		})
 	);
 

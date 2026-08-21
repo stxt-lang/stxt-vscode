@@ -4,7 +4,7 @@ import * as os from 'os';
 import * as path from 'path';
 import type { ExtensionContext } from 'vscode';
 import type { DiscoveryEnvironment } from '@stxt-lang/core';
-import { setWorkspaceFolder, Uri } from './stub/vscode';
+import { DiagnosticSeverity, setConfiguration, setWorkspaceFolder, Uri } from './stub/vscode';
 import { asTextDocument, TestDocument } from './stub/TestDocument';
 import { registerSchemaLoader, ensureSchemasForDocument, getSchema, getSchemas } from '../extension/SchemaLoader';
 import { analyze, describeDiagnostics } from './corpus';
@@ -197,13 +197,49 @@ describe('SchemaLoader', () => {
 
 	describe('validation when there are no schemas', () => {
 
-		it('flags nothing in a document with a namespace if there is no schema at all', async () => {
+		it('warns SCHEMA_NOT_FOUND in a document with a namespace if there is no schema at all', async () => {
 			await register(emptyDir);
 
-			// Without the filter there would be one SCHEMA_NOT_FOUND per node, not one per document.
+			// Validation is on by default, so an empty chain is reported, not silenced: the
+			// setting decides whether the document is validated, not unrelated schemas.
 			const { diagnostics } = analyze(documentPath, DOCUMENT);
 
+			assert.ok(diagnostics.length > 0, 'SCHEMA_NOT_FOUND was expected.');
+			assert.ok(diagnostics.every(d => d.message.includes('SCHEMA_NOT_FOUND') && d.severity === DiagnosticSeverity.Warning),
+				`Only SCHEMA_NOT_FOUND warnings were expected:${describeDiagnostics(diagnostics)}`);
+		});
+
+		it('flags nothing in a document without namespace if there is no schema at all', async () => {
+			await register(emptyDir);
+
+			const { diagnostics } = analyze(documentPath, 'Nota: hola\n\tCuerpo: texto\n');
+
 			assert.strictEqual(diagnostics.length, 0, `No diagnostic was expected:${describeDiagnostics(diagnostics)}`);
+		});
+
+		it('flags nothing in a namespaced document when stxt.schemaValidation is off', async () => {
+			await register(emptyDir);
+			setConfiguration('stxt.schemaValidation', false);
+			try {
+				const { diagnostics } = analyze(documentPath, DOCUMENT);
+				assert.strictEqual(diagnostics.length, 0, `No diagnostic was expected:${describeDiagnostics(diagnostics)}`);
+			} finally {
+				setConfiguration('stxt.schemaValidation', undefined);
+			}
+		});
+
+		it('keeps syntax errors but drops schema errors when stxt.schemaValidation is off', async () => {
+			await register(projectDir);
+			setConfiguration('stxt.schemaValidation', false);
+			try {
+				const { diagnostics } = analyze(path.join(subDir, 'otro.stxt'), OTHER_DOCUMENT);
+				assert.strictEqual(diagnostics.length, 0, `No diagnostic was expected:${describeDiagnostics(diagnostics)}`);
+
+				const broken = analyze(documentPath, 'Documento (test.arriba):\n\t\t\tTitulo: salto de nivel\n');
+				assert.ok(broken.diagnostics.length > 0, 'An indentation jump should still be an error.');
+			} finally {
+				setConfiguration('stxt.schemaValidation', undefined);
+			}
 		});
 
 		it('still flags syntax errors even without schemas', async () => {

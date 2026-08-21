@@ -4,6 +4,20 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.10.1]
+
+Editor-only release, same `@stxt-lang/core` `^0.10.0`.
+
+- **New setting `stxt.schemaValidation`** (default `true`): validate documents against the
+  schemas and templates of their resolution chain. Off, only the syntax is checked — definition
+  documents are not checked against their meta-schema either — like `stxt validate --no-schema`.
+  Changing it re-analyzes every open document.
+- **`SCHEMA_NOT_FOUND` is no longer silenced when the chain has no definition at all.** With
+  validation on, a namespace that no definition covers is a warning on each node, whatever else
+  is installed: the setting decides whether a document is validated, not the presence of
+  unrelated schemas beside it (which until now changed a document's verdict without touching
+  it). Same rule as the playground 0.4.3 and the CLI 0.10.1.
+
 ## [0.10.0]
 
 Language release: `@stxt-lang/core` `^0.10.0`, the last one before 1.0. No editor-only changes.
