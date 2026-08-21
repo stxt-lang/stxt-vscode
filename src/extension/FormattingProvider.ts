@@ -8,9 +8,9 @@ import { DocumentFormattingEditProvider, FormattingOptions, Range, TextDocument,
  * open a node are rewritten in canonical form, the text lines of a `>>` block — its blank lines
  * included — are re-indented to the level of their block (keeping any indentation of their own
  * beyond it), the whole indentation
- * units of a comment line are converted to the editor's style (STXT-SPEC does not validate the
- * indentation of a comment, so it carries no level: as many whole tabs or 4-space units as the
- * line has are converted, one for one, and whatever follows them is kept), and every other line —
+ * units of a comment line are converted to the editor's style (STXT-SPEC §9 validates the
+ * indentation of a comment like a node's, so in a document that parses every comment has a
+ * whole number of units; they are converted one for one and the text after them is kept), and every other line —
  * blank lines — is left as the author wrote it, minus trailing whitespace. Lines the parse tree
  * does not describe (for instance, after an indentation error) are left untouched.
  *

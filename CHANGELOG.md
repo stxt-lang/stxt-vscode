@@ -4,6 +4,20 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.9.0]
+
+Language release: `@stxt-lang/core` `^0.9.0`, which carries the one change of STXT-SPEC dated
+2026-08-21. No editor-only changes.
+
+- **The indentation of a comment is validated like a node's** (STXT-SPEC 9, 11): only tabs or
+  only groups of four spaces, never mixed on the same line, and at most one level deeper than
+  the last node. A comment still produces no node and never moves the hierarchy. The errors are
+  the node ones — `MIXED_INDENTATION`, `INVALID_NUMBER_SPACES`, `INDENTATION_LEVEL_NOT_VALID` —
+  and show up as diagnostics on the comment line. Before, a comment could sit at any
+  indentation. Formatting is unchanged in substance: the indentation units of a comment are
+  still converted one for one to the editor's style; a comment with leftover spaces is now a
+  syntax error, so the document is reported instead of reformatted.
+
 ## [0.8.0]
 
 Language release: `@stxt-lang/core` `^0.8.0`, which carries the three changes of the

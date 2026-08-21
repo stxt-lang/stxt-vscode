@@ -168,20 +168,26 @@ describe('FormattingProvider', () => {
 	});
 
 	describe('comment lines', () => {
-		// A comment has no level of its own (STXT-SPEC does not validate its indentation), so the
-		// formatter converts as many whole indentation units as it has, one for one, and keeps
-		// whatever follows them: the comment does not stay in the old style, and its own extra
-		// spacing is not touched. Same rule as `stxt format` of the CLI and the playground.
-		const MIXED = 'Padre: p\n\t# tab comment\n    # spaces comment\n\t\t  # two units and two spaces\n  # two spaces only\n\tHijo: v';
+		// STXT-SPEC §9 validates the indentation of a comment like a node's (whole units, at most
+		// one level deeper than the last node), so the formatter converts its units one for one:
+		// the comment does not stay in the old style. Same rule as `stxt format` of the CLI and
+		// the playground.
+		const MIXED = 'Padre: p\n\t# tab comment\n    # spaces comment\n\tHijo: v\n\t\t# two units, after a childless node';
 
-		it('converts their whole indentation units to tabs, keeping the remainder', () => {
+		it('converts their indentation units to tabs', () => {
 			assert.strictEqual(format(MIXED),
-				'Padre: p\n\t# tab comment\n\t# spaces comment\n\t\t  # two units and two spaces\n  # two spaces only\n\tHijo: v');
+				'Padre: p\n\t# tab comment\n\t# spaces comment\n\tHijo: v\n\t\t# two units, after a childless node');
 		});
 
-		it('converts their whole indentation units to spaces, keeping the remainder', () => {
+		it('converts their indentation units to spaces', () => {
 			assert.strictEqual(format(MIXED, true),
-				'Padre: p\n    # tab comment\n    # spaces comment\n          # two units and two spaces\n  # two spaces only\n    Hijo: v');
+				'Padre: p\n    # tab comment\n    # spaces comment\n    Hijo: v\n        # two units, after a childless node');
+		});
+
+		it('reports a comment with invalid indentation as a syntax error, like a node', () => {
+			const { diagnostics } = analyze('/tmp/format.stxt', 'Padre: p\n\t\t  # mixed\n  # two spaces\n\t\t# level 2 after level 0');
+			assert.deepStrictEqual(diagnostics.map((d) => `${d.range.start.line + 1}:${d.message.split(']')[0]}]`),
+				['2:[MIXED_INDENTATION]', '3:[INVALID_NUMBER_SPACES]', '4:[INDENTATION_LEVEL_NOT_VALID]']);
 		});
 
 		it('leaves a comment at the margin alone', () => {
