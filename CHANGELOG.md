@@ -4,6 +4,22 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.10.0]
+
+Language release: `@stxt-lang/core` `^0.10.0`, the last one before 1.0. No editor-only changes.
+
+- **Blanks inside binary values** (STXT-SCHEMA-SPEC 9.5): `HEXADECIMAL`, `BINARY` and `BASE64`
+  drop every space and tab before validating, inline and in `>>` blocks, so `DE AD BE EF`,
+  `1010 1010` and Base64 wrapped at 76 columns are valid. An empty `BASE64` value is now an error,
+  as the specification always said.
+- **`VALUE_EMPTY`** (STXT-SCHEMA-SPEC 13, condition 14; STXT-TEMPLATE-SPEC 14.14): an empty
+  `Value:` in an `ENUM`, or an empty item in a template list (`ENUM [a, , b]`, `[a, b,]`), is a
+  definition error shown on that line.
+- **Error messages** carry only the description; the code and line are separate fields, as the
+  diagnostics already showed them. No visible change in the editor.
+- The core now exposes `SPEC_VERSION` (`1.0`), the version of the STXT specifications it
+  implements.
+
 ## [0.9.1]
 
 Language release: `@stxt-lang/core` `^0.9.1`. No editor-only changes.
