@@ -15,7 +15,7 @@ import {
 } from './corpus';
 
 /**
- * Editor-layer invariants over the real stxt-web corpus.
+ * Editor-layer invariants over the real stxt-lang corpus.
  *
  * Language conformance is not checked here —the `../stxt-js` tests do that against the
  * same corpus— but what the extension does with documents already known to be valid:
@@ -65,7 +65,7 @@ function columnsOf(text: string): number[] {
 	return [...new Set([0, Math.floor(text.length / 2), Math.max(0, text.length - 1), text.length])];
 }
 
-describeCorpus('stxt-web corpus', root => {
+describeCorpus('stxt-lang corpus', root => {
 
 	before(async () => {
 		await loadSchemas(root);

@@ -16,7 +16,7 @@ import {
 import { log } from './Log';
 
 /**
- * Schema/template resolution according to STXT-DISCOVERY-SPEC (stxt-web,
+ * Schema/template resolution according to STXT-DISCOVERY-SPEC (stxt-lang,
  * `stxt-discovery-ref.stxt`): the normative logic lives in `DiscoveryResolver`
  * (@stxt-lang/core) and only the two editor adapters remain here —
  * `vscode.workspace.fs` and the process environment— plus the per-document state.

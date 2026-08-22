@@ -12,7 +12,7 @@ import { analyze, describeDiagnostics } from './corpus';
 /**
  * Where the loader looks for schemas, and what gets flagged when it finds none.
  *
- * It is the only block that does not use the stxt-web corpus: what is tested is the
+ * It is the only block that does not use the stxt-lang corpus: what is tested is the
  * directory lookup (STXT-DISCOVERY-SPEC), so it needs its own disposable tree instead
  * of real documents.
  *

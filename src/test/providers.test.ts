@@ -17,7 +17,7 @@ import { MarkdownSpan, newMarkdownState, tokenizeMarkdownLine } from '../extensi
  * the observer that colours and the suggestion lookup.
  *
  * The observer ones need no schemas; the completion ones do, and they use those of the
- * stxt-web corpus so as not to invent a fake schema that drifts out of sync.
+ * stxt-lang corpus so as not to invent a fake schema that drifts out of sync.
  */
 
 const FORMATTING = new StxtFormattingProvider();
@@ -226,7 +226,7 @@ describe('FormattingProvider', () => {
 
 describeCorpus('Completion with the corpus schemas', root => {
 
-	// The org.example.enum.test schema of stxt-web: Document has the children Priority
+	// The org.example.enum.test schema of stxt-lang: Document has the children Priority
 	// (Max 1), Title (1,1) and Content (1,1, of type TEXT); Priority is an ENUM.
 	const NAMESPACE = 'org.example.enum.test';
 
@@ -409,7 +409,7 @@ describe('MarkdownTokenizer', () => {
 
 describeCorpus('MARKDOWN blocks with the corpus grammars', root => {
 
-	// dev.stxt.website of stxt-web declares `Content: MARKDOWN` and `CODE: TEXT`.
+	// dev.stxt.website of stxt-lang declares `Content: MARKDOWN` and `CODE: TEXT`.
 	before(async () => {
 		await loadSchemas(root);
 	});
@@ -450,7 +450,7 @@ describeCorpus('MARKDOWN blocks with the corpus grammars', root => {
 describeCorpus('Hover with the corpus definitions', root => {
 	const HOVER = new StxtHoverProvider();
 
-	// The dev.stxt.website template of stxt-web describes its nodes in a Description block
+	// The dev.stxt.website template of stxt-lang describes its nodes in a Description block
 	// ("Document: Un documento es bla, bla, bla"); Priority of org.example.enum.test is an ENUM
 	// with no description.
 	before(async () => {
@@ -493,7 +493,7 @@ describeCorpus('Hover with the corpus definitions', root => {
 
 describeCorpus('Go to definition with the corpus definitions', root => {
 
-	// Two definitions of stxt-web: org.example.enum.test is a schema (`Node: Document` on
+	// Two definitions of stxt-lang: org.example.enum.test is a schema (`Node: Document` on
 	// line 2, `Node: Priority` on line 12) and org.example.tomcat a template (`Server` on
 	// line 3 of the file, its child `Port` on line 4).
 	const SCHEMA_NAMESPACE = 'org.example.enum.test';
