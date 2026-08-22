@@ -55,8 +55,8 @@ its canonical form (one space after the colon, no trailing whitespace), the line
 — blank ones included — are re-indented to the level of their block (any indentation of their own
 beyond it is content and stays), the whole indentation units of a comment (tabs or groups of four spaces) are converted to
 the editor's style, one for one, and everything else — the text of the comments, blank lines — is
-kept as it is, with only trailing whitespace removed. It is the same formatting `stxt format`
-applies from the command line.
+kept as it is, with only trailing whitespace removed. It is the `Formatter` of `@stxt-lang/core`,
+the same one `stxt format` applies from the command line and the playground uses.
 
 The indentation follows the editor: tabs by default for `.stxt` files, or spaces when
 `editor.insertSpaces` is on for the document. With spaces a level is always four spaces, whatever

@@ -4,6 +4,16 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.11.1]
+
+Moves to `@stxt-lang/core` `^0.11.1`. No visible change.
+
+- **Format Document** delegates to the new `Formatter` of the core, the same one `stxt format`
+  and the playground use; the extension's own line rewriter is gone. Same result as before, with
+  one difference on documents with syntax errors: a line the parse tree does not describe now has
+  its whole indentation units converted to the editor's style, like a comment, instead of being
+  left in the old style.
+
 ## [0.11.0]
 
 Moves to `@stxt-lang/core` `^0.11.0`, the preview of the 1.0 core. No visible change.

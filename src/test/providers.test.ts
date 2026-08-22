@@ -118,7 +118,8 @@ describe('FormattingProvider', () => {
 
 	it('leaves a line with invalid indentation untouched', () => {
 		// A jump of more than one level produces no node, so the formatter does not know
-		// which level to place it at: it leaves it as is instead of inventing an indent.
+		// which level to place it at: it only converts its indentation units to the editor's
+		// style (none here, tabs to tabs) instead of inventing an indent.
 		const text = 'Padre: p\n\t\t\tHijo: v';
 		assert.strictEqual(format(text), text);
 	});

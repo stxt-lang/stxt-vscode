@@ -80,7 +80,6 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
     const nodeByLine = tokenObserver.getNodeByLine();
     const commentLines = tokenObserver.getCommentLines();
     const textLineByLineNumber = tokenObserver.getTextLineByLineNumber();
-    const textContentByLineNumber = tokenObserver.getTextContentByLineNumber();
 
     // Convert errors to diagnostics
     for (const error of parseResult.getErrors()) {
@@ -104,7 +103,7 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
     diagnosticCollection.set(document.uri, diagnostics);
 
     // Store the results
-    const result: AnalysisResult = { tokens, nodeByLine, commentLines, textLineByLineNumber, textContentByLineNumber };
+    const result: AnalysisResult = { tokens, nodeByLine, commentLines, textLineByLineNumber };
     LAST_ANALYSIS_BY_URI.set(document.uri.toString(), result);
 
     log.trace(`Analysis of ${document.uri.toString()}: ${tokens.length} tokens, ${diagnostics.length} diagnostics.`);
