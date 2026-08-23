@@ -4,6 +4,12 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.12.0]
+
+Moves to `@stxt-lang/core` `^0.12.0`, the language change of STXT-SPEC §8.3 (clarified on
+2026-08-22): an indented first line is now a parse error, `INDENTATION_LEVEL_NOT_VALID`. The
+extension reports it like any other syntax error; nothing else changes.
+
 ## [0.11.1]
 
 Moves to `@stxt-lang/core` `^0.11.1`. No visible change.
