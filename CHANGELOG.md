@@ -4,6 +4,11 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.13.1]
+
+New extension icon: the Russo One "S" over "TXT", white on the brand gradient, matching the
+portal's favicon. No functional change.
+
 ## [0.13.0]
 
 Moves to `@stxt-lang/core` `^0.13.0`: the writing operations of STXT-TREE-SPEC §11–12 are now
