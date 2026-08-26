@@ -10,10 +10,16 @@ Moves to `@stxt-lang/core` `^0.14.0`: the parser limits of STXT-SPEC §11.2. Doc
 more than 100 levels, lines longer than 10 000 characters and inputs over 10 000 000 characters
 are now rejected (`LIMIT_NESTING_EXCEEDED`, `LIMIT_LINE_LENGTH_EXCEEDED`,
 `LIMIT_INPUT_SIZE_EXCEEDED`), and a limit error aborts the parse, so it is always the last
-diagnostic of the document. These are the recommended defaults of the specification; the
-extension uses them as they come, with no setting of its own. The core also gains a streaming
-API (`StreamObserver`, `parseStream`) that the extension does not need. Nothing else changes in
-the editor layer.
+diagnostic of the document. The core also gains a streaming API (`StreamObserver`,
+`parseStream`) that the extension does not need.
+
+Three new settings — **`stxt.maxNesting`**, **`stxt.maxLineLength`** and
+**`stxt.maxInputSize`** — configure the limits per user or per workspace, next to
+`stxt.schemaValidation` and `stxt.developerMode`; `-1` disables one, and the defaults are the
+recommended ones of the specification. Changing any STXT setting re-analyzes the open
+documents. Known limitation: **Format Document** keeps the recommended defaults for now, since
+the core's `Formatter` does not take parser options yet; a document that only parses with
+raised limits gets diagnostics and colouring, but is not reformatted.
 
 This release also ships the 0.13.1 icon, which was never published on its own.
 

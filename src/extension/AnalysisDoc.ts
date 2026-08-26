@@ -1,5 +1,5 @@
 import vscode from 'vscode';
-import { Node, Parser, ParseException, ParseResult, Schema, SchemaValidator, ValidationException, transformNodeToSchema, transformTemplateNodeToSchema } from '@stxt-lang/core';
+import { Constants, Node, Parser, ParseException, ParseResult, ParserOptions, Schema, SchemaValidator, ValidationException, transformNodeToSchema, transformTemplateNodeToSchema } from '@stxt-lang/core';
 import { AnalysisResult } from './AnalysisResult';
 import { SchemaLoaderExtension, getSchemaForDocument } from './SchemaLoader';
 import { diagnosticCollection } from '../extension';
@@ -14,6 +14,20 @@ const LAST_ANALYSIS_BY_URI  = new Map<string, AnalysisResult>();
  */
 export function isSchemaValidationEnabled(document: vscode.TextDocument): boolean {
     return vscode.workspace.getConfiguration('stxt', document).get<boolean>('schemaValidation', true);
+}
+
+/**
+ * The parser limits for a document (STXT-SPEC 11.2), from the `stxt.maxNesting`,
+ * `stxt.maxLineLength` and `stxt.maxInputSize` settings; -1 disables one. The defaults are
+ * the recommended ones of the specification, the same the core ships.
+ */
+export function parserLimits(document: vscode.TextDocument): ParserOptions {
+    const configuration = vscode.workspace.getConfiguration('stxt', document);
+    return {
+        maxNesting: configuration.get<number>('maxNesting', Constants.DEFAULT_MAX_NESTING),
+        maxLineLength: configuration.get<number>('maxLineLength', Constants.DEFAULT_MAX_LINE_LENGTH),
+        maxInputSize: configuration.get<number>('maxInputSize', Constants.DEFAULT_MAX_INPUT_SIZE),
+    };
 }
 
 /**
@@ -68,7 +82,7 @@ export function analysisDoc(document: vscode.TextDocument, diagnosticCollection:
     // definitions. Until 0.10.0 the code was silenced on an empty chain, and a document's
     // verdict changed when an unrelated schema was installed beside it.
     const schemaValidation = isSchemaValidationEnabled(document);
-    const parser = new Parser();
+    const parser = new Parser(parserLimits(document));
     parser.registerObserver(tokenObserver);
     if (schemaValidation) {
         parser.registerValidator(new SchemaValidator(new SchemaLoaderExtension(document.uri)));

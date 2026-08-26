@@ -45,8 +45,9 @@ export async function activate(context: vscode.ExtensionContext) {
 			diagnosticCollection.delete(doc.uri);
 		}),
 		vscode.workspace.onDidChangeConfiguration(e => {
-			if (e.affectsConfiguration('stxt.schemaValidation')) {
-				log.info('stxt.schemaValidation changed: re-analyzing every open document.');
+			// Any stxt.* setting may change the analysis (schema validation, parser limits)
+			if (e.affectsConfiguration('stxt')) {
+				log.info('STXT settings changed: re-analyzing every open document.');
 				analysisAllDocs();
 			}
 		})

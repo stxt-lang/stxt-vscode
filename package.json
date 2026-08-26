@@ -121,6 +121,24 @@
           "type": "boolean",
           "default": false,
           "description": "Show the technical details of the node under the cursor in the hover: form and level, canonical and qualified names, value, schema type and allowed values, text content, and comments. When off, the hover shows only the description the schema or template gives for the node, if there is one."
+        },
+        "stxt.maxNesting": {
+          "type": "integer",
+          "default": 100,
+          "minimum": -1,
+          "description": "Maximum open nesting levels of the parser (STXT-SPEC 11.2); level 0 is the first. A document nesting deeper is rejected with LIMIT_NESTING_EXCEEDED. -1 disables the limit; 100 is the recommended default."
+        },
+        "stxt.maxLineLength": {
+          "type": "integer",
+          "default": 10000,
+          "minimum": -1,
+          "description": "Maximum length of one line, indentation included (STXT-SPEC 11.2). A longer line is rejected with LIMIT_LINE_LENGTH_EXCEEDED. -1 disables the limit; 10000 is the recommended default."
+        },
+        "stxt.maxInputSize": {
+          "type": "integer",
+          "default": 10000000,
+          "minimum": -1,
+          "description": "Maximum total size of a document, in characters (STXT-SPEC 11.2). A larger document is rejected with LIMIT_INPUT_SIZE_EXCEEDED. -1 disables the limit; 10000000 is the recommended default."
         }
       }
     },
