@@ -2,7 +2,7 @@
   "name": "stxt",
   "displayName": "STXT - Semantic Text",
   "description": "Language support for STXT (Semantic Text): highlighting, validation against schemas and templates, completion, hover and formatting.",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "publisher": "stxt-lang",
   "repository": {
     "type": "git",
@@ -148,7 +148,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "@stxt-lang/core": "^0.13.0"
+    "@stxt-lang/core": "^0.14.0"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

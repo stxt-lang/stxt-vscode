@@ -4,7 +4,20 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [0.13.1]
+## [0.14.0]
+
+Moves to `@stxt-lang/core` `^0.14.0`: the parser limits of STXT-SPEC §11.2. Documents nesting
+more than 100 levels, lines longer than 10 000 characters and inputs over 10 000 000 characters
+are now rejected (`LIMIT_NESTING_EXCEEDED`, `LIMIT_LINE_LENGTH_EXCEEDED`,
+`LIMIT_INPUT_SIZE_EXCEEDED`), and a limit error aborts the parse, so it is always the last
+diagnostic of the document. These are the recommended defaults of the specification; the
+extension uses them as they come, with no setting of its own. The core also gains a streaming
+API (`StreamObserver`, `parseStream`) that the extension does not need. Nothing else changes in
+the editor layer.
+
+This release also ships the 0.13.1 icon, which was never published on its own.
+
+## [0.13.1] (not published)
 
 New extension icon: the Russo One "S" over "TXT", white on the brand gradient, matching the
 portal's favicon. No functional change.
