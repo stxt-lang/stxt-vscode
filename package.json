@@ -1,7 +1,7 @@
 {
   "name": "stxt",
-  "displayName": "STXT - Semantic Text",
-  "description": "Language support for STXT (Semantic Text): highlighting, validation against schemas and templates, completion, hover and formatting.",
+  "displayName": "STXT Language",
+  "description": "Language support for STXT: highlighting, validation against schemas and templates, completion, hover and formatting.",
   "version": "0.14.1",
   "publisher": "stxt-lang",
   "repository": {
@@ -21,7 +21,6 @@
   ],
   "keywords": [
     "stxt",
-    "semantic text",
     "language",
     "syntax",
     "schema",
@@ -35,7 +34,7 @@
       {
         "id": "stxt",
         "aliases": [
-          "STXT (Semantic Text)",
+          "STXT",
           "STXT"
         ],
         "extensions": [

@@ -1,6 +1,6 @@
-# STXT – Semantic Text
+# STXT Language
 
-Support for the **STXT (Semantic Text)** language in Visual Studio Code.
+Support for the **STXT** language in Visual Studio Code.
 
 STXT is a structured, indentation-based language designed for semantic configuration and content definition.
 
