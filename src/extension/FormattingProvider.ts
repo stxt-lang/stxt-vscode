@@ -1,5 +1,6 @@
 import { Formatter, IndentStyle } from '@stxt-lang/core';
 import { DocumentFormattingEditProvider, FormattingOptions, Range, TextDocument, TextEdit } from 'vscode';
+import { parserLimits } from './AnalysisDoc';
 
 /**
  * Formats a document with `Formatter` of `@stxt-lang/core`, the same formatter `stxt format` of
@@ -13,6 +14,9 @@ import { DocumentFormattingEditProvider, FormattingOptions, Range, TextDocument,
  * The indentation follows the editor: tabs, or spaces when the editor inserts spaces. In that
  * case a level is always **four** spaces (STXT-SPEC: an indentation of spaces is a multiple of
  * four), whatever `tabSize` says, so the result is a valid document.
+ *
+ * The formatter parses with the same limits the analysis uses (`stxt.maxNesting`,
+ * `stxt.maxLineLength`, `stxt.maxInputSize`): a document the settings allow is formatted whole.
  */
 export class StxtFormattingProvider implements DocumentFormattingEditProvider {
 
@@ -23,7 +27,7 @@ export class StxtFormattingProvider implements DocumentFormattingEditProvider {
 		// The formatter keeps the lines one to one, so the edits are computed line by line: only
 		// the lines that change are replaced, which keeps the cursor and the undo history sane.
 		const lines = document.getText().split(/\r?\n/);
-		const formatted = Formatter.format(document.getText(), style).text.split(/\r?\n/);
+		const formatted = Formatter.format(document.getText(), style, parserLimits(document)).text.split(/\r?\n/);
 
 		lines.forEach((line, index) => {
 			const newLine = formatted[index];
