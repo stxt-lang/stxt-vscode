@@ -153,19 +153,22 @@ describe('FormattingProvider', () => {
 	});
 
 	it('indents the blank lines inside a text block to the level of the block', () => {
-		// STXT-SPEC §10.3: a blank line of a block is "" whatever its indentation, so writing it
-		// with the indentation of the block changes nothing, keeps the block in one piece, and
-		// is what the CLI does too. Blank lines outside a block have no level and stay empty.
+		// STXT-SPEC §10.3: a blank line before more block text is "" whatever its indentation,
+		// so writing it with the indentation of the block changes nothing, keeps the block in
+		// one piece, and is what the CLI does too. Blank lines outside a block have no level
+		// and stay empty.
 		assert.strictEqual(format('Doc >>\n\tuna\n\n\t\t\t\n\totra'), 'Doc >>\n\tuna\n\t\n\t\n\totra');
 		assert.strictEqual(format('Doc >>\n\tuna\n\t\n\totra'), 'Doc >>\n\tuna\n\t\n\totra');
 		assert.strictEqual(format('Doc >>\n\tuna\n\n\totra', true), 'Doc >>\n    una\n    \n    otra');
 		assert.strictEqual(format('Padre:\n\tHijo: v\n\t\n\tOtro: w'), 'Padre:\n\tHijo: v\n\n\tOtro: w');
 	});
 
-	it('normalises a whitespace-only last line of a text block to the level of the block', () => {
-		// The trailing blank line of the block stays a line (an empty last line would be the
-		// final line ending), with the indentation of the block.
-		assert.strictEqual(format('Doc >>\n\tuna\n\t\t\t'), 'Doc >>\n\tuna\n\t');
+	it('normalises a whitespace-only last line of a text block to a plain blank line', () => {
+		// The final blank lines of a block are not content (STXT-SPEC §10.3, since core 0.15.0:
+		// the parser drops them when the block closes), so the formatter leaves them plain and
+		// unindented, like any blank line outside a block.
+		assert.strictEqual(format('Doc >>\n\tuna\n\t\t\t'), 'Doc >>\n\tuna\n');
+		assert.strictEqual(format('Doc >>\n\tuna\n\t\t\t\nOtro: x'), 'Doc >>\n\tuna\n\nOtro: x');
 	});
 
 	describe('comment lines', () => {

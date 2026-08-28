@@ -4,6 +4,20 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.15.0]
+
+Moves to `@stxt-lang/core` `^0.15.0`, a language change (STXT-SPEC §10.3): the **final empty
+lines of a `>>` block are no longer content**. The sequence of empty lines after the last
+non-empty line of a block is discarded when the block closes, whether a shallower line closes
+it or the document ends — they were visual separation (or an editor's final line breaks), not
+content, and two visually identical documents now produce the same tree. Leading and
+intermediate empty lines are kept, an empty line still never closes a block, and a block whose
+lines are all blank is now as empty as a block with no lines.
+
+In the editor: diagnostics, hover, completion and the canonical tree reflect the trimmed
+content, and *Format Document* leaves the final blank lines of a block plain and unindented
+(they used to get the block's indentation). No extension code changes beyond the tests.
+
 ## [0.14.1]
 
 Moves to `@stxt-lang/core` `^0.14.1`: the parser limits of STXT-SPEC §11.2 (there is no 0.14.0
