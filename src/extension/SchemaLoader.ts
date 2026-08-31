@@ -2,16 +2,16 @@ import vscode from 'vscode';
 import * as os from 'os';
 import * as path from 'path';
 import {
-    DiscoveryDefinition,
-    DiscoveryEntry,
-    DiscoveryEnvironment,
-    DiscoveryFileSystem,
-    DiscoveryResolver,
-    DiscoveryResult,
-    Schema,
-    SchemaProvider,
-    StringUtils,
-    UnifiedSchemaProvider,
+	DiscoveryDefinition,
+	DiscoveryEntry,
+	DiscoveryEnvironment,
+	DiscoveryFileSystem,
+	DiscoveryResolver,
+	DiscoveryResult,
+	Schema,
+	SchemaProvider,
+	StringUtils,
+	UnifiedSchemaProvider,
 } from '@stxt-lang/core';
 import { log } from './Log';
 
@@ -44,76 +44,76 @@ const SCHEMA_DIR_GLOB = '**/*.stxt';
  * only for paths it did not produce itself, which come from an injected environment.
  */
 class VscodeDiscoveryFileSystem implements DiscoveryFileSystem {
-    private readonly uris = new Map<string, vscode.Uri>();
+	private readonly uris = new Map<string, vscode.Uri>();
 
-    /** Registers a Uri and returns the path (its textual form) the resolver will see. */
-    track(uri: vscode.Uri): string {
-        const key = uri.toString();
-        this.uris.set(key, uri);
-        return key;
-    }
+	/** Registers a Uri and returns the path (its textual form) the resolver will see. */
+	track(uri: vscode.Uri): string {
+		const key = uri.toString();
+		this.uris.set(key, uri);
+		return key;
+	}
 
-    /** The Uri of a path produced by this adapter (or, if it comes from outside, parsed from its text). */
-    uriOf(pathKey: string): vscode.Uri {
-        let uri = this.uris.get(pathKey);
+	/** The Uri of a path produced by this adapter (or, if it comes from outside, parsed from its text). */
+	uriOf(pathKey: string): vscode.Uri {
+		let uri = this.uris.get(pathKey);
 
-        if (!uri) {
-            // Paths are born in track/join/parentOf, but an injected environment (tests,
-            // configuration) may contribute its own: those are recovered from their text.
-            uri = vscode.Uri.parse(pathKey);
-            this.uris.set(pathKey, uri);
-        }
+		if (!uri) {
+			// Paths are born in track/join/parentOf, but an injected environment (tests,
+			// configuration) may contribute its own: those are recovered from their text.
+			uri = vscode.Uri.parse(pathKey);
+			this.uris.set(pathKey, uri);
+		}
 
-        return uri;
-    }
+		return uri;
+	}
 
-    async isDirectory(pathKey: string): Promise<boolean> {
-        try {
-            await vscode.workspace.fs.readDirectory(this.uriOf(pathKey));
-            return true;
-        } catch {
-            // The usual case is that the directory does not exist: not an error.
-            return false;
-        }
-    }
+	async isDirectory(pathKey: string): Promise<boolean> {
+		try {
+			await vscode.workspace.fs.readDirectory(this.uriOf(pathKey));
+			return true;
+		} catch {
+			// The usual case is that the directory does not exist: not an error.
+			return false;
+		}
+	}
 
-    async listDirectory(pathKey: string): Promise<DiscoveryEntry[]> {
-        const base = this.uriOf(pathKey);
-        const entries = await vscode.workspace.fs.readDirectory(base);
+	async listDirectory(pathKey: string): Promise<DiscoveryEntry[]> {
+		const base = this.uriOf(pathKey);
+		const entries = await vscode.workspace.fs.readDirectory(base);
 
-        // Never follow a symbolic link in a resolution directory (STXT-DISCOVERY-SPEC sections
-        // 3 and 10): a directory link could loop the descent, a file link could read a file from
-        // outside the .stxt/. A symlink has the SymbolicLink bit set in its FileType; filter
-        // those out so both directory and file links are omitted.
-        return entries
-            .filter(([, type]) => (type & vscode.FileType.SymbolicLink) === 0)
-            .map(([name, type]) => ({
-                path: this.track(vscode.Uri.joinPath(base, name)),
-                name,
-                isDirectory: type === vscode.FileType.Directory,
-            }));
-    }
+		// Never follow a symbolic link in a resolution directory (STXT-DISCOVERY-SPEC sections
+		// 3 and 10): a directory link could loop the descent, a file link could read a file from
+		// outside the .stxt/. A symlink has the SymbolicLink bit set in its FileType; filter
+		// those out so both directory and file links are omitted.
+		return entries
+			.filter(([, type]) => (type & vscode.FileType.SymbolicLink) === 0)
+			.map(([name, type]) => ({
+				path: this.track(vscode.Uri.joinPath(base, name)),
+				name,
+				isDirectory: type === vscode.FileType.Directory,
+			}));
+	}
 
-    async readFile(pathKey: string): Promise<string> {
-        const bytes = await vscode.workspace.fs.readFile(this.uriOf(pathKey));
-        return new TextDecoder('utf-8').decode(bytes);
-    }
+	async readFile(pathKey: string): Promise<string> {
+		const bytes = await vscode.workspace.fs.readFile(this.uriOf(pathKey));
+		return new TextDecoder('utf-8').decode(bytes);
+	}
 
-    parentOf(pathKey: string): string | null {
-        const parent = vscode.Uri.joinPath(this.uriOf(pathKey), '..');
-        const parentKey = parent.toString();
+	parentOf(pathKey: string): string | null {
+		const parent = vscode.Uri.joinPath(this.uriOf(pathKey), '..');
+		const parentKey = parent.toString();
 
-        // The file system root is its own parent.
-        if (parentKey === pathKey) {
-            return null;
-        }
+		// The file system root is its own parent.
+		if (parentKey === pathKey) {
+			return null;
+		}
 
-        return this.track(parent);
-    }
+		return this.track(parent);
+	}
 
-    join(pathKey: string, name: string): string {
-        return this.track(vscode.Uri.joinPath(this.uriOf(pathKey), name));
-    }
+	join(pathKey: string, name: string): string {
+		return this.track(vscode.Uri.joinPath(this.uriOf(pathKey), name));
+	}
 }
 
 /**
@@ -123,33 +123,33 @@ class VscodeDiscoveryFileSystem implements DiscoveryFileSystem {
  * so these values are the right ones there too.
  */
 class VscodeDiscoveryEnvironment implements DiscoveryEnvironment {
-    constructor(private readonly fileSystem: VscodeDiscoveryFileSystem) {}
+	constructor(private readonly fileSystem: VscodeDiscoveryFileSystem) {}
 
-    getStxtPath(): string[] | null {
-        const value = process.env['STXT_PATH'];
+	getStxtPath(): string[] | null {
+		const value = process.env['STXT_PATH'];
 
-        if (value === undefined) {
-            return null;
-        }
+		if (value === undefined) {
+			return null;
+		}
 
-        return value.split(path.delimiter)
-            .filter(entry => entry !== '')
-            .map(entry => this.fileSystem.track(vscode.Uri.file(entry)));
-    }
+		return value.split(path.delimiter)
+			.filter(entry => entry !== '')
+			.map(entry => this.fileSystem.track(vscode.Uri.file(entry)));
+	}
 
-    getUserLevelDir(): string | null {
-        const home = os.homedir();
-        return home ? this.fileSystem.track(vscode.Uri.file(path.join(home, STXT_DIR))) : null;
-    }
+	getUserLevelDir(): string | null {
+		const home = os.homedir();
+		return home ? this.fileSystem.track(vscode.Uri.file(path.join(home, STXT_DIR))) : null;
+	}
 
-    getSystemLevelDir(): string | null {
-        if (process.platform === 'win32') {
-            const programData = process.env['ProgramData'];
-            return programData ? this.fileSystem.track(vscode.Uri.file(path.join(programData, 'stxt'))) : null;
-        }
+	getSystemLevelDir(): string | null {
+		if (process.platform === 'win32') {
+			const programData = process.env['ProgramData'];
+			return programData ? this.fileSystem.track(vscode.Uri.file(path.join(programData, 'stxt'))) : null;
+		}
 
-        return this.fileSystem.track(vscode.Uri.file('/etc/stxt'));
-    }
+		return this.fileSystem.track(vscode.Uri.file('/etc/stxt'));
+	}
 }
 
 // **********
@@ -180,20 +180,20 @@ let notifySchemasChanged: () => void | Promise<void> = () => { /* not registered
  * union of everything resolved, which is the behaviour for consumers without a document.
  */
 export class SchemaLoaderExtension implements SchemaProvider {
-    constructor(private readonly documentUri?: vscode.Uri) {}
+	constructor(private readonly documentUri?: vscode.Uri) {}
 
-    getSchema(namespace: string): Schema | null | undefined {
-        if (this.documentUri) {
-            return getSchemaForDocument(this.documentUri, namespace);
-        }
+	getSchema(namespace: string): Schema | null | undefined {
+		if (this.documentUri) {
+			return getSchemaForDocument(this.documentUri, namespace);
+		}
 
-        return getSchema(namespace);
-    }
+		return getSchema(namespace);
+	}
 }
 
 /** The resolution result that corresponds to a document, if its directory was already resolved. */
 function resultForDocument(documentUri: vscode.Uri): DiscoveryResult | undefined {
-    return RESULTS.get(vscode.Uri.joinPath(documentUri, '..').toString());
+	return RESULTS.get(vscode.Uri.joinPath(documentUri, '..').toString());
 }
 
 /**
@@ -201,45 +201,45 @@ function resultForDocument(documentUri: vscode.Uri): DiscoveryResult | undefined
  * not resolved yet, falls back to the global union.
  */
 export function getSchemaForDocument(documentUri: vscode.Uri, namespace: string): Schema | null | undefined {
-    const result = resultForDocument(documentUri);
+	const result = resultForDocument(documentUri);
 
-    if (result) {
-        const schema = result.getSchema(namespace);
+	if (result) {
+		const schema = result.getSchema(namespace);
 
-        if (schema) {
-            return schema;
-        }
-    }
+		if (schema) {
+			return schema;
+		}
+	}
 
-    return getSchema(namespace);
+	return getSchema(namespace);
 }
 
 /** The active schemas for a document; if its directory is not resolved, the global union. */
 export function getSchemasForDocument(documentUri: vscode.Uri): ReadonlyArray<Schema> {
-    const result = resultForDocument(documentUri);
-    return result ? result.getAllSchemas() : getSchemas();
+	const result = resultForDocument(documentUri);
+	return result ? result.getAllSchemas() : getSchemas();
 }
 
 /** Resolves a namespace against the union of all results (first one that has it wins). */
 export function getSchema(namespace: string): Schema | undefined | null {
-    for (const result of RESULTS.values()) {
-        const schema = result.getSchema(namespace);
+	for (const result of RESULTS.values()) {
+		const schema = result.getSchema(namespace);
 
-        if (schema) {
-            return schema;
-        }
-    }
+		if (schema) {
+			return schema;
+		}
+	}
 
-    // Even without results, the meta-schemas of the reserved namespaces must be served.
-    return META_FALLBACK.getSchema(namespace);
+	// Even without results, the meta-schemas of the reserved namespaces must be served.
+	return META_FALLBACK.getSchema(namespace);
 }
 
 /** Where the active definition of a namespace lives: the file, as the editor can open it, and its provenance. */
 export interface DefinitionLocation {
-    /** The definition file (schema or template), as a Uri the editor can open. */
-    readonly uri: vscode.Uri;
-    /** The active definition, with the namespace, compiled schema and level directory. */
-    readonly definition: DiscoveryDefinition;
+	/** The definition file (schema or template), as a Uri the editor can open. */
+	readonly uri: vscode.Uri;
+	/** The active definition, with the namespace, compiled schema and level directory. */
+	readonly definition: DiscoveryDefinition;
 }
 
 /**
@@ -252,37 +252,37 @@ export interface DefinitionLocation {
  * @returns the definition and its file, or undefined if no loaded level defines the namespace.
  */
 export function getDefinitionForDocument(documentUri: vscode.Uri, namespace: string): DefinitionLocation | undefined {
-    const own = resultForDocument(documentUri);
-    const results = own ? [own, ...RESULTS.values()] : [...RESULTS.values()];
+	const own = resultForDocument(documentUri);
+	const results = own ? [own, ...RESULTS.values()] : [...RESULTS.values()];
 
-    for (const result of results) {
-        const definition = result.getDefinition(namespace);
+	for (const result of results) {
+		const definition = result.getDefinition(namespace);
 
-        if (definition) {
-            return { uri: fileSystem.uriOf(definition.file), definition };
-        }
-    }
+		if (definition) {
+			return { uri: fileSystem.uriOf(definition.file), definition };
+		}
+	}
 
-    return undefined;
+	return undefined;
 }
 
 /** Every known active schema, one per namespace (the first result that defines it wins). */
 export function getSchemas(): ReadonlyArray<Schema> {
-    const seen = new Set<string>();
-    const result: Schema[] = [];
+	const seen = new Set<string>();
+	const result: Schema[] = [];
 
-    for (const discovery of RESULTS.values()) {
-        for (const definition of discovery.getActiveDefinitions()) {
-            const key = StringUtils.lowerCase(definition.namespace);
+	for (const discovery of RESULTS.values()) {
+		for (const definition of discovery.getActiveDefinitions()) {
+			const key = StringUtils.lowerCase(definition.namespace);
 
-            if (!seen.has(key)) {
-                seen.add(key);
-                result.push(definition.schema);
-            }
-        }
-    }
+			if (!seen.has(key)) {
+				seen.add(key);
+				result.push(definition.schema);
+			}
+		}
+	}
 
-    return result;
+	return result;
 }
 
 // ****************
@@ -290,42 +290,42 @@ export function getSchemas(): ReadonlyArray<Schema> {
 // ****************
 
 export async function registerSchemaLoader(
-    context: vscode.ExtensionContext,
-    onSchemasChanged: () => void | Promise<void>,
-    environment?: DiscoveryEnvironment,
+	context: vscode.ExtensionContext,
+	onSchemasChanged: () => void | Promise<void>,
+	environment?: DiscoveryEnvironment,
 ): Promise<void> {
-    extensionContext = context;
-    notifySchemasChanged = onSchemasChanged;
+	extensionContext = context;
+	notifySchemasChanged = onSchemasChanged;
 
-    // Registering means starting from scratch: in the editor it happens once, on activation.
-    // The `environment` parameter exists for the tests, which inject an isolated environment
-    // (no STXT_PATH and no real user/system levels).
-    fileSystem = new VscodeDiscoveryFileSystem();
-    resolver = new DiscoveryResolver(fileSystem, environment ?? new VscodeDiscoveryEnvironment(fileSystem));
-    RESULTS.clear();
-    KNOWN_LEVEL_DIRS.clear();
-    WATCHED_DIRS.clear();
+	// Registering means starting from scratch: in the editor it happens once, on activation.
+	// The `environment` parameter exists for the tests, which inject an isolated environment
+	// (no STXT_PATH and no real user/system levels).
+	fileSystem = new VscodeDiscoveryFileSystem();
+	resolver = new DiscoveryResolver(fileSystem, environment ?? new VscodeDiscoveryEnvironment(fileSystem));
+	RESULTS.clear();
+	KNOWN_LEVEL_DIRS.clear();
+	WATCHED_DIRS.clear();
 
-    // Watcher for any .stxt file inside a .stxt directory of the workspace
-    watchPattern(STXT_FILES_GLOB);
+	// Watcher for any .stxt file inside a .stxt directory of the workspace
+	watchPattern(STXT_FILES_GLOB);
 
-    // Initial starting points: the workspace folders and the documents already open.
-    for (const folder of vscode.workspace.workspaceFolders ?? []) {
-        log.trace(`Workspace folder: ${folder.uri.toString()}`);
-        await resolveLocation(folder.uri);
-    }
+	// Initial starting points: the workspace folders and the documents already open.
+	for (const folder of vscode.workspace.workspaceFolders ?? []) {
+		log.trace(`Workspace folder: ${folder.uri.toString()}`);
+		await resolveLocation(folder.uri);
+	}
 
-    for (const document of vscode.workspace.textDocuments) {
-        await resolveLocationForDocument(document);
-    }
+	for (const document of vscode.workspace.textDocuments) {
+		await resolveLocationForDocument(document);
+	}
 
-    await notifySchemasChanged();
+	await notifySchemasChanged();
 
-    if (getSchemas().length === 0) {
-        log.info(`No schemas loaded: the resolution chain provides no definition. Namespaced documents will report SCHEMA_NOT_FOUND (unless stxt.schemaValidation is off).`);
-    } else {
-        log.info(`Initial load: ${getSchemas().length} schemas, ${KNOWN_LEVEL_DIRS.size} resolution directories.`);
-    }
+	if (getSchemas().length === 0) {
+		log.info(`No schemas loaded: the resolution chain provides no definition. Namespaced documents will report SCHEMA_NOT_FOUND (unless stxt.schemaValidation is off).`);
+	} else {
+		log.info(`Initial load: ${getSchemas().length} schemas, ${KNOWN_LEVEL_DIRS.size} resolution directories.`);
+	}
 }
 
 /**
@@ -338,21 +338,21 @@ export async function registerSchemaLoader(
  * @param document the document that has just been opened.
  */
 export async function ensureSchemasForDocument(document: vscode.TextDocument): Promise<void> {
-    if (await resolveLocationForDocument(document)) {
-        log.info(`New resolution directories for ${document.uri.toString()}: revalidating.`);
-        await notifySchemasChanged();
-    }
+	if (await resolveLocationForDocument(document)) {
+		log.info(`New resolution directories for ${document.uri.toString()}: revalidating.`);
+		await notifySchemasChanged();
+	}
 }
 
 // The document's directory is the starting point of its resolution chain.
 async function resolveLocationForDocument(document: vscode.TextDocument): Promise<boolean> {
-    if (document.languageId !== 'stxt' || document.isUntitled) {
-        // A document without a location has no project level (STXT-DISCOVERY-SPEC 4.1);
-        // its user/system levels are already covered by the initial load.
-        return false;
-    }
+	if (document.languageId !== 'stxt' || document.isUntitled) {
+		// A document without a location has no project level (STXT-DISCOVERY-SPEC 4.1);
+		// its user/system levels are already covered by the initial load.
+		return false;
+	}
 
-    return resolveLocation(vscode.Uri.joinPath(document.uri, '..'));
+	return resolveLocation(vscode.Uri.joinPath(document.uri, '..'));
 }
 
 /**
@@ -363,63 +363,63 @@ async function resolveLocationForDocument(document: vscode.TextDocument): Promis
  * @returns true if any new resolution directory was discovered.
  */
 async function resolveLocation(dirUri: vscode.Uri): Promise<boolean> {
-    if (!resolver) {
-        return false;
-    }
+	if (!resolver) {
+		return false;
+	}
 
-    const key = fileSystem.track(dirUri);
-    const result = await resolver.resolve(key);
-    RESULTS.set(key, result);
+	const key = fileSystem.track(dirUri);
+	const result = await resolver.resolve(key);
+	RESULTS.set(key, result);
 
-    let discovered = false;
+	let discovered = false;
 
-    for (const levelDir of result.getChain()) {
-        if (!KNOWN_LEVEL_DIRS.has(levelDir)) {
-            KNOWN_LEVEL_DIRS.add(levelDir);
-            watchSchemaDir(levelDir);
-            log.info(`Resolution directory found: ${levelDir}`);
-            discovered = true;
-        }
-    }
+	for (const levelDir of result.getChain()) {
+		if (!KNOWN_LEVEL_DIRS.has(levelDir)) {
+			KNOWN_LEVEL_DIRS.add(levelDir);
+			watchSchemaDir(levelDir);
+			log.info(`Resolution directory found: ${levelDir}`);
+			discovered = true;
+		}
+	}
 
-    if (discovered) {
-        // Resolution errors (STXT-DISCOVERY-SPEC section 8) are reported to the log,
-        // once per discovery so they are not repeated on every resolve.
-        for (const error of result.getErrors()) {
-            log.error(`[${error.code}] ${error.message}`);
-        }
-    }
+	if (discovered) {
+		// Resolution errors (STXT-DISCOVERY-SPEC section 8) are reported to the log,
+		// once per discovery so they are not repeated on every resolve.
+		for (const error of result.getErrors()) {
+			log.error(`[${error.code}] ${error.message}`);
+		}
+	}
 
-    return discovered;
+	return discovered;
 }
 
 // A change on disk invalidates the loaded levels: everything known is re-resolved.
 async function reloadAllSchemaData(reason: string): Promise<void> {
-    if (!resolver) {
-        return;
-    }
+	if (!resolver) {
+		return;
+	}
 
-    try {
-        log.info(`Reloading schemas (${reason})...`);
-        resolver.clearCache();
+	try {
+		log.info(`Reloading schemas (${reason})...`);
+		resolver.clearCache();
 
-        for (const key of RESULTS.keys()) {
-            const result = await resolver.resolve(key);
-            RESULTS.set(key, result);
+		for (const key of RESULTS.keys()) {
+			const result = await resolver.resolve(key);
+			RESULTS.set(key, result);
 
-            for (const levelDir of result.getChain()) {
-                if (!KNOWN_LEVEL_DIRS.has(levelDir)) {
-                    KNOWN_LEVEL_DIRS.add(levelDir);
-                    watchSchemaDir(levelDir);
-                }
-            }
-        }
+			for (const levelDir of result.getChain()) {
+				if (!KNOWN_LEVEL_DIRS.has(levelDir)) {
+					KNOWN_LEVEL_DIRS.add(levelDir);
+					watchSchemaDir(levelDir);
+				}
+			}
+		}
 
-        await notifySchemasChanged();
-        log.info(`Schemas reloaded (${reason}): ${getSchemas().length}.`);
-    } catch (e) {
-        log.error(`Error reloading schemas (${reason}): ${String(e)}`);
-    }
+		await notifySchemasChanged();
+		log.info(`Schemas reloaded (${reason}): ${getSchemas().length}.`);
+	} catch (e) {
+		log.error(`Error reloading schemas (${reason}): ${String(e)}`);
+	}
 }
 
 // *********
@@ -428,23 +428,23 @@ async function reloadAllSchemaData(reason: string): Promise<void> {
 
 // A resolution directory outside the workspace is not covered by the global watcher, so it gets its own.
 function watchSchemaDir(levelDirKey: string): void {
-    if (!WATCHED_DIRS.has(levelDirKey)) {
-        WATCHED_DIRS.add(levelDirKey);
-        watchPattern(new vscode.RelativePattern(fileSystem.uriOf(levelDirKey), SCHEMA_DIR_GLOB));
-    }
+	if (!WATCHED_DIRS.has(levelDirKey)) {
+		WATCHED_DIRS.add(levelDirKey);
+		watchPattern(new vscode.RelativePattern(fileSystem.uriOf(levelDirKey), SCHEMA_DIR_GLOB));
+	}
 }
 
 function watchPattern(pattern: vscode.GlobPattern): void {
-    if (!extensionContext) {
-        return;
-    }
+	if (!extensionContext) {
+		return;
+	}
 
-    const watcher = vscode.workspace.createFileSystemWatcher(pattern);
+	const watcher = vscode.workspace.createFileSystemWatcher(pattern);
 
-    extensionContext.subscriptions.push(
-        watcher,
-        watcher.onDidCreate(() => reloadAllSchemaData('file created')),
-        watcher.onDidChange(() => reloadAllSchemaData('file changed')),
-        watcher.onDidDelete(() => reloadAllSchemaData('file deleted')),
-    );
+	extensionContext.subscriptions.push(
+		watcher,
+		watcher.onDidCreate(() => reloadAllSchemaData('file created')),
+		watcher.onDidChange(() => reloadAllSchemaData('file changed')),
+		watcher.onDidDelete(() => reloadAllSchemaData('file deleted')),
+	);
 }

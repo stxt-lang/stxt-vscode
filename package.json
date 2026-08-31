@@ -34,7 +34,6 @@
       {
         "id": "stxt",
         "aliases": [
-          "STXT",
           "STXT"
         ],
         "extensions": [
@@ -161,7 +160,7 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "eslint src",
-    "pretest": "npm run compile",
+    "pretest": "npm run compile && npm run lint",
     "test": "mocha"
   },
   "dependencies": {

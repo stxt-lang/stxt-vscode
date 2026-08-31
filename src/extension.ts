@@ -97,4 +97,5 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function -- required export of the VS Code extension API, with nothing to clean up
 export function deactivate() { }

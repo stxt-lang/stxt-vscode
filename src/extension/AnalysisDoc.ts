@@ -13,7 +13,7 @@ const LAST_ANALYSIS_BY_URI  = new Map<string, AnalysisResult>();
  * installed extension validates against the resolution chain of each document.
  */
 export function isSchemaValidationEnabled(document: vscode.TextDocument): boolean {
-    return vscode.workspace.getConfiguration('stxt', document).get<boolean>('schemaValidation', true);
+	return vscode.workspace.getConfiguration('stxt', document).get<boolean>('schemaValidation', true);
 }
 
 /**
@@ -22,12 +22,12 @@ export function isSchemaValidationEnabled(document: vscode.TextDocument): boolea
  * the recommended ones of the specification, the same the core ships.
  */
 export function parserLimits(document: vscode.TextDocument): ParserOptions {
-    const configuration = vscode.workspace.getConfiguration('stxt', document);
-    return {
-        maxNesting: configuration.get<number>('maxNesting', Constants.DEFAULT_MAX_NESTING),
-        maxLineLength: configuration.get<number>('maxLineLength', Constants.DEFAULT_MAX_LINE_LENGTH),
-        maxInputSize: configuration.get<number>('maxInputSize', Constants.DEFAULT_MAX_INPUT_SIZE),
-    };
+	const configuration = vscode.workspace.getConfiguration('stxt', document);
+	return {
+		maxNesting: configuration.get<number>('maxNesting', Constants.DEFAULT_MAX_NESTING),
+		maxLineLength: configuration.get<number>('maxLineLength', Constants.DEFAULT_MAX_LINE_LENGTH),
+		maxInputSize: configuration.get<number>('maxInputSize', Constants.DEFAULT_MAX_INPUT_SIZE),
+	};
 }
 
 /**
@@ -44,14 +44,14 @@ export function parserLimits(document: vscode.TextDocument): ParserOptions {
  * @returns the analysis, or undefined if the extension is not activated yet (tests only).
  */
 export function getAnalysis(document: vscode.TextDocument): AnalysisResult | undefined {
-    const cached = LAST_ANALYSIS_BY_URI.get(document.uri.toString());
+	const cached = LAST_ANALYSIS_BY_URI.get(document.uri.toString());
 
-    if (cached || !diagnosticCollection) {
-        return cached;
-    }
+	if (cached || !diagnosticCollection) {
+		return cached;
+	}
 
-    log.trace(`Cold analysis, not in cache: ${document.uri.toString()}`);
-    return analysisDoc(document, diagnosticCollection);
+	log.trace(`Cold analysis, not in cache: ${document.uri.toString()}`);
+	return analysisDoc(document, diagnosticCollection);
 }
 
 export function analysisAllDocs(): void{
@@ -64,86 +64,86 @@ export function analysisAllDocs(): void{
 }
 
 export function analysisDoc(document: vscode.TextDocument, diagnosticCollection: vscode.DiagnosticCollection): AnalysisResult {
-    const diagnostics: vscode.Diagnostic[] = [];
+	const diagnostics: vscode.Diagnostic[] = [];
 
-    // Create the observer that generates tokens and nodeByLine during parsing. It asks the
-    // grammar of each block's namespace for its type, to colour MARKDOWN blocks as Markdown;
-    // the resolution chain is the document's own (STXT-DISCOVERY-SPEC section 7).
-    const tokenObserver = new TokenGeneratorObserver(node => node.getNamespace()
-        ? getSchemaForDocument(document.uri, node.getNamespace())?.getNodeDefinition(node.getName())?.getType()
-        : undefined);
+	// Create the observer that generates tokens and nodeByLine during parsing. It asks the
+	// grammar of each block's namespace for its type, to colour MARKDOWN blocks as Markdown;
+	// the resolution chain is the document's own (STXT-DISCOVERY-SPEC section 7).
+	const tokenObserver = new TokenGeneratorObserver(node => node.getNamespace()
+		? getSchemaForDocument(document.uri, node.getNamespace())?.getNodeDefinition(node.getName())?.getType()
+		: undefined);
 
-    // Parse the document, with schema validation unless the setting turns it off. The
-    // provider is created with the document's Uri: each document validates against its own
-    // resolution chain (STXT-DISCOVERY-SPEC section 7), not against the union of everything
-    // loaded. With validation on, a namespace that no definition of the chain covers is a
-    // SCHEMA_NOT_FOUND warning (STXT-SCHEMA-SPEC section 13) also when the chain is empty:
-    // the setting decides whether a document is validated, not the presence of unrelated
-    // definitions. Until 0.10.0 the code was silenced on an empty chain, and a document's
-    // verdict changed when an unrelated schema was installed beside it.
-    const schemaValidation = isSchemaValidationEnabled(document);
-    const parser = new Parser(parserLimits(document));
-    parser.registerObserver(tokenObserver);
-    if (schemaValidation) {
-        parser.registerValidator(new SchemaValidator(new SchemaLoaderExtension(document.uri)));
-    }
-    const parseResult: ParseResult = parser.parseResult(document.getText());
+	// Parse the document, with schema validation unless the setting turns it off. The
+	// provider is created with the document's Uri: each document validates against its own
+	// resolution chain (STXT-DISCOVERY-SPEC section 7), not against the union of everything
+	// loaded. With validation on, a namespace that no definition of the chain covers is a
+	// SCHEMA_NOT_FOUND warning (STXT-SCHEMA-SPEC section 13) also when the chain is empty:
+	// the setting decides whether a document is validated, not the presence of unrelated
+	// definitions. Until 0.10.0 the code was silenced on an empty chain, and a document's
+	// verdict changed when an unrelated schema was installed beside it.
+	const schemaValidation = isSchemaValidationEnabled(document);
+	const parser = new Parser(parserLimits(document));
+	parser.registerObserver(tokenObserver);
+	if (schemaValidation) {
+		parser.registerValidator(new SchemaValidator(new SchemaLoaderExtension(document.uri)));
+	}
+	const parseResult: ParseResult = parser.parseResult(document.getText());
 
-    // Collect the tokens and nodeByLine generated by the observer
-    const tokens = tokenObserver.getTokens();
-    const nodeByLine = tokenObserver.getNodeByLine();
-    const commentLines = tokenObserver.getCommentLines();
-    const textLineByLineNumber = tokenObserver.getTextLineByLineNumber();
+	// Collect the tokens and nodeByLine generated by the observer
+	const tokens = tokenObserver.getTokens();
+	const nodeByLine = tokenObserver.getNodeByLine();
+	const commentLines = tokenObserver.getCommentLines();
+	const textLineByLineNumber = tokenObserver.getTextLineByLineNumber();
 
-    // Convert errors to diagnostics
-    for (const error of parseResult.getErrors()) {
-        const line = error.line > 0 ? error.line - 1 : 0;
-        const lineText = document.lineAt(line).text;
-        const range = new vscode.Range(line, 0, line, lineText.length);
-        const severity = error instanceof ValidationException
-            ? vscode.DiagnosticSeverity.Warning
-            : vscode.DiagnosticSeverity.Error;
-        diagnostics.push(new vscode.Diagnostic(range, `[${error.code}]: ${error.message}`, severity));
-    }
+	// Convert errors to diagnostics
+	for (const error of parseResult.getErrors()) {
+		const line = error.line > 0 ? error.line - 1 : 0;
+		const lineText = document.lineAt(line).text;
+		const range = new vscode.Range(line, 0, line, lineText.length);
+		const severity = error instanceof ValidationException
+			? vscode.DiagnosticSeverity.Warning
+			: vscode.DiagnosticSeverity.Error;
+		diagnostics.push(new vscode.Diagnostic(range, `[${error.code}]: ${error.message}`, severity));
+	}
 
-    // A definition document is itself checked by its transform (same layer as schema
-    // validation, so the same setting governs it, as `--no-schema` does in the CLI).
-    if (schemaValidation) {
-        validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.template", "Template", transformTemplateNodeToSchema);
-        validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.schema", "Schema", transformNodeToSchema);
-    }
+	// A definition document is itself checked by its transform (same layer as schema
+	// validation, so the same setting governs it, as `--no-schema` does in the CLI).
+	if (schemaValidation) {
+		validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.template", "Template", transformTemplateNodeToSchema);
+		validateSpecialDocument(parseResult.getNodes(), diagnostics, "@stxt.schema", "Schema", transformNodeToSchema);
+	}
 
-    // End of diagnosis
-    diagnosticCollection.set(document.uri, diagnostics);
+	// End of diagnosis
+	diagnosticCollection.set(document.uri, diagnostics);
 
-    // Store the results
-    const result: AnalysisResult = { tokens, nodeByLine, commentLines, textLineByLineNumber };
-    LAST_ANALYSIS_BY_URI.set(document.uri.toString(), result);
+	// Store the results
+	const result: AnalysisResult = { tokens, nodeByLine, commentLines, textLineByLineNumber };
+	LAST_ANALYSIS_BY_URI.set(document.uri.toString(), result);
 
-    log.trace(`Analysis of ${document.uri.toString()}: ${tokens.length} tokens, ${diagnostics.length} diagnostics.`);
-    return result;
+	log.trace(`Analysis of ${document.uri.toString()}: ${tokens.length} tokens, ${diagnostics.length} diagnostics.`);
+	return result;
 }
 
 function validateSpecialDocument(nodes: Node[], diagnostics: vscode.Diagnostic[], namespace: string, typeName: string,
-     transformer: (node: Node) => Schema): void {
-        
-    nodes.forEach((node) => {
-        if (node.getNamespace() === namespace) {
-            try {
-                transformer(node);
-            } catch (e: unknown) {
-                if (e instanceof ParseException) {
-                    const line = e.line > 0 ? e.line - 1 : 0;
-                    const range = new vscode.Range(line, 0, line, 100);
-                    diagnostics.push(new vscode.Diagnostic(range, `${typeName} error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
-                } else if (e instanceof Error) {
-                    const range = new vscode.Range(0, 0, 0, 100);
-                    diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
-                } else {
-                    const range = new vscode.Range(0, 0, 0, 100);
-                    diagnostics.push(new vscode.Diagnostic(range, `Unknown error: ${String(e)}`, vscode.DiagnosticSeverity.Error));
-                }
-            }
-        }
-    });
+	 transformer: (node: Node) => Schema): void {
+		
+	nodes.forEach((node) => {
+		if (node.getNamespace() === namespace) {
+			try {
+				transformer(node);
+			} catch (e: unknown) {
+				if (e instanceof ParseException) {
+					const line = e.line > 0 ? e.line - 1 : 0;
+					const range = new vscode.Range(line, 0, line, 100);
+					diagnostics.push(new vscode.Diagnostic(range, `${typeName} error [${e.code}]: ${e.message}`, vscode.DiagnosticSeverity.Error));
+				} else if (e instanceof Error) {
+					const range = new vscode.Range(0, 0, 0, 100);
+					diagnostics.push(new vscode.Diagnostic(range, `Error: ${e.message}`, vscode.DiagnosticSeverity.Error));
+				} else {
+					const range = new vscode.Range(0, 0, 0, 100);
+					diagnostics.push(new vscode.Diagnostic(range, `Unknown error: ${String(e)}`, vscode.DiagnosticSeverity.Error));
+				}
+			}
+		}
+	});
 }
