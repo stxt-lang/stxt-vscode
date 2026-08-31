@@ -4,11 +4,15 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [0.17.0]
 
-- Strict UTF-8 decodes (STXT-SPEC §3): a definition or document whose bytes are not valid
-  UTF-8 is a read error instead of being silently decoded with U+FFFD replacement
-  characters (`SchemaLoader.readFile`, `DefinitionProvider`).
+Moves to `@stxt-lang/core` `^0.17.0`, the release of the external spec review: normative
+`EMAIL` grammar (STXT-SCHEMA-SPEC §9.4), cardinality bound of 2^32 - 1
+(`CARDINALITY_NOT_VALID` above `4294967295`) and the strict-UTF-8 read rule of STXT-SPEC §3.
+
+- Strict UTF-8 decodes in the extension itself (STXT-SPEC §3): a definition or document whose
+  bytes are not valid UTF-8 is a read error instead of being silently decoded with U+FFFD
+  replacement characters (`SchemaLoader.readFile`, `DefinitionProvider`).
 
 ## [0.16.0]
 

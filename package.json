@@ -2,7 +2,7 @@
   "name": "stxt",
   "displayName": "STXT Language",
   "description": "Language support for STXT: highlighting, validation against schemas and templates, completion, hover and formatting.",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "publisher": "stxt-lang",
   "repository": {
     "type": "git",
@@ -164,7 +164,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "@stxt-lang/core": "^0.16.0"
+    "@stxt-lang/core": "^0.17.0"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
