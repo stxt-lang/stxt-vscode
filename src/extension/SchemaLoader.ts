@@ -81,11 +81,17 @@ class VscodeDiscoveryFileSystem implements DiscoveryFileSystem {
         const base = this.uriOf(pathKey);
         const entries = await vscode.workspace.fs.readDirectory(base);
 
-        return entries.map(([name, type]) => ({
-            path: this.track(vscode.Uri.joinPath(base, name)),
-            name,
-            isDirectory: type === vscode.FileType.Directory,
-        }));
+        // Never follow a symbolic link in a resolution directory (STXT-DISCOVERY-SPEC sections
+        // 3 and 10): a directory link could loop the descent, a file link could read a file from
+        // outside the .stxt/. A symlink has the SymbolicLink bit set in its FileType; filter
+        // those out so both directory and file links are omitted.
+        return entries
+            .filter(([, type]) => (type & vscode.FileType.SymbolicLink) === 0)
+            .map(([name, type]) => ({
+                path: this.track(vscode.Uri.joinPath(base, name)),
+                name,
+                isDirectory: type === vscode.FileType.Directory,
+            }));
     }
 
     async readFile(pathKey: string): Promise<string> {

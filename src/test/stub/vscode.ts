@@ -229,7 +229,11 @@ const workspaceFs = {
 	async readDirectory(uri: Uri): Promise<[string, FileType][]> {
 		// readdirSync throws if the directory does not exist, just like the real API.
 		return fs.readdirSync(uri.fsPath, { withFileTypes: true })
-			.map(entry => [entry.name, entry.isDirectory() ? FileType.Directory : FileType.File]);
+			.map((entry): [string, FileType] => {
+				// Report the SymbolicLink bit like the real API, so a symlink is distinguishable.
+				const base = entry.isDirectory() ? FileType.Directory : FileType.File;
+				return [entry.name, (entry.isSymbolicLink() ? base | FileType.SymbolicLink : base) as FileType];
+			});
 	},
 
 	async readFile(uri: Uri): Promise<Uint8Array> {
