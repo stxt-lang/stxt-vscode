@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { ExtensionContext } from 'vscode';
 import { InlineNode, Node, Parser, ParseException } from '@stxt-lang/core';
-import { languages, setWorkspaceFolder, Diagnostic, DiagnosticSeverity } from './stub/vscode';
+import { setWorkspaceFolder, Diagnostic, DiagnosticSeverity } from './stub/vscode';
 import { TestDocument, asTextDocument } from './stub/TestDocument';
-import { analysisDoc } from '../extension/AnalysisDoc';
+import { analyzeDocument, createDiagnosticCollection } from '../extension/AnalysisDoc';
 import { AnalysisResult } from '../extension/AnalysisResult';
 import { registerSchemaLoader, getSchemas } from '../extension/SchemaLoader';
 
@@ -141,10 +141,11 @@ export interface AnalyzedDocument {
  */
 export function analyze(filePath: string, text: string): AnalyzedDocument {
 	const document = new TestDocument(filePath, text);
-	const collection = languages.createDiagnosticCollection('stxt');
-	const analysis = analysisDoc(asTextDocument(document), collection as never);
+	const textDocument = asTextDocument(document);
+	const collection = createDiagnosticCollection();
+	const analysis = analyzeDocument(textDocument);
 
-	return { document, analysis, diagnostics: collection.get(document.uri) ?? [] };
+	return { document, analysis, diagnostics: collection.get(textDocument.uri) ?? [] };
 }
 
 // Analyzes a corpus file, reading it from disk.

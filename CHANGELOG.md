@@ -4,6 +4,26 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.16.0]
+
+Moves to `@stxt-lang/core` `^0.16.0` — no language changes: the core release carries the
+hardening fixes of the ports security audit (bounded discovery descent, a linear `BASE64`
+check, strict blanks in template parsing) and error parity between the ports.
+
+### Security
+
+- The schema loader no longer follows symbolic links inside a resolution directory
+  (STXT-DISCOVERY-SPEC §3/§10): any entry with the symlink bit is omitted from the listing,
+  closing both symlink loops and the reading of unrelated files through a planted link. Same
+  behaviour as the real adapters of the ports and the CLI.
+
+### Changed
+
+- Internal maintenance, no behaviour change: the diagnostic collection lives with the analysis
+  cache (no circular import with the activation module), the analysis of a closed document is
+  dropped instead of cached forever, and the analysis internals were renamed for consistency
+  (`analyzeDocument`, `textNodeByLineIndex`).
+
 ## [0.15.0]
 
 Moves to `@stxt-lang/core` `^0.15.0`, a language change (STXT-SPEC §10.3): the **final empty

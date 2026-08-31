@@ -5,5 +5,6 @@ export interface AnalysisResult {
 	tokens: StxtToken[];
 	nodeByLine: Map<number, Node>;
 	commentLines: Set<number>;
-	textLineByLineNumber: Map<number, TextNode>;
+	/** The block node whose text each line belongs to, by 0-based line index. */
+	textNodeByLineIndex: Map<number, TextNode>;
 }

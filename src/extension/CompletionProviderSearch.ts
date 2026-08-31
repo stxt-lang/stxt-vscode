@@ -26,28 +26,17 @@ export function findSuggestionsByParent(parent: InlineNode, prefix: string): Com
 		if (normalizedPrefix.length > 0 && !StringUtils.normalize(childDef.getName()).startsWith(normalizedPrefix)) {
 			continue;
 		}
-		const isText: boolean = isBlockText(childDef);
-		const item = new CompletionItem(childDef.getName(), isText ? CompletionItemKind.Module: CompletionItemKind.EnumMember);
-		if (childDef.getNamespace() === parent.getNamespace()) {
-			if (isText) {
-				item.insertText = `${childDef.getName()} >>\n\t`;
-			} else {
-				item.insertText = `${childDef.getName()}: `;
-			}
-		} else {
-			if (isText) {
-				item.insertText = `${childDef.getName()} (${childDef.getNamespace()})>>\n\t`;
-			} else {
-				item.insertText = `${childDef.getName()} (${childDef.getNamespace()}): `;
-			}
-		}
+
+		// A child of the parent's own namespace is inserted without repeating it
+		const item = createCompletionItem(childDef.getName(), childDef.getNamespace(),
+			isBlockText(childDef), childDef.getNamespace() !== parent.getNamespace());
 		item.detail = childName;
 
 		const actualChildren: Node[] = parent.getChildrenByName(childDef.getName(), childDef.getNamespace());
-		const maxChilds = childDef.getMax() ?? -1;
-		if (maxChilds < 0 || actualChildren.length < maxChilds) {
+		const maxChildren = childDef.getMax() ?? -1;
+		if (maxChildren < 0 || actualChildren.length < maxChildren) {
 			result.push(item);
-		}        
+		}
 	}
 
 	return result;
@@ -70,7 +59,7 @@ export function findRootLevelSuggestions(prefix: string): CompletionItem[] {
 			}
 			seen.add(key);
 
-			result.push(createCompletionItem(nodeDef.getName(), schema.getNamespace(), isBlockTextNode(nodeDef), false));
+			result.push(createCompletionItem(nodeDef.getName(), schema.getNamespace(), isBlockTextNode(nodeDef), true));
 		}
 	}
 
@@ -103,9 +92,14 @@ function getRootNodeDefinitions(schema: Schema): NodeDefinition[] {
 	return Array.from(schema.getNodes().values());
 }
 
-function createCompletionItem(name: string, namespace: string, isText: boolean, hideNamespaceWhenEmpty: boolean): CompletionItem {
+/**
+ * A completion item that inserts the node line: `Name: ` or `Name >>` with a fresh indented
+ * line, with the namespace in parentheses when `withNamespace` asks for it (an empty
+ * namespace is never written).
+ */
+function createCompletionItem(name: string, namespace: string, isText: boolean, withNamespace: boolean): CompletionItem {
 	const item = new CompletionItem(name, isText ? CompletionItemKind.Module : CompletionItemKind.EnumMember);
-	const includeNamespace = namespace.length > 0 && !hideNamespaceWhenEmpty;
+	const includeNamespace = namespace.length > 0 && withNamespace;
 
 	if (includeNamespace) {
 		if (isText) {

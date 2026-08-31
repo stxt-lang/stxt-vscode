@@ -29,9 +29,12 @@ export class StxtDefinitionProvider implements vscode.DefinitionProvider {
 
 		// Only the head of the line (name, namespace, separator) is a reference; the value is not.
 		const headTokens = analysis.tokens.filter(token => token.line === position.line && token.type !== 'string');
-		const headEnd = Math.max(...headTokens.map(token => token.startChar + token.length));
+		if (headTokens.length === 0) {
+			return undefined;
+		}
 
-		if (headTokens.length === 0 || position.character > headEnd) {
+		const headEnd = Math.max(...headTokens.map(token => token.startChar + token.length));
+		if (position.character > headEnd) {
 			return undefined;
 		}
 

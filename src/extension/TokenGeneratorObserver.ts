@@ -1,5 +1,5 @@
-import { Observer, Node, Parser, Line, TextNode } from '@stxt-lang/core';
-import { StxtToken } from './Tokens';
+import { Constants, Observer, Node, Parser, Line, TextNode } from '@stxt-lang/core';
+import { StxtToken, StxtTokenType } from './Tokens';
 import { MarkdownState, newMarkdownState, tokenizeMarkdownLine } from './MarkdownTokenizer';
 
 /** Schema type declared for a node by the grammar of its namespace, or undefined if none declares it. */
@@ -12,8 +12,11 @@ export class TokenGeneratorObserver implements Observer {
 	private tokens: StxtToken[] = [];
 	private nodeByLine = new Map<number, Node>();
 	private commentLines = new Set<number>();
-	private textLineByLineNumber = new Map<number, TextNode>();
-	private templateNodeByLine = new Map<number, Line>();
+	// The block node whose text each line belongs to, by 0-based line index
+	private textNodeByLineIndex = new Map<number, TextNode>();
+	// The source Line of each text line of an open Structure/Description block, by 1-based
+	// absolute line number (parseTemplateContent maps inner lines back to absolute ones)
+	private templateLineByLineNumber = new Map<number, Line>();
 
 	// The block whose text lines are being received, and whether it is MARKDOWN: the type is
 	// resolved once per block, and the tokenizer state (open code fence) lives with it.
@@ -30,12 +33,12 @@ export class TokenGeneratorObserver implements Observer {
 	onTextLine(node: TextNode, lineNumber: number, _lineString: string, line: Line): void {
 		// Remember the parent node of the text lines
 		const lineIndex = lineNumber - 1; // lineNumber is 1-indexed
-		this.textLineByLineNumber.set(lineIndex, node);
-		
+		this.textNodeByLineIndex.set(lineIndex, node);
+
 		// Keep line information for lines inside template nodes
 		if (this.isTemplateContentNode(node)) {
 			// lineNumber is 1-indexed and absolute within the document
-			this.templateNodeByLine.set(lineNumber, line);
+			this.templateLineByLineNumber.set(lineNumber, line);
 		}
 
 		// Colour the content of MARKDOWN blocks. The tokens are emitted here, line by line, so
@@ -75,7 +78,7 @@ export class TokenGeneratorObserver implements Observer {
 
 		// Reset the map for template nodes
 		if (this.isTemplateContentNode(node)) {
-			this.templateNodeByLine.clear();
+			this.templateLineByLineNumber.clear();
 		}
 	}
 
@@ -84,7 +87,7 @@ export class TokenGeneratorObserver implements Observer {
 		if (this.isTemplateContentNode(node)) {
 			this.parseTemplateContent(node);
 			// Clear the map after processing
-			this.templateNodeByLine.clear();
+			this.templateLineByLineNumber.clear();
 		}
 	}
 
@@ -122,7 +125,7 @@ export class TokenGeneratorObserver implements Observer {
 				const absoluteLineNumber = lineOffset + token.line + 1;
 				
 				// Get the indentation of the original line
-				const originalLine = this.templateNodeByLine.get(absoluteLineNumber);
+				const originalLine = this.templateLineByLineNumber.get(absoluteLineNumber);
 				// The content starts where the indentation ends
 				const offset = originalLine ? originalLine.contentStart : 0;
 
@@ -165,52 +168,51 @@ export class TokenGeneratorObserver implements Observer {
 		return this.commentLines;
 	}
 
-	getTextLineByLineNumber(): Map<number, TextNode> {
-		return this.textLineByLineNumber;
+	getTextNodeByLineIndex(): Map<number, TextNode> {
+		return this.textNodeByLineIndex;
 	}
 
 	private generateTokensForNode(node: Node, lineIndex: number, line: string): void {
 		if (node.isTextNode()) {
-			const sepIndx = line.indexOf(">>");
-			if (sepIndx === -1) {
+			const sepIndex = line.indexOf(Constants.SEP_TEXT_NODE);
+			if (sepIndex === -1) {
 				return;
 			}
-
-			const head = line.substring(0, sepIndx);
-			const nsOpen = head.indexOf('(');
-			const nsClose = head.indexOf(')');
-
-			if (nsOpen !== -1 && nsClose !== -1) {
-				this.tokens.push({ line: lineIndex, startChar: 0, length: nsOpen, type: 'macro' });
-				this.tokens.push({ line: lineIndex, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
-				this.tokens.push({ line: lineIndex, startChar: nsClose + 1, length: line.length - nsClose - 1, type: 'macro' });
-			} else {
-				this.tokens.push({ line: lineIndex, startChar: 0, length: sepIndx, type: 'macro' });
-				this.tokens.push({ line: lineIndex, startChar: sepIndx, length: 2, type: 'macro' });
-			}
+			this.pushHeadTokens(lineIndex, line, sepIndex, Constants.SEP_TEXT_NODE.length, line.length, 'macro');
 		} else {
-			const colon = line.indexOf(':');
-			if (colon === -1) {
+			const sepIndex = line.indexOf(Constants.SEP_NODE);
+			if (sepIndex === -1) {
 				return;
 			}
+			this.pushHeadTokens(lineIndex, line, sepIndex, Constants.SEP_NODE.length, sepIndex + 1, 'property');
 
-			const head = line.substring(0, colon);
-			const nsOpen = head.indexOf('(');
-			const nsClose = head.indexOf(')');
-
-			if (nsOpen !== -1 && nsClose !== -1) {
-				this.tokens.push({ line: lineIndex, startChar: 0, length: nsOpen, type: 'property' });
-				this.tokens.push({ line: lineIndex, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
-				this.tokens.push({ line: lineIndex, startChar: nsClose + 1, length: colon - (nsClose + 1) + 1, type: 'property' });
-			} else {
-				this.tokens.push({ line: lineIndex, startChar: 0, length: colon, type: 'property' });
-				this.tokens.push({ line: lineIndex, startChar: colon, length: 1, type: 'property' });
-			}
-
-			const valueStart = colon + 1;
+			const valueStart = sepIndex + 1;
 			if (valueStart < line.length) {
 				this.tokens.push({ line: lineIndex, startChar: valueStart, length: line.length - valueStart, type: 'string' });
 			}
+		}
+	}
+
+	/**
+	 * The tokens of a node line's head: the name (coloured `type`), the namespace when the
+	 * line declares one, and the separator. With a namespace, everything from the closing
+	 * parenthesis up to `tailEnd` (the end of the line for a block, the separator inclusive
+	 * for an inline node) is one token; without one, the name and the separator are two.
+	 */
+	private pushHeadTokens(lineIndex: number, line: string, sepIndex: number, sepLength: number,
+		tailEnd: number, type: StxtTokenType): void {
+
+		const head = line.substring(0, sepIndex);
+		const nsOpen = head.indexOf('(');
+		const nsClose = head.indexOf(')');
+
+		if (nsOpen !== -1 && nsClose !== -1) {
+			this.tokens.push({ line: lineIndex, startChar: 0, length: nsOpen, type });
+			this.tokens.push({ line: lineIndex, startChar: nsOpen, length: nsClose - nsOpen + 1, type: 'namespace' });
+			this.tokens.push({ line: lineIndex, startChar: nsClose + 1, length: tailEnd - nsClose - 1, type });
+		} else {
+			this.tokens.push({ line: lineIndex, startChar: 0, length: sepIndex, type });
+			this.tokens.push({ line: lineIndex, startChar: sepIndex, length: sepLength, type });
 		}
 	}
 }
