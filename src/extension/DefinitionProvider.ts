@@ -54,7 +54,8 @@ export class StxtDefinitionProvider implements vscode.DefinitionProvider {
 		const onNamespace = headTokens.some(token => token.type === 'namespace'
 			&& position.character >= token.startChar && position.character <= token.startChar + token.length);
 
-		const text = new TextDecoder('utf-8').decode(await vscode.workspace.fs.readFile(location.uri));
+		// Strict decode (STXT-SPEC 3): invalid UTF-8 is an error, not U+FFFD
+		const text = new TextDecoder('utf-8', { fatal: true }).decode(await vscode.workspace.fs.readFile(location.uri));
 		const line = onNamespace ? rootLine(text) : definitionLine(text, node.getName(), namespace);
 
 		log.trace(`Definition of ${node.getQualifiedName()}: ${location.uri.toString()}:${line + 1}.`);

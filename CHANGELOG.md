@@ -4,6 +4,12 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [Unreleased]
+
+- Strict UTF-8 decodes (STXT-SPEC §3): a definition or document whose bytes are not valid
+  UTF-8 is a read error instead of being silently decoded with U+FFFD replacement
+  characters (`SchemaLoader.readFile`, `DefinitionProvider`).
+
 ## [0.16.0]
 
 Moves to `@stxt-lang/core` `^0.16.0` — no language changes: the core release carries the

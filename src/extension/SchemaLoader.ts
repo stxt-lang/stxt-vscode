@@ -96,7 +96,9 @@ class VscodeDiscoveryFileSystem implements DiscoveryFileSystem {
 
 	async readFile(pathKey: string): Promise<string> {
 		const bytes = await vscode.workspace.fs.readFile(this.uriOf(pathKey));
-		return new TextDecoder('utf-8').decode(bytes);
+		// Strict decode (STXT-SPEC 3): a definition that is not valid UTF-8 is a read error,
+		// never silently decoded with U+FFFD replacement characters.
+		return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
 	}
 
 	parentOf(pathKey: string): string | null {
