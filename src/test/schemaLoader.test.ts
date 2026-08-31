@@ -39,6 +39,16 @@ const USER_TEMPLATE = [
 	''
 ].join('\n');
 
+// A template reachable only through a symbolic link: it must NOT be loaded
+// (STXT-DISCOVERY-SPEC sections 3 and 10 — a resolution directory does not follow symlinks).
+const LEAK_TEMPLATE = [
+	'Template (@stxt.template): test.filtrado',
+	'\tStructure >>',
+	'\t\tNota (test.filtrado):',
+	'\t\t\tTitulo: (?)',
+	''
+].join('\n');
+
 // Two versions of the same namespace for the precedence test: the far one requires
 // Titulo, the near one makes it optional.
 const NESTED_FAR = [
@@ -163,6 +173,31 @@ describe('SchemaLoader', () => {
 			await ensureSchemasForDocument(asTextDocument(document));
 
 			assert.ok(getSchema(NAMESPACE), `Opening ${documentPath} did not load the ${NAMESPACE} schema.`);
+		});
+
+		it('does not follow a symbolic link in a resolution directory', async function () {
+			// A .stxt with a real template plus a symlink to an outside template of another namespace.
+			const linkRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'stxt-loader-symlink-'));
+			try {
+				const stxtDir = path.join(linkRoot, '.stxt');
+				fs.mkdirSync(stxtDir, { recursive: true });
+				fs.writeFileSync(path.join(stxtDir, 'real.stxt'), TEMPLATE, 'utf-8');
+
+				const outside = path.join(linkRoot, 'outside.stxt');
+				fs.writeFileSync(outside, LEAK_TEMPLATE, 'utf-8');
+				try {
+					fs.symlinkSync(outside, path.join(stxtDir, 'leak.stxt'), 'file');
+				} catch {
+					this.skip(); // the environment does not allow creating symbolic links
+				}
+
+				await register(linkRoot);
+
+				assert.ok(getSchema(NAMESPACE), 'the real template of the .stxt must be loaded');
+				assert.ok(!getSchema('test.filtrado'), 'a definition reached through a symlink must not be loaded');
+			} finally {
+				fs.rmSync(linkRoot, { recursive: true, force: true });
+			}
 		});
 	});
 
