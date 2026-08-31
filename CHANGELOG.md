@@ -4,6 +4,12 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.0]
+
+**First stable release**, on `@stxt-lang/core` `^1.0.0`. Functionally identical to 0.17.0: the
+number is the promise, not a change. What the 1.x line of the core freezes, and what it does
+not, is stated at [stxt.dev/lang-stability](https://stxt.dev/lang-stability).
+
 ## [0.17.0]
 
 Moves to `@stxt-lang/core` `^0.17.0`, the release of the external spec review: normative
