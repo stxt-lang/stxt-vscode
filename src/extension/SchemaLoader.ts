@@ -2,6 +2,7 @@ import vscode from 'vscode';
 import * as os from 'os';
 import * as path from 'path';
 import {
+	Constants,
 	DiscoveryDefinition,
 	DiscoveryEntry,
 	DiscoveryEnvironment,
@@ -14,6 +15,9 @@ import {
 	UnifiedSchemaProvider,
 } from '@stxt-lang/core';
 import { log } from './Log';
+
+/** Largest definition file a resolution directory loads: the parser's default input limit in characters, times the 4 bytes a character takes at most in UTF-8. */
+const MAX_DEFINITION_FILE_BYTES = 4 * Constants.DEFAULT_MAX_INPUT_SIZE;
 
 /**
  * Schema/template resolution according to STXT-DISCOVERY-SPEC (stxt-lang,
@@ -85,8 +89,11 @@ class VscodeDiscoveryFileSystem implements DiscoveryFileSystem {
 		// 3 and 10): a directory link could loop the descent, a file link could read a file from
 		// outside the .stxt/. A symlink has the SymbolicLink bit set in its FileType; filter
 		// those out so both directory and file links are omitted.
+		// A FileType.Unknown entry (a FIFO, socket or device) is neither: reading it could
+		// block forever, so it is omitted too.
 		return entries
-			.filter(([, type]) => (type & vscode.FileType.SymbolicLink) === 0)
+			.filter(([, type]) => (type & vscode.FileType.SymbolicLink) === 0
+				&& (type === vscode.FileType.File || type === vscode.FileType.Directory))
 			.map(([name, type]) => ({
 				path: this.track(vscode.Uri.joinPath(base, name)),
 				name,
@@ -95,6 +102,13 @@ class VscodeDiscoveryFileSystem implements DiscoveryFileSystem {
 	}
 
 	async readFile(pathKey: string): Promise<string> {
+		// A definition is parsed with the default limits (Constants.DEFAULT_MAX_INPUT_SIZE
+		// characters, at most 4 bytes each in UTF-8): a bigger file cannot be within them, so it
+		// is rejected by size before being read whole. The error becomes DISCOVERY_NOT_PARSEABLE.
+		const { size } = await vscode.workspace.fs.stat(this.uriOf(pathKey));
+		if (size > MAX_DEFINITION_FILE_BYTES) {
+			throw new Error(`Definition file larger than ${MAX_DEFINITION_FILE_BYTES} bytes: ${pathKey}`);
+		}
 		const bytes = await vscode.workspace.fs.readFile(this.uriOf(pathKey));
 		// Strict decode (STXT-SPEC 3): a definition that is not valid UTF-8 is a read error,
 		// never silently decoded with U+FFFD replacement characters.

@@ -4,6 +4,18 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.1]
+
+**Security patch**, on `@stxt-lang/core` `^1.0.1` (the security review of the core: template
+lines and namespaces without backtracking regexes, ASCII-only namespace lower-casing, bounded
+memory on hostile input; see its release notes). No language change.
+
+### Fixed
+
+- The discovery adapter omits `FileType.Unknown` entries (FIFOs, sockets, devices) from a
+  resolution directory — reading one could block the extension — and rejects a definition
+  file above 4 × the parser's default input limit before reading it whole.
+
 ## [1.0.0]
 
 **First stable release**, on `@stxt-lang/core` `^1.0.0`. Functionally identical to 0.17.0: the

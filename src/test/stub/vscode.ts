@@ -231,13 +231,20 @@ const workspaceFs = {
 		return fs.readdirSync(uri.fsPath, { withFileTypes: true })
 			.map((entry): [string, FileType] => {
 				// Report the SymbolicLink bit like the real API, so a symlink is distinguishable.
-				const base = entry.isDirectory() ? FileType.Directory : FileType.File;
+				const base = entry.isDirectory() ? FileType.Directory : entry.isFile() ? FileType.File : FileType.Unknown;
 				return [entry.name, (entry.isSymbolicLink() ? base | FileType.SymbolicLink : base) as FileType];
 			});
 	},
 
 	async readFile(uri: Uri): Promise<Uint8Array> {
 		return fs.readFileSync(uri.fsPath);
+	},
+
+	// The shape of the real FileStat: the loader reads `size` before reading a definition.
+	async stat(uri: Uri): Promise<{ type: FileType; ctime: number; mtime: number; size: number }> {
+		const st = fs.statSync(uri.fsPath);
+		const type = st.isDirectory() ? FileType.Directory : st.isFile() ? FileType.File : FileType.Unknown;
+		return { type, ctime: st.ctimeMs, mtime: st.mtimeMs, size: st.size };
 	}
 };
 

@@ -1,3 +1,4 @@
+import { Constants } from '@stxt-lang/core';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -197,6 +198,26 @@ describe('SchemaLoader', () => {
 				assert.ok(!getSchema('test.filtrado'), 'a definition reached through a symlink must not be loaded');
 			} finally {
 				fs.rmSync(linkRoot, { recursive: true, force: true });
+			}
+		});
+
+		// Security review of 2026-09-06: a definition above 4 × the parser's default input limit
+		// is rejected by size before being read whole; the rest of the level still loads.
+		it('rejects a definition file above the size bound without reading it', async () => {
+			const bigRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'stxt-loader-big-'));
+			try {
+				const stxtDir = path.join(bigRoot, '.stxt');
+				fs.mkdirSync(stxtDir, { recursive: true });
+				fs.writeFileSync(path.join(stxtDir, 'real.stxt'), TEMPLATE, 'utf-8');
+				const fd = fs.openSync(path.join(stxtDir, 'big.stxt'), 'w');
+				fs.ftruncateSync(fd, 4 * Constants.DEFAULT_MAX_INPUT_SIZE + 1); // sparse: nothing is written
+				fs.closeSync(fd);
+
+				await register(bigRoot);
+
+				assert.ok(getSchema(NAMESPACE), 'the real template of the .stxt must be loaded');
+			} finally {
+				fs.rmSync(bigRoot, { recursive: true, force: true });
 			}
 		});
 	});
