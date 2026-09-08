@@ -4,6 +4,15 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.2]
+
+**Maintenance release**, on `@stxt-lang/core` `^1.0.2`. The STXT specifications now carry a
+date and a status instead of a version number (STXT-SPEC §1.1; `Genesis` → `Aurora` → `Zenith`
+→ `Twilight`), and the core exposes the date of the STXT-SPEC text it implements as
+`SPEC_VERSION` (`2026-09-07`). The bundled core is the one that implements the dated
+specification. No change of its own; no language change. The full statement is at
+[stxt.dev/stability](https://stxt.dev/stability).
+
 ## [1.0.1]
 
 **Security patch**, on `@stxt-lang/core` `^1.0.1` (the security review of the core: template
