@@ -4,6 +4,21 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.3]
+
+**Security patch**, on `@stxt-lang/core` `^1.0.3`: a project-level `.stxt` that is a symbolic
+link forms no level (STXT-DISCOVERY-SPEC §4.1, §10, text of 2026-09-10). A cloned repository
+carrying `.stxt -> /` or `.stxt -> $HOME` made the extension walk that whole tree, parsing every
+file as a definition and showing the first line that failed to parse in a diagnostic. Links
+inside a resolution directory were already omitted (1.0.1). The user level, the system level
+and the `STXT_PATH` entries are still followed when they are links: `~/.stxt` linked to a
+dotfiles repository keeps working. No language change.
+
+### Changed
+
+- The discovery adapter implements the core's new `isSymbolicLink` through the SymbolicLink bit
+  of `vscode.workspace.fs.stat`; the test stub reports that bit like the real API.
+
 ## [1.0.2]
 
 **Maintenance release**, on `@stxt-lang/core` `^1.0.2`. The STXT specifications now carry a

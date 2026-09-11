@@ -240,11 +240,14 @@ const workspaceFs = {
 		return fs.readFileSync(uri.fsPath);
 	},
 
-	// The shape of the real FileStat: the loader reads `size` before reading a definition.
+	// The shape of the real FileStat: the loader reads `size` before reading a definition, and
+	// `type` carries the SymbolicLink bit alongside the target's type when the path is a link,
+	// like the real API.
 	async stat(uri: Uri): Promise<{ type: FileType; ctime: number; mtime: number; size: number }> {
+		const link = fs.lstatSync(uri.fsPath).isSymbolicLink();
 		const st = fs.statSync(uri.fsPath);
-		const type = st.isDirectory() ? FileType.Directory : st.isFile() ? FileType.File : FileType.Unknown;
-		return { type, ctime: st.ctimeMs, mtime: st.mtimeMs, size: st.size };
+		const base = st.isDirectory() ? FileType.Directory : st.isFile() ? FileType.File : FileType.Unknown;
+		return { type: (link ? base | FileType.SymbolicLink : base) as FileType, ctime: st.ctimeMs, mtime: st.mtimeMs, size: st.size };
 	}
 };
 

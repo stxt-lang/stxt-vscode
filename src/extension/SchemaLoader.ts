@@ -81,6 +81,19 @@ class VscodeDiscoveryFileSystem implements DiscoveryFileSystem {
 		}
 	}
 
+	async isSymbolicLink(pathKey: string): Promise<boolean> {
+		// Only consulted during the project-level ascent (STXT-DISCOVERY-SPEC section 4.1): the
+		// .stxt of an ancestor that is itself a link forms no level. `stat` reports a symbolic
+		// link with the SymbolicLink bit set alongside the type of its target.
+		try {
+			const { type } = await vscode.workspace.fs.stat(this.uriOf(pathKey));
+			return (type & vscode.FileType.SymbolicLink) !== 0;
+		} catch {
+			// The usual case is that the path does not exist: not an error.
+			return false;
+		}
+	}
+
 	async listDirectory(pathKey: string): Promise<DiscoveryEntry[]> {
 		const base = this.uriOf(pathKey);
 		const entries = await vscode.workspace.fs.readDirectory(base);

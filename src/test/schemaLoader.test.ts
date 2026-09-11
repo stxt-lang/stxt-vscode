@@ -201,6 +201,31 @@ describe('SchemaLoader', () => {
 			}
 		});
 
+		// STXT-DISCOVERY-SPEC sections 4.1 and 10: an ancestor .stxt that is itself a symbolic link
+		// forms no level (a cloned repository could carry `.stxt -> /`). The chain logic is the
+		// core's; this checks the adapter reports the link and the loader ends up without it.
+		it('does not take a workspace .stxt that is a symbolic link as a level', async function () {
+			const linkRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'stxt-loader-level-symlink-'));
+			try {
+				const outside = path.join(linkRoot, 'outside', 'defs');
+				fs.mkdirSync(outside, { recursive: true });
+				fs.writeFileSync(path.join(outside, 'leak.stxt'), LEAK_TEMPLATE, 'utf-8');
+				const project = path.join(linkRoot, 'project');
+				fs.mkdirSync(project);
+				try {
+					fs.symlinkSync(outside, path.join(project, '.stxt'), 'dir');
+				} catch {
+					this.skip(); // the environment does not allow creating symbolic links
+				}
+
+				await register(project);
+
+				assert.ok(!getSchema('test.filtrado'), 'a level reached through a symlink must not be loaded');
+			} finally {
+				fs.rmSync(linkRoot, { recursive: true, force: true });
+			}
+		});
+
 		// Security review of 2026-09-06: a definition above 4 × the parser's default input limit
 		// is rejected by size before being read whole; the rest of the level still loads.
 		it('rejects a definition file above the size bound without reading it', async () => {
