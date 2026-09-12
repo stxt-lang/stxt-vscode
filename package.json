@@ -2,7 +2,7 @@
   "name": "stxt",
   "displayName": "STXT Language",
   "description": "Language support for STXT: highlighting, validation against schemas and templates, completion, hover and formatting.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "publisher": "stxt-lang",
   "repository": {
     "type": "git",

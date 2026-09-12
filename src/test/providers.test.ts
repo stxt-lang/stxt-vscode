@@ -274,6 +274,16 @@ describeCorpus('Completion with the corpus schemas', root => {
 			`Content is TEXT, it should insert a block: "${content.insertText}".`);
 	});
 
+	it('proposes the ">>" block for children of type MARKDOWN, like TEXT', () => {
+		// dev.stxt.website of stxt-lang declares `Content: MARKDOWN` under Document
+		const parent = documentNode('Document (dev.stxt.website):');
+		const content = findSuggestionsByParent(parent, 'content')[0];
+
+		assert.ok(content, 'Content was not suggested.');
+		assert.strictEqual(content.insertText?.toString(), 'Content >>\n\t',
+			`Content is MARKDOWN, it should insert a block: "${content.insertText}".`);
+	});
+
 	it('offers the values of an ENUM and filters them by prefix', () => {
 		const priority = documentNode(`Document (${NAMESPACE}):\n\tPriority: high`).getChildren()[0];
 

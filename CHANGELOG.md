@@ -4,6 +4,15 @@ All notable changes to the "stxt" extension are documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.0.4]
+
+### Fixed
+
+- Completion offers nodes of type `MARKDOWN` as text blocks (`Name >>` plus a fresh indented
+  line), like `TEXT` and `BLOCK`; they were offered inline (`Name: `).
+- The block form of a suggestion that spells out its namespace now reads `Name (ns) >>`, with
+  the space before `>>` of the canonical form; it was written without it.
+
 ## [1.0.3]
 
 **Security patch**, on `@stxt-lang/core` `^1.0.3`: a project-level `.stxt` that is a symbolic

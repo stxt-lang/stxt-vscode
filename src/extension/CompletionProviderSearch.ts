@@ -103,7 +103,7 @@ function createCompletionItem(name: string, namespace: string, isText: boolean, 
 
 	if (includeNamespace) {
 		if (isText) {
-			item.insertText = `${name} (${namespace})>>\n\t`;
+			item.insertText = `${name} (${namespace}) >>\n\t`;
 		} else {
 			item.insertText = `${name} (${namespace}): `;
 		}
@@ -119,9 +119,14 @@ function createCompletionItem(name: string, namespace: string, isText: boolean, 
 	return item;
 }
 
+/**
+ * Whether a node of this type is written as a text block. `MARKDOWN` is a text type like `TEXT`
+ * (STXT-SCHEMA-SPEC §9.7): both admit the inline form, but their content is prose and is
+ * written as a block.
+ */
 function isBlockTextNode(nodeDef: NodeDefinition): boolean {
 	const type = nodeDef.getType();
-	return type === "TEXT" || type === "BLOCK";
+	return type === "TEXT" || type === "BLOCK" || type === "MARKDOWN";
 }
 
 function isBlockText(childDef: ChildDefinition): boolean {
