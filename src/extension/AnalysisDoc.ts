@@ -58,7 +58,7 @@ export function parserLimits(document: vscode.TextDocument): ParserOptions {
  *
  * The cold case is real and must be covered: VS Code asks for the semantic tokens as
  * soon as it paints the document, and that may arrive before the `onDidOpenTextDocument`
- * that analyzes it —or before the initial schema load, which is asynchronous, finishes—.
+ * that analyzes it, or before the initial schema load, which is asynchronous, finishes.
  * A provider that only looked at the cache would return nothing and the document would
  * stay **uncolored until it was edited**.
  *

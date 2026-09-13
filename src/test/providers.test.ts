@@ -46,7 +46,7 @@ function labelsOf(items: readonly { label: string | { label: string } }[]): stri
 describe('TokenGeneratorObserver', () => {
 
 	it('colours an inline node: name, colon and value', () => {
-		// "Nombre: valor" — the colon is at position 6.
+		// "Nombre: valor", the colon is at position 6.
 		assert.deepStrictEqual(tokensOf('Nombre: valor'), [
 			'0:0+6 property',
 			'0:6+1 property',
@@ -55,7 +55,7 @@ describe('TokenGeneratorObserver', () => {
 	});
 
 	it('colours the namespace of an inline node apart from the name', () => {
-		// "Nodo (ns.uno): v" — parentheses at 5 and 12, colon at 13.
+		// "Nodo (ns.uno): v", parentheses at 5 and 12, colon at 13.
 		assert.deepStrictEqual(tokensOf('Nodo (ns.uno): v'), [
 			'0:0+5 property',
 			'0:5+8 namespace',
@@ -486,7 +486,7 @@ describeCorpus('Hover with the corpus definitions', root => {
 
 	it('in normal mode shows the type and the allowed values of an ENUM without a description', () => {
 		const text = hoverText('Document (org.example.enum.test):\n\tPriority: high', 1, false);
-		assert.strictEqual(text?.trim(), '**Type:** `ENUM` — `high`, `medium`, `low`');
+		assert.strictEqual(text?.trim(), '**Type:** `ENUM` (`high`, `medium`, `low`)');
 	});
 
 	it('in normal mode shows nothing for a namespace with no grammar loaded', () => {

@@ -5,7 +5,7 @@ let channel: vscode.LogOutputChannel | undefined;
 /**
  * The "STXT" channel of the Output panel. It is a LogOutputChannel, so VS Code stamps
  * every line with a timestamp and a level and honours the level chosen with the
- * "Developer: Set Log Level…" command. That level defaults to Info: whatever is
+ * "Developer: Set Log Level..." command. That level defaults to Info: whatever is
  * logged with trace() does not reach the panel unless the user raises it.
  */
 export function getLogChannel(): vscode.LogOutputChannel {

@@ -7,10 +7,10 @@ import { getSchemaForDocument } from './SchemaLoader';
  * Hover over a node. Two modes, chosen by the `stxt.developerMode` setting:
  *
  * - **Normal** (the default): what the schema or template of the namespace says about the node
- *   — its `Description`, its type and, for an `ENUM`, the allowed values — the documentation of
+ *, its `Description`, its type and, for an `ENUM`, the allowed values, the documentation of
  *   the grammar, meant for whoever writes the document. Node not declared, no hover.
- * - **Developer**: the technical card — form and level, names, value, schema type and allowed
- *   values, the description, the content of a text block — and a card for comments too.
+ * - **Developer**: the technical card, form and level, names, value, schema type and allowed
+ *   values, the description, the content of a text block, and a card for comments too.
  */
 export class StxtHoverProvider implements HoverProvider {
 	provideHover(document: TextDocument, position: Position): ProviderResult<Hover> {
@@ -106,9 +106,9 @@ function valueList(values: ReadonlySet<string>): string {
 	return Array.from(values).map(v => `\`${escapeMd(v)}\``).join(', ');
 }
 
-/** ` — a, b, c` after the type when there are allowed values (an ENUM); nothing otherwise. */
+/** ` (a, b, c)` after the type when there are allowed values (an ENUM); nothing otherwise. */
 function allowedValues(values: ReadonlySet<string>): string {
-	return values.size > 0 ? ` — ${valueList(values)}` : '';
+	return values.size > 0 ? ` (${valueList(values)})` : '';
 }
 
 // Minimal escaping so backticks do not break the inline markdown

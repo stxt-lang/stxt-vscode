@@ -14,7 +14,7 @@ import { StxtSemanticTokensProvider } from '../extension/SemanticTokensProvider'
  * The providers read the analysis from the `AnalysisDoc` cache, so everything depends on
  * the document being analyzed by the time VS Code asks for the tokens, which is as soon as
  * it paints it. When it is not, the editor gets an empty list and the file stays black and
- * white until it is edited —the editor never asks again on its own—. The three paths by
+ * white until it is edited, the editor never asks again on its own. The three paths by
  * which a document reaches the provider are covered here.
  */
 
@@ -107,7 +107,7 @@ describe('activate: the document has colour from the very first moment', () => {
 
 	it('analyzes on the spot when asked about a document it has never seen', async () => {
 		// Safety net: VS Code may ask for the tokens before the open event, or while the
-		// initial schema load —which is asynchronous— is still in progress.
+		// initial schema load, which is asynchronous, is still in progress.
 		const document = new TestDocument(path.join(tempRoot, 'nunca-abierto.stxt'), DOCUMENT);
 		const from = logMessages.length;
 

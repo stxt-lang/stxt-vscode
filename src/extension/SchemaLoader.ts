@@ -22,8 +22,8 @@ const MAX_DEFINITION_FILE_BYTES = 4 * Constants.DEFAULT_MAX_INPUT_SIZE;
 /**
  * Schema/template resolution according to STXT-DISCOVERY-SPEC (stxt-lang,
  * `stxt-discovery-ref.stxt`): the normative logic lives in `DiscoveryResolver`
- * (@stxt-lang/core) and only the two editor adapters remain here —
- * `vscode.workspace.fs` and the process environment— plus the per-document state.
+ * (@stxt-lang/core) and only the two editor adapters remain here,
+ * `vscode.workspace.fs` and the process environment, plus the per-document state.
  *
  * The chain of each document (every ancestor `.stxt/`, user level, system level,
  * or `STXT_PATH`) is resolved by its directory and cached per directory; the loaded

@@ -9,7 +9,7 @@ const TEMPLATE_NAMESPACE = '@stxt.template';
 
 /**
  * "Go to definition" over a node: opens the schema or template that defines its namespace,
- * placed on the line that declares the node — `Node: Name` in a schema, the node's own line
+ * placed on the line that declares the node, `Node: Name` in a schema, the node's own line
  * inside `Structure >>` in a template. Over the namespace itself it opens the root of the
  * definition document.
  *

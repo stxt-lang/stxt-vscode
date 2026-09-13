@@ -46,7 +46,7 @@ memory on hostile input; see its release notes). No language change.
 ### Fixed
 
 - The discovery adapter omits `FileType.Unknown` entries (FIFOs, sockets, devices) from a
-  resolution directory — reading one could block the extension — and rejects a definition
+  resolution directory, reading one could block the extension, and rejects a definition
   file above 4 × the parser's default input limit before reading it whole.
 
 ## [1.0.0]
@@ -67,7 +67,7 @@ Moves to `@stxt-lang/core` `^0.17.0`, the release of the external spec review: n
 
 ## [0.16.0]
 
-Moves to `@stxt-lang/core` `^0.16.0` — no language changes: the core release carries the
+Moves to `@stxt-lang/core` `^0.16.0` with no language changes: the core release carries the
 hardening fixes of the ports security audit (bounded discovery descent, a linear `BASE64`
 check, strict blanks in template parsing) and error parity between the ports.
 
@@ -90,7 +90,7 @@ check, strict blanks in template parsing) and error parity between the ports.
 Moves to `@stxt-lang/core` `^0.15.0`, a language change (STXT-SPEC §10.3): the **final empty
 lines of a `>>` block are no longer content**. The sequence of empty lines after the last
 non-empty line of a block is discarded when the block closes, whether a shallower line closes
-it or the document ends — they were visual separation (or an editor's final line breaks), not
+it or the document ends, they were visual separation (or an editor's final line breaks), not
 content, and two visually identical documents now produce the same tree. Leading and
 intermediate empty lines are kept, an empty line still never closes a block, and a block whose
 lines are all blank is now as empty as a block with no lines.
@@ -109,8 +109,8 @@ are now rejected (`LIMIT_NESTING_EXCEEDED`, `LIMIT_LINE_LENGTH_EXCEEDED`,
 diagnostic of the document. The core also gains a streaming API (`StreamObserver`,
 `parseStream`) that the extension does not need.
 
-Three new settings — **`stxt.maxNesting`**, **`stxt.maxLineLength`** and
-**`stxt.maxInputSize`** — configure the limits per user or per workspace, next to
+Three new settings (**`stxt.maxNesting`**, **`stxt.maxLineLength`** and
+**`stxt.maxInputSize`**) configure the limits per user or per workspace, next to
 `stxt.schemaValidation` and `stxt.developerMode`; `-1` disables one, and the defaults are the
 recommended ones of the specification. Changing any STXT setting re-analyzes the open
 documents. **Format Document** parses with the same limits (via `Formatter` of the core
@@ -125,7 +125,7 @@ portal's favicon. No functional change.
 
 ## [0.13.0]
 
-Moves to `@stxt-lang/core` `^0.13.0`: the writing operations of STXT-TREE-SPEC §11–12 are now
+Moves to `@stxt-lang/core` `^0.13.0`: the writing operations of STXT-TREE-SPEC §11-12 are now
 normative. **Format Document** drops an initial BOM, as §12.1 says; otherwise the formatter
 behaves as before. Nothing else changes.
 
@@ -159,8 +159,8 @@ Moves to `@stxt-lang/core` `^0.11.0`, the preview of the 1.0 core. No visible ch
 Editor-only release, same `@stxt-lang/core` `^0.10.0`.
 
 - **New setting `stxt.schemaValidation`** (default `true`): validate documents against the
-  schemas and templates of their resolution chain. Off, only the syntax is checked — definition
-  documents are not checked against their meta-schema either — like `stxt validate --no-schema`.
+  schemas and templates of their resolution chain. Off, only the syntax is checked, definition
+  documents are not checked against their meta-schema either, like `stxt validate --no-schema`.
   Changing it re-analyzes every open document.
 - **`SCHEMA_NOT_FOUND` is no longer silenced when the chain has no definition at all.** With
   validation on, a namespace that no definition covers is a warning on each node, whatever else
@@ -197,7 +197,7 @@ Language release: `@stxt-lang/core` `^0.9.1`. No editor-only changes.
   `NODE_NOT_DEFINED_IN_SCHEMA` (was `NODE_NOT_EXIST_IN_SCHEMA`), `UNEXPECTED_ERROR` (was
   `VALIDATION_ERROR`), and the schema- and template-loading families (`SCHEMA_*`, `TEMPLATE_*`,
   `*_DUPLICATED`, `DESCRIPTION_*`, `REFERENCE_*`). The `SCHEMA_NOT_FOUND` filter is unchanged.
-- **Value types by grammar** (STXT-SCHEMA-SPEC 9.3–9.5): `URL` is an absolute URL with scheme and
+- **Value types by grammar** (STXT-SCHEMA-SPEC 9.3-9.5): `URL` is an absolute URL with scheme and
   host by the specification's own grammar; `DATE`, `TIME` and `TIMESTAMP` check calendar and clock
   ranges (`2026-02-30` and `24:00:00` are errors now); the `TIMESTAMP` fraction takes one or more
   digits; `NUMBER` is documented as not the JSON number.
@@ -210,7 +210,7 @@ Language release: `@stxt-lang/core` `^0.9.0`, which carries the one change of ST
 - **The indentation of a comment is validated like a node's** (STXT-SPEC 9, 11): only tabs or
   only groups of four spaces, never mixed on the same line, and at most one level deeper than
   the last node. A comment still produces no node and never moves the hierarchy. The errors are
-  the node ones — `MIXED_INDENTATION`, `INVALID_NUMBER_SPACES`, `INDENTATION_LEVEL_NOT_VALID` —
+  the node ones (`MIXED_INDENTATION`, `INVALID_NUMBER_SPACES`, `INDENTATION_LEVEL_NOT_VALID`)
   and show up as diagnostics on the comment line. Before, a comment could sit at any
   indentation. Formatting is unchanged in substance: the indentation units of a comment are
   still converted one for one to the editor's style; a comment with leftover spaces is now a
@@ -232,8 +232,8 @@ specifications dated 2026-08-20. No editor-only changes.
   no longer reports `SCHEMA_NOT_FOUND` for a node without a namespace, which is what the
   extension already did through `ConditionalValidator`; nothing changes on screen.
 - **Combining marks in node names** (STXT-SPEC 4.2). Names accept the Unicode categories `Mn`
-  and `Mc` besides letters and digits — Devanagari, Bengali, Tamil or Thai vowel signs, and
-  combining accents with no precomposed form — so `हिंदी: x` is no longer `INVALID_NODE_NAME`.
+  and `Mc` besides letters and digits, Devanagari, Bengali, Tamil or Thai vowel signs, and
+  combining accents with no precomposed form, so `हिंदी: x` is no longer `INVALID_NODE_NAME`.
   Enclosing marks (`Me`) are not allowed, and a name still needs at least one letter or digit.
 
 ## [0.7.4]
@@ -243,7 +243,7 @@ Editor-only release; the language and `@stxt-lang/core` `^0.7.1` are unchanged.
 - **Formatting converts the indentation of comments too.** A comment has no level of its own
   (STXT-SPEC does not validate its indentation), so *Format Document* used to leave it as
   written, and a document converted between tabs and spaces kept its comments in the old style.
-  Now the whole indentation units of a comment — tabs or groups of four spaces — are converted
+  Now the whole indentation units of a comment, tabs or groups of four spaces, are converted
   to the editor's style, one for one, and whatever follows them (the comment's own extra
   spacing and its text) is kept exactly as it is. Same rule as `stxt format` 0.7.3 of the CLI
   and the playground's re-indentation.
@@ -274,12 +274,12 @@ Editor-only release; the language and `@stxt-lang/core` `^0.7.1` are unchanged.
   default for `.stxt` is still tabs); it used to write tabs regardless. With spaces a level is
   always **four** spaces, whatever `editor.tabSize` says, because that is what STXT-SPEC allows.
 - **The lines of a `>>` block are re-indented too**, to the level of their block, keeping any
-  indentation of their own beyond it — the same thing `stxt format` of the CLI does. Blank lines
+  indentation of their own beyond it, the same thing `stxt format` of the CLI does. Blank lines
   inside a block stay empty (STXT-SPEC §10.3), comments and blank lines outside blocks are kept
   as written, and lines the parse tree does not describe are left untouched.
 - **New setting `stxt.developerMode`** (default off). Hovering a node now shows what its
-  schema or template declares for it — the description, the type and, for an `ENUM`, the
-  allowed values — the documentation of the grammar, meant for whoever writes the document;
+  schema or template declares for it, the description, the type and, for an `ENUM`, the
+  allowed values, the documentation of the grammar, meant for whoever writes the document;
   nothing when no grammar declares the node. Turning the setting on
   brings back the technical card (form and level, names, value, schema type and allowed
   values, text content) and the card over comments.
@@ -323,7 +323,7 @@ in-memory model and a round of housekeeping before publishing.
   `package.json` gains `homepage`, `bugs` and a fuller description; README documents completion,
   the output channel and the shared parser.
 
-- `@stxt-lang/core`: `SchemaProvider` contract — providers never throw "not found".
+- `@stxt-lang/core`: `SchemaProvider` contract: providers never throw "not found".
   `SchemaProviderMeta` and `MetaTemplateSchemaProvider` return `null` for any namespace but their
   own (they used to throw `RESOURCE_NOT_FOUND`), so a `SchemaValidator` over the default
   `SchemaProviderMemory` (whose parent is the meta provider) now reports `SCHEMA_NOT_FOUND` as a
@@ -351,7 +351,7 @@ A release about **where schemas come from**. Until now that answer was written h
 and it was the editor's own answer: the first `.stxt/` found on the way up. STXT now has a fourth
 normative specification, **STXT-DISCOVERY-SPEC** (`stxt-web/es/stxt-discovery-ref.stxt`), that
 defines resolution for every tool at once, and this version implements it. `@stxt-lang/core` moves
-to **0.6.0**, which is where the resolution logic now lives — so the extension and the `stxt`
+to **0.6.0**, which is where the resolution logic now lives, so the extension and the `stxt`
 command line resolve identically by construction, not by two implementations happening to agree.
 A project whose schemas sit in `<workspace>/.stxt/` behaves exactly as it did in 0.5.5.
 
@@ -374,15 +374,15 @@ A project whose schemas sit in `<workspace>/.stxt/` behaves exactly as it did in
   schemas: `SchemaLoaderExtension` now carries the document's Uri, and hover resolves the same way.
   Completion still reads the union of everything resolved, because a completion request has no
   document context to narrow it down.
-- **`SchemaLoader.ts` is now just the editor's side of the spec**: two adapters —
-  `vscode.workspace.fs` and the process environment — over `DiscoveryResolver`, plus per-directory
+- **`SchemaLoader.ts` is now just the editor's side of the spec**: two adapters
+  (`vscode.workspace.fs` and the process environment) over `DiscoveryResolver`, plus per-directory
   caching of the results and a `FileSystemWatcher` per resolution level. Any change on disk still
   clears the cache, re-resolves and re-analyses the open documents. `ensureSchemasForDocument()`
   keeps resolving a document's chain before analysing it, which is what covers opening a subfolder
   of a project whose `.stxt/` sits above the workspace root.
-- `npm test` is **410 passing**. `schemaLoader.test.ts` grew a suite for the chain itself — the
+- `npm test` is **410 passing**. `schemaLoader.test.ts` grew a suite for the chain itself, the
   user level loading alongside the project one, `STXT_PATH` replacing everything, and a nested
-  `.stxt/` validating against the nearest definition — and every registration in it now injects an
+  `.stxt/` validating against the nearest definition, and every registration in it now injects an
   isolated `DiscoveryEnvironment`, so the tests no longer depend on whatever `~/.stxt` the machine
   running them happens to have.
 
@@ -390,12 +390,12 @@ A project whose schemas sit in `<workspace>/.stxt/` behaves exactly as it did in
 
 An editor-layer release about **where the schemas come from and when the document gets analysed**.
 Nothing here is a new capability: it is three things that were wrong, and a document with `.stxt/`
-at the root of its workspace behaves exactly as it did in 0.5.4. `@stxt-lang/core` stays at 0.5.3 —
+at the root of its workspace behaves exactly as it did in 0.5.4. `@stxt-lang/core` stays at 0.5.3:
 no parser, schema or template behaviour changed.
 
 - **A document is coloured as soon as it is shown, without having to touch it first.** The providers
   read the analysis from the cache of `AnalysisDoc`, and nothing guaranteed the cache was warm when
-  VS Code asked for the semantic tokens — which it does the moment it paints the document, and does
+  VS Code asked for the semantic tokens, which it does the moment it paints the document, and does
   not ask again until an edit or a reopen invalidates it. So the file stayed black and white until
   it was touched. Two paths were losing that race: documents already open when the extension
   activates never get `onDidOpenTextDocument`, and were only analysed at the end of the initial
@@ -404,7 +404,7 @@ no parser, schema or template behaviour changed.
   the providers, the open handler analyses **before** awaiting the schema search, and `getAnalysis()`
   analyses on the spot if it is ever asked for a document the cache has not seen.
 - **A document with no schema anywhere is no longer reported as a problem.** `SCHEMA_NOT_FOUND` is
-  emitted by the validator for **every node** —the namespace is inherited from the parent— so
+  emitted by the validator for **every node**, the namespace is inherited from the parent, so
   opening a `.stxt` file where no schema had been loaded filled the whole file with warnings, one
   per line. It is now suppressed while no schema at all is loaded: STXT-SPEC §15 and §17.2 make
   schemas a separate and **optional** layer («@STXT@ **NO DEBE** imponer reglas semánticas
@@ -412,7 +412,7 @@ no parser, schema or template behaviour changed.
   soon as any schema is loaded the warning comes back, because then an unresolved namespace is
   usually a typo. Syntax errors are unaffected. The filter lives in `AnalysisDoc`, not in the core.
 - **The `.stxt` directory is now searched upwards**, from each workspace folder and from the folder
-  of every document that is opened, up to the first one that exists or to the filesystem root — the
+  of every document that is opened, up to the first one that exists or to the filesystem root, the
   same rule `tsconfig.json` and `.editorconfig` follow. Until now only `<workspace root>/.stxt` was
   read, so opening a subfolder of a project in VS Code, or a single file outside any folder, meant
   no schemas at all: no validation, no completion and no hover descriptions. Directories found
@@ -421,21 +421,21 @@ no parser, schema or template behaviour changed.
 - **`@vscode/test-cli` and `@vscode/test-electron` are out of `devDependencies`.** They were never
   used: the test suite runs on plain Node against `src/test/stub/vscode.ts`, so nothing here ever
   launched Electron. 0.5.4 kept them around for a possible smoke test of `activate()` and the
-  `FileSystemWatcher` — the one thing the stub cannot reach — but an unused dependency parked for a
+  `FileSystemWatcher`, the one thing the stub cannot reach, but an unused dependency parked for a
   test that does not exist yet is just install weight, and reinstalling them the day that test is
   written costs one command.
 - `npm test` is **391 passing**, with two new suites that do not use the stxt-web corpus, because
   what they check is not documents: `schemaLoader.test.ts` builds a throwaway tree with the schema
   one level above the workspace root, and `activation.test.ts` runs `activate()` itself and asks the
   provider for tokens at the exact instant it is registered. Each of its three tests fails if its
-  own fix is undone. That took the stub a bit further — it now serves the document events and the
-  `registerXProvider` calls — which is most of what the deferred smoke test of `activate()` needed.
+  own fix is undone. That took the stub a bit further: it now serves the document events and the
+  `registerXProvider` calls, which is most of what the deferred smoke test of `activate()` needed.
 
 ## [0.5.4]
 
 An editor-layer release: the extension no longer writes to the shared developer console, it
 gets its own test suite, and that suite immediately found two bugs in the formatter.
-`@stxt-lang/core` stays at 0.5.3 — no parser, schema or template behaviour changed.
+`@stxt-lang/core` stays at 0.5.3: no parser, schema or template behaviour changed.
 
 - **`npm test` exists again in this repository**: mocha over the compiled output, like
   `../../stxt-js`, but **without Electron**. Only four files of `src/` touch `vscode` at runtime,
@@ -443,7 +443,7 @@ gets its own test suite, and that suite immediately found two bugs in the format
   `src/test/register.ts` intercepts `require('vscode')` to hand it over. The providers therefore
   run in plain Node in under a second, and `@vscode/test-cli` / `@vscode/test-electron` stay
   unused, reserved for a future smoke test of `activate()`.
-- **380 tests, most of them invariants over the real corpus of `../../stxt-web`** — the same idea
+- **380 tests, most of them invariants over the real corpus of `../../stxt-web`**, the same idea
   as the sibling repository, so there are no fixtures to keep in sync. For each of its 44
   documents: every token falls inside its line, tokens are ordered and do not overlap, the
   relative encoding of the semantic tokens round-trips, formatting is idempotent and preserves
@@ -453,17 +453,17 @@ gets its own test suite, and that suite immediately found two bugs in the format
 - **The formatter no longer deletes the last line of a text block.** When the last line of the
   file held nothing but indentation it still belonged to the block, and right-trimming it left
   `""`, which at the end of a file is indistinguishable from the final line break: the block lost
-  that line. STXT-SPEC §10.3 requires empty lines inside a block —including trailing ones— to be
+  that line. STXT-SPEC §10.3 requires empty lines inside a block, including trailing ones, to be
   preserved. Six of the corpus documents were affected.
 - **The formatter no longer adds a trailing space to nodes with no value.** `Metadata:` came back
   as `Metadata: ` because the value was concatenated after `": "` without checking whether there
   was one. It changed no content, which is why only a targeted test caught it.
-- **The 22 `console.log` calls are gone** — 15 of them active, the other 7 left commented out. The
+- **The 22 `console.log` calls are gone**, 15 of them active, the other 7 left commented out. The
   five in `CompletionProvider` and `CompletionProviderSearch` fired on every keystroke inside a
   `.stxt` file, and all of them wrote into the Extension Host console shared by every extension.
   They now go through a new `extension/Log.ts`, which owns a **`STXT` channel in the Output panel**
   created with `{ log: true }`: VS Code timestamps each line, tags it with its level, and honours
-  the level chosen in *Developer: Set Log Level…*. Per-keystroke messages (analysis, completion) log at `trace`, so
+  the level chosen in *Developer: Set Log Level...*. Per-keystroke messages (analysis, completion) log at `trace`, so
   they are off by default; schema loading logs at `info`; a schema under `.stxt/**` that cannot be
   read or fails to load logs at `error`, which used to be indistinguishable from the rest. The
   commented-out `console.log` lines in `extension.ts` and `AnalysisDoc.ts` became `trace` calls
@@ -471,8 +471,8 @@ gets its own test suite, and that suite immediately found two bugs in the format
 - `language-configuration.json` stays **empty** (`{}`), and that is now a documented decision rather
   than an oversight. Comment, bracket and indentation rules were written into it during this release
   and then dropped again: every editor behaviour in this extension is derived from parsing the
-  document with `@stxt-lang/core`, so the language is defined in exactly one place — the core, which
-  follows the spec — instead of being restated as a second set of hand-written regular expressions
+  document with `@stxt-lang/core`, so the language is defined in exactly one place, the core, which
+  follows the spec, instead of being restated as a second set of hand-written regular expressions
   that drifts out of sync without anyone noticing.
 
 ## [0.5.3]
@@ -487,7 +487,7 @@ documented and in one language. No parser, schema or template behaviour changed.
 - **Every exported member now carries a JSDoc comment**, which `tsc` copies into the published
   `out/**/*.d.ts`: that is what a consumer of the package reads on hover in the editor, the
   TypeScript equivalent of the javadoc Java publishes to javadoc.io. The package went from **11
-  doc comments in 6 files** (4 of them tests) to **203 across all 59 source files** — the only one
+  doc comments in 6 files** (4 of them tests) to **203 across all 59 source files**, the only one
   left without any is `all.ts`, which is just re-exports.
 - The one exception message that was still in Spanish is now English: `NOT_STXT_SCHEMA` reads
   `Expected schema(...) but got ...`, the same text `stxt-java` emits. The error code is unchanged.
@@ -498,7 +498,7 @@ documented and in one language. No parser, schema or template behaviour changed.
 ## [0.5.2]
 
 - `@stxt-lang/core` now exports `ValidationException`, so the extension distinguishes schema warnings from syntax errors with `error instanceof ValidationException` instead of comparing `error.name` against the `'ValidationException'` string. Same behaviour, but the compiler checks it now.
-- The npm package got its public face: a `README.md` (the npm page was blank), a `LICENSE`, and `author`/`keywords`/`homepage`/`bugs` filled in. The licence is MIT across the whole `stxt-lang` org — `@stxt-lang/core` declared `ISC` until now, while this extension already said MIT.
+- The npm package got its public face: a `README.md` (the npm page was blank), a `LICENSE`, and `author`/`keywords`/`homepage`/`bugs` filled in. The licence is MIT across the whole `stxt-lang` org, `@stxt-lang/core` declared `ISC` until now, while this extension already said MIT.
 - The published tarball no longer ships `.js.map` files. `src/` is not published, so every source map dangled; dropping them takes it from 169 files / 38 kB to 115 / 27 kB.
 - No parser, schema or template behaviour changed in this release.
 
@@ -522,7 +522,7 @@ documented and in one language. No parser, schema or template behaviour changed.
 - Declaring `Children` in a schema `Node` whose type does not admit children (everything except `INLINE` and `GROUP`) now fails to load with `CHILDREN_NOT_ALLOWED_FOR_TYPE` (STXT-SCHEMA-SPEC 13.5). Same for template nodes that have children under a leaf type (STXT-TEMPLATE-SPEC 14.9).
 - `HEXADECIMAL` now follows STXT-SCHEMA-SPEC 9.5 exactly: any `[0-9A-Fa-f]+` string. The even-length requirement and the `#` prefix (inherited from the Java port) are gone; spec wins over code. The two `stxt-web` documents that used the CSS notation (`intro_programacion.stxt`, `receta_2.stxt`) were fixed there by dropping the `#`.
 - The binary types (`HEXADECIMAL`, `BINARY`, `BASE64`) validate the block form on the concatenation of lines, trimming each line (STXT-SCHEMA-SPEC 9.5). Whitespace *inside* a line is no longer silently removed before validating.
-- Value forms are now enforced per type (STXT-SCHEMA-SPEC 9.2–9.4): inline-only types (`NUMBER`, `DATE`, `BOOLEAN`, `ENUM`, `URL`, `EMAIL`, …) reject the `>>` block form with `NOT_ALLOWED_TEXT`; `BLOCK` requires the `>>` form and rejects inline nodes (even empty ones) with `BLOCK_FORM_REQUIRED`; `GROUP` rejects the `>>` form as well as inline values.
+- Value forms are now enforced per type (STXT-SCHEMA-SPEC 9.2-9.4): inline-only types (`NUMBER`, `DATE`, `BOOLEAN`, `ENUM`, `URL`, `EMAIL`, ...) reject the `>>` block form with `NOT_ALLOWED_TEXT`; `BLOCK` requires the `>>` form and rejects inline nodes (even empty ones) with `BLOCK_FORM_REQUIRED`; `GROUP` rejects the `>>` form as well as inline values.
 - The embedded meta-schema now declares `Values` with `Type: GROUP` (STXT-SCHEMA-SPEC 15.2), so `Values: texto` no longer passes meta-validation.
 - CLAUDE.md architecture notes updated: `Node` is mutable during parsing; `freeze()` no longer exists.
 

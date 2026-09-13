@@ -41,7 +41,7 @@ const USER_TEMPLATE = [
 ].join('\n');
 
 // A template reachable only through a symbolic link: it must NOT be loaded
-// (STXT-DISCOVERY-SPEC sections 3 and 10 — a resolution directory does not follow symlinks).
+// (STXT-DISCOVERY-SPEC sections 3 and 10, a resolution directory does not follow symlinks).
 const LEAK_TEMPLATE = [
 	'Template (@stxt.template): test.filtrado',
 	'\tStructure >>',
@@ -97,8 +97,8 @@ describe('SchemaLoader', () => {
 	 *     proyecto/sub/doc.stxt         ← what gets opened, two levels below
 	 *     vacio/                        ← a folder with no .stxt above it
 	 *     usuario/.stxt/personal.stxt   ← acts as the user level (injected)
-	 *     anidado/.stxt/                ← monorepo: far level…
-	 *     anidado/web/.stxt/            ← …and near level of the same namespace
+	 *     anidado/.stxt/                ← monorepo: far level...
+	 *     anidado/web/.stxt/            ← ...and near level of the same namespace
 	 */
 	before(() => {
 		tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'stxt-loader-'));

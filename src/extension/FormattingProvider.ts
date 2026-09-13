@@ -5,9 +5,9 @@ import { parserLimits } from './AnalysisDoc';
 /**
  * Formats a document with `Formatter` of `@stxt-lang/core`, the same formatter `stxt format` of
  * the CLI and the playground use: the lines that open a node are rewritten in canonical form,
- * the text lines of a `>>` block — its blank lines included — are re-indented to the level of
- * their block (keeping any indentation of their own beyond it), and every other line —
- * comments, blank lines, lines the parse tree does not describe because of a syntax error — is
+ * the text lines of a `>>` block, its blank lines included, are re-indented to the level of
+ * their block (keeping any indentation of their own beyond it), and every other line,
+ * comments, blank lines, lines the parse tree does not describe because of a syntax error, is
  * kept as the author wrote it, minus trailing whitespace and with its whole indentation units
  * converted to the editor's style. The rules are documented in the core.
  *

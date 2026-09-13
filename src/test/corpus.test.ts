@@ -17,8 +17,8 @@ import {
 /**
  * Editor-layer invariants over the real stxt-lang corpus.
  *
- * Language conformance is not checked here —the `../stxt-js` tests do that against the
- * same corpus— but what the extension does with documents already known to be valid:
+ * Language conformance is not checked here, the `../stxt-js` tests do that against the
+ * same corpus, but what the extension does with documents already known to be valid:
  * that it colours within the line, that it formats without changing what the document
  * says, and that it does not blow up at any cursor position.
  */
@@ -186,7 +186,7 @@ describeCorpus('stxt-lang corpus', root => {
 						try {
 							COMPLETION.provideCompletionItems(asTextDocument(document), asPosition(line, column));
 						} catch (e) {
-							assert.fail(`Completion broken at ${line + 1}:${column} — ${String(e)}`);
+							assert.fail(`Completion broken at ${line + 1}:${column}: ${String(e)}`);
 						}
 					}
 				}
@@ -202,7 +202,7 @@ describeCorpus('stxt-lang corpus', root => {
 							try {
 								HOVER.provideHover(asTextDocument(document), asPosition(line, 0));
 							} catch (e) {
-								assert.fail(`Hover broken on line ${line + 1} (developer mode ${developerMode}) — ${String(e)}`);
+								assert.fail(`Hover broken on line ${line + 1} (developer mode ${developerMode}): ${String(e)}`);
 							}
 						}
 					} finally {
@@ -218,7 +218,7 @@ describeCorpus('stxt-lang corpus', root => {
 					try {
 						await DEFINITION.provideDefinition(asTextDocument(document), asPosition(line, 0));
 					} catch (e) {
-						assert.fail(`Go to definition broken on line ${line + 1} — ${String(e)}`);
+						assert.fail(`Go to definition broken on line ${line + 1}: ${String(e)}`);
 					}
 				}
 			});
