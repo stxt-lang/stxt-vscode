@@ -23,7 +23,7 @@ import { registerSchemaLoader, getSchemas } from '../extension/SchemaLoader';
 /**
  * stxt-lang folders whose documents must validate without errors. They are deliberately
  * the same ones `../stxt-js` looks at, so that both repositories test the same set;
- * `examples/` and `tutorial/` are left out for that reason.
+ * `examples/` is left out for that reason.
  *
  * Schemas and templates are not listed here: the real `SchemaLoader` loads them, since it
  * already walks `<workspace>/.stxt/**` on its own (see `loadSchemas`).
